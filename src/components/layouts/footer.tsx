@@ -11,6 +11,7 @@ export const Footer = memo(() => (
     >
       <span className='text-default-600'>Powered by</span>
       <p className='text-primary'>HeroUI</p>
+      <span>v1.0.0</span>
     </Link>
   </footer>
 ))
