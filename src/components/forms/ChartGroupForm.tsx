@@ -171,6 +171,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
             'plant_ids',
             plants.map((plant) => plant.plant_id)
           )
+
           if (is_has_slider) {
             replaceSlideItem(
               charts
