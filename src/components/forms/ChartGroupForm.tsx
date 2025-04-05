@@ -184,7 +184,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                       acc[slideIndex] = { slide_charts: [] }
                     }
                     acc[slideIndex].slide_charts.push({
-                      _id: chart.id,
+                      _id: chart.chart_id,
                       name: chart.chart_name
                     })
 
@@ -196,7 +196,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
           } else {
             replaceChartItem(
               charts.map((chart) => ({
-                _id: chart.id,
+                _id: chart.chart_id,
                 name: chart.chart_name
               }))
             )
