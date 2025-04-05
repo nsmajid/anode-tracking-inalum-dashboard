@@ -369,7 +369,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
           }))
     }
 
-    const formData = new FormData()
+    const formData = new URLSearchParams()
 
     formData.append('dashboard_name', payload.dashboard_name)
     formData.append('dashboard_resolution_id', payload.dashboard_resolution_id)
@@ -387,7 +387,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
       setSubmitting(true)
       await api({
         url: apiUrl,
-        data: formData,
+        data: formData.toString(),
         method,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
