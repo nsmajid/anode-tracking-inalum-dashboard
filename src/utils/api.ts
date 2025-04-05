@@ -1,4 +1,4 @@
-import { API_KEY_HEADER, BASE_API_URL } from '@/config/constants'
+import { API_KEY_HEADER, BASE_API_URL, getAuthHeaders } from '@/config/constants'
 import axios from 'axios'
 
 const api = axios.create({
@@ -13,13 +13,13 @@ api.interceptors.request.use(
   async (config) => {
     // Do something before request is sent
 
-    // const customAuthHeaders = await getAuthHeaders()
+    const customAuthHeaders = await getAuthHeaders()
 
     // @ts-ignore
     config.headers = {
       ...config.headers,
-      ...API_KEY_HEADER
-      // ...customAuthHeaders
+      ...API_KEY_HEADER,
+      ...customAuthHeaders
     }
 
     return config
