@@ -1,7 +1,7 @@
 import { Button } from '@heroui/button'
 
 import AppLayout from '@/layouts/app'
-import { GetServerSidePropsContext } from 'next'
+import { GetStaticPropsContext } from 'next'
 
 export default function IndexPage() {
   return (
@@ -13,14 +13,14 @@ export default function IndexPage() {
   )
 }
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const { query } = context
-  const ids = query?.ids
+export const getStaticProps = async (context: GetStaticPropsContext) => {
+  const { params } = context
+  const ids = params?.ids
 
   if (ids) {
     return {
       redirect: {
-        destination: `/auth?${new URLSearchParams(query as Record<string, string>).toString()}`,
+        destination: `/auth?${new URLSearchParams(params as Record<string, string>).toString()}`,
         permanent: false
       }
     }
