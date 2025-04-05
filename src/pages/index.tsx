@@ -1,34 +1,20 @@
-import { Button } from '@heroui/button'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import AppLayout from '@/layouts/app'
-import { GetStaticPropsContext } from 'next'
 
 export default function IndexPage() {
-  return (
-    <div className='w-full'>
-      <Button variant='shadow' color='primary'>
-        Button
-      </Button>
-    </div>
-  )
-}
+  const router = useRouter()
 
-export const getStaticProps = async (context: GetStaticPropsContext) => {
-  const { params } = context
-  const ids = params?.ids
+  useEffect(() => {
+    const ids = router.query.ids
 
-  if (ids) {
-    return {
-      redirect: {
-        destination: `/auth?${new URLSearchParams(params as Record<string, string>).toString()}`,
-        permanent: false
-      }
+    if (ids) {
+      router.replace(`/auth?${new URLSearchParams(router.query as Record<string, string>).toString()}`)
     }
-  }
+  }, [router.query, router])
 
-  return {
-    props: {}
-  }
+  return <div className='w-full'>Welcome</div>
 }
 
 IndexPage.getLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>
