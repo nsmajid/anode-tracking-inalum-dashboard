@@ -248,18 +248,19 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
 
           const sourceChart = sourceSlide.slide_charts[sourceChartIndex]
 
-          newSlideItems[sourceIndex] = {
-            ...sourceSlide,
-            slide_charts: sourceSlide.slide_charts.filter((_, i) => i !== sourceChartIndex)
+          // Remove the chart from the source
+          sourceSlide.slide_charts.splice(sourceChartIndex, 1)
+
+          if (sourceIndex === destinationIndex) {
+            // If within the same group, just reorder
+            sourceSlide.slide_charts.splice(destinationChartIndex, 0, sourceChart)
+          } else {
+            // If different group, add the chart to the destination
+            destinationSlide.slide_charts.splice(destinationChartIndex, 0, sourceChart)
           }
-          newSlideItems[destinationIndex] = {
-            ...destinationSlide,
-            slide_charts: [
-              ...destinationSlide.slide_charts.slice(0, destinationChartIndex),
-              sourceChart,
-              ...destinationSlide.slide_charts.slice(destinationChartIndex)
-            ]
-          }
+
+          newSlideItems[sourceIndex] = { ...sourceSlide }
+          newSlideItems[destinationIndex] = { ...destinationSlide }
 
           replaceSlideItem(newSlideItems)
         }
