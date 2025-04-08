@@ -11,7 +11,13 @@ export default function AuthPage() {
       ids: (router.query?.ids || '') as string,
       uid: (router.query?.uid || '') as string
     })
-    router.replace('/')
+    const chartId = router.query?.id as string
+
+    if (chartId) {
+      router.replace(`/chart/${chartId}`)
+    } else {
+      router.replace('/')
+    }
   }, [router.query])
 
   return (
