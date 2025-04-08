@@ -6,7 +6,7 @@ import { DefaultApiResponse } from '@/types/api'
 import { getErrorMessage } from '@/utils/error'
 import toast from 'react-hot-toast'
 import { getAuthHeaders, UID_KEY } from '@/config/constants'
-import { Avatar, Skeleton, User } from '@heroui/react'
+import { Avatar, Skeleton } from '@heroui/react'
 import { title } from '@/components/primitives'
 
 export default function ProfilePage() {
