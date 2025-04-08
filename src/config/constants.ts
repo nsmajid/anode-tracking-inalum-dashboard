@@ -11,15 +11,15 @@ export const API_KEY_HEADER = {
   'DOLKODE-API-KEY': 'iDk77driVS'
 }
 
-const SESSION_KEY = {
+export const SESSION_KEY = {
   header: 'at-session',
   cookie: 'f4h3iu4h3f4h38hfu'
 }
-const UID_KEY = {
+export const UID_KEY = {
   header: 'at-uid',
   cookie: 'iu4h3f4h38hfu7y6t'
 }
-const REMOTE_ADDR_KEY = {
+export const REMOTE_ADDR_KEY = {
   header: 'at-remote-addr'
 }
 
