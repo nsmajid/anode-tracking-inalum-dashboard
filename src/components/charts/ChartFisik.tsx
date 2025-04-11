@@ -374,7 +374,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
           <div className='w-full'>
             <DateRangePicker
               className='max-w-xs'
-              label='Stay duration'
+              label={dateRangeProperties?.label_name}
               value={
                 dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
                   ? {

@@ -5,5 +5,6 @@ export enum EnumChartType {
 
 export enum EnumChartCode {
   FISIK = 'fisik',
-  KORELASI = 'korelasi'
+  KORELASI = 'korelasi',
+  GRADE = 'grade'
 }

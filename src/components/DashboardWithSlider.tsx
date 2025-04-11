@@ -11,6 +11,8 @@ import dynamic from 'next/dynamic'
 import { EnumChartCode } from '@/types/chart'
 
 const ChartFisik = dynamic(() => import('./charts/ChartFisik'), { ssr: false })
+const ChartKorelasi = dynamic(() => import('./charts/ChartKorelasi'), { ssr: false })
+const ChartGrade = dynamic(() => import('./charts/ChartGrade'), { ssr: false })
 
 const settings = {
   dots: false,
@@ -79,6 +81,8 @@ const DashboardWithSlider: React.FC<Props> = ({ dashboard, charts }) => {
             {charts.map((chart, idx) => (
               <div key={idx} className='w-full'>
                 {chart.chart_code === EnumChartCode.FISIK && <ChartFisik chart={chart} />}
+                {chart.chart_code === EnumChartCode.KORELASI && <ChartKorelasi chart={chart} />}
+                {chart.chart_code === EnumChartCode.GRADE && <ChartGrade chart={chart} />}
               </div>
             ))}
           </div>

@@ -13,6 +13,8 @@ import { EnumChartCode, EnumChartType } from '@/types/chart'
 import DashboardWithSlider from '@/components/DashboardWithSlider'
 
 const ChartFisik = dynamic(() => import('@/components/charts/ChartFisik'), { ssr: false })
+const ChartKorelasi = dynamic(() => import('@/components/charts/ChartKorelasi'), { ssr: false })
+const ChartGrade = dynamic(() => import('@/components/charts/ChartGrade'), { ssr: false })
 
 export default function ChartPage() {
   const router = useRouter()
@@ -81,6 +83,8 @@ export default function ChartPage() {
       {charts.map((chart) => (
         <div key={chart.id} className='w-full'>
           {chart.chart_code === EnumChartCode.FISIK && <ChartFisik chart={chart} />}
+          {chart.chart_code === EnumChartCode.KORELASI && <ChartKorelasi chart={chart} />}
+          {chart.chart_code === EnumChartCode.GRADE && <ChartGrade chart={chart} />}
         </div>
       ))}
     </div>
