@@ -11,10 +11,10 @@ export default function AuthPage() {
       ids: (router.query?.ids || '') as string,
       uid: (router.query?.uid || '') as string
     })
-    const chartId = router.query?.id as string
+    const dashboardId = router.query?.id as string
 
-    if (chartId) {
-      router.replace(`/chart/${chartId}`)
+    if (dashboardId) {
+      router.replace(`/dashboard/${dashboardId}`)
     } else {
       router.replace('/')
     }
