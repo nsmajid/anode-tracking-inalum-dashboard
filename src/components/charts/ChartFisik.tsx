@@ -1,6 +1,20 @@
-import { Button, DateRangePicker, NumberInput, Select, SelectItem, Skeleton } from '@heroui/react'
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  DateRangePicker,
+  NumberInput,
+  Select,
+  SelectItem,
+  Skeleton
+} from '@heroui/react'
 import { parseDate } from '@internationalized/date'
 import { memo, useMemo, useState } from 'react'
+
+import ChartFisikPart1 from './chart-fisik-parts/ChartFisikPart1'
+import ChartFisikPart2 from './chart-fisik-parts/ChartFisikPart2'
+import ChartFisikPart3 from './chart-fisik-parts/ChartFisikPart3'
 
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
@@ -47,6 +61,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   } | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<{
     label_name: string
+    required: boolean
     start: {
       label_name: string
       name: string
@@ -198,6 +213,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       })
       setDateRangeProperties({
         label_name: daterange.label_name,
+        required: daterange.required,
         start: {
           ...daterange.value.start_daterange,
           label_name: `${daterange.label_name} ${daterange.value.start_daterange.label_name}`,
@@ -239,203 +255,218 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   return (
     <div className='w-full space-y-6'>
       <h3 className='text-2xl font-semibold text-center'>{chartData?.chart_name}</h3>
-      <div className='w-full space-y-2'>
-        <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
-          <div className='w-full'>
-            <Select
-              className='max-w-xs'
-              label={parametersProperties?.label_name}
-              placeholder={`Pilih ${parametersProperties?.label_name}`}
-              isRequired={parametersProperties?.required}
-              selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
-              onChange={(e) => {
-                const { value } = e.target
-
-                setParametersProperties((current) => (current ? { ...current, value } : current))
-              }}
-            >
-              {(parametersProperties?.options || []).map((option) => (
-                <SelectItem key={option}>{option}</SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div className='w-full space-y-1'>
-            <div className='w-full flex items-center gap-2'>
+      <Card className='w-full space-y-2'>
+        <CardHeader>
+          <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
+            <div className='w-full'>
               <Select
-                className='w-full max-w-[13rem]'
-                label={lotProperties?.label_name}
-                placeholder={`Pilih ${lotProperties?.label_name}`}
-                isRequired={lotProperties?.required}
-                isDisabled={!parametersProperties?.value}
-                selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
+                className='max-w-xs'
+                label={parametersProperties?.label_name}
+                placeholder={`Pilih ${parametersProperties?.label_name}`}
+                isRequired={parametersProperties?.required}
+                selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
                 onChange={(e) => {
                   const { value } = e.target
 
-                  setLotProperties((current) => (current ? { ...current, value } : current))
-                  setCycleProperties((current) =>
+                  setParametersProperties((current) => (current ? { ...current, value } : current))
+                }}
+              >
+                {(parametersProperties?.options || []).map((option) => (
+                  <SelectItem key={option}>{option}</SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div className='w-full space-y-1'>
+              <div className='w-full flex items-center gap-2'>
+                <Select
+                  className='w-full max-w-[13rem]'
+                  label={lotProperties?.label_name}
+                  placeholder={`Pilih ${lotProperties?.label_name}`}
+                  isRequired={lotProperties?.required}
+                  isDisabled={!parametersProperties?.value}
+                  selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
+                  onChange={(e) => {
+                    const { value } = e.target
+
+                    setLotProperties((current) => (current ? { ...current, value } : current))
+                    setCycleProperties((current) =>
+                      current
+                        ? { ...current, start: { ...current.start, value: null }, end: { ...current.end, value: null } }
+                        : current
+                    )
+                  }}
+                >
+                  {(lotProperties?.options || []).map((option) => (
+                    <SelectItem key={option.lot}>{option.lot}</SelectItem>
+                  ))}
+                </Select>
+                <div className='inline-flex items-center gap-2'>
+                  <NumberInput
+                    className='w-full max-w-[15rem]'
+                    label={`${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`}
+                    isDisabled={!lotProperties?.value}
+                    isRequired={cycleProperties?.start?.required}
+                    minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
+                    maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
+                    value={cycleProperties?.start?.value ? Number(cycleProperties?.start?.value) : 0}
+                    onValueChange={(value) => {
+                      setCycleProperties((current) =>
+                        current
+                          ? {
+                              ...current,
+                              start: {
+                                ...current.start,
+                                value: `${value}`
+                              },
+                              end: {
+                                ...current.end,
+                                value: null
+                              }
+                            }
+                          : current
+                      )
+                    }}
+                  />
+                  <div>-</div>
+                  <NumberInput
+                    className='w-full max-w-[15rem]'
+                    label={`${cycleProperties?.label_name} ${cycleProperties?.end.label_name}`}
+                    isDisabled={!lotProperties?.value || !cycleProperties?.start?.value}
+                    isRequired={cycleProperties?.end?.required}
+                    minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
+                    maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
+                    value={cycleProperties?.end?.value ? Number(cycleProperties?.end?.value) : 0}
+                    validate={(value) => {
+                      if (value < Number(cycleProperties?.start?.value || 0)) {
+                        return `${cycleProperties?.label_name} ${cycleProperties?.end.label_name} must be greater than ${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`
+                      }
+                      return true
+                    }}
+                    onValueChange={(value) => {
+                      setCycleProperties((current) =>
+                        current
+                          ? {
+                              ...current,
+                              end: {
+                                ...current.end,
+                                value: `${value}`
+                              }
+                            }
+                          : current
+                      )
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className='w-full'>
+              <DateRangePicker
+                className='max-w-xs'
+                label={dateRangeProperties?.label_name}
+                isRequired={dateRangeProperties?.required}
+                value={
+                  dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
+                    ? {
+                        start: parseDate(fixIsoDate(dateRangeProperties?.start?.value)),
+                        end: parseDate(fixIsoDate(dateRangeProperties?.end?.value))
+                      }
+                    : undefined
+                }
+                onChange={(value) => {
+                  setDateRangeProperties((current) =>
                     current
-                      ? { ...current, start: { ...current.start, value: null }, end: { ...current.end, value: null } }
+                      ? {
+                          ...current,
+                          start: {
+                            ...current.start,
+                            value: value?.start?.toString?.() || null
+                          },
+                          end: {
+                            ...current.end,
+                            value: value?.end?.toString?.() || null
+                          }
+                        }
                       : current
                   )
                 }}
-              >
-                {(lotProperties?.options || []).map((option) => (
-                  <SelectItem key={option.lot}>{option.lot}</SelectItem>
-                ))}
-              </Select>
-              <div className='inline-flex items-center gap-2'>
-                <NumberInput
-                  className='w-full max-w-[15rem]'
-                  label={`${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`}
-                  isDisabled={!lotProperties?.value}
-                  isRequired={cycleProperties?.start?.required}
-                  minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
-                  maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
-                  value={cycleProperties?.start?.value ? Number(cycleProperties?.start?.value) : 0}
-                  onValueChange={(value) => {
-                    setCycleProperties((current) =>
-                      current
-                        ? {
-                            ...current,
-                            start: {
-                              ...current.start,
-                              value: `${value}`
-                            },
-                            end: {
-                              ...current.end,
-                              value: null
-                            }
-                          }
-                        : current
-                    )
-                  }}
-                />
-                <div>-</div>
-                <NumberInput
-                  className='w-full max-w-[15rem]'
-                  label={`${cycleProperties?.label_name} ${cycleProperties?.end.label_name}`}
-                  isDisabled={!lotProperties?.value || !cycleProperties?.start?.value}
-                  isRequired={cycleProperties?.end?.required}
-                  minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
-                  maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
-                  value={cycleProperties?.end?.value ? Number(cycleProperties?.end?.value) : 0}
-                  onValueChange={(value) => {
-                    setCycleProperties((current) =>
-                      current
-                        ? {
-                            ...current,
-                            end: {
-                              ...current.end,
-                              value: `${value}`
-                            }
-                          }
-                        : current
-                    )
-                  }}
-                />
-              </div>
+              />
             </div>
-          </div>
-          <div className='w-full'>
-            <DateRangePicker
-              className='max-w-xs'
-              label={dateRangeProperties?.label_name}
-              value={
-                dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
-                  ? {
-                      start: parseDate(fixIsoDate(dateRangeProperties?.start?.value)),
-                      end: parseDate(fixIsoDate(dateRangeProperties?.end?.value))
-                    }
-                  : undefined
-              }
-              onChange={(value) => {
-                setDateRangeProperties((current) =>
-                  current
-                    ? {
-                        ...current,
-                        start: {
-                          ...current.start,
-                          value: value?.start?.toString?.() || null
-                        },
-                        end: {
-                          ...current.end,
-                          value: value?.end?.toString?.() || null
-                        }
-                      }
-                    : current
-                )
-              }}
-            />
-          </div>
-          <div className='w-full flex justify-end'>
-            <Button type='submit' color='primary'>
-              Tampilkan
-            </Button>
-          </div>
-        </form>
-        <div className='w-full aspect-[10/5] flex border'>
-          <div className='m-auto'>[chart part 1]</div>
-        </div>
-      </div>
-      <div className='w-full space-y-2'>
-        <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
-          <div className='w-full'>
-            <Select
-              className='max-w-xs'
-              label={categoryProperties?.label_name}
-              placeholder={`Pilih ${categoryProperties?.label_name}`}
-              isRequired={categoryProperties?.required}
-              selectedKeys={categoryProperties?.value ? [categoryProperties?.value] : []}
-              onChange={(e) => {
-                const { value } = e.target
+            <div className='w-full flex justify-end'>
+              <Button type='submit' color='primary'>
+                Tampilkan
+              </Button>
+            </div>
+          </form>
+        </CardHeader>
+        <CardBody className='w-full'>
+          <ChartFisikPart1 />
+        </CardBody>
+      </Card>
+      <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-6'>
+        <Card className='w-full space-y-2'>
+          <CardHeader>
+            <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
+              <div className='w-full'>
+                <Select
+                  className='max-w-xs'
+                  label={categoryProperties?.label_name}
+                  placeholder={`Pilih ${categoryProperties?.label_name}`}
+                  isRequired={categoryProperties?.required}
+                  selectedKeys={categoryProperties?.value ? [categoryProperties?.value] : []}
+                  onChange={(e) => {
+                    const { value } = e.target
 
-                setCategoryProperties((current) => (current ? { ...current, value } : current))
-              }}
-            >
-              {(categoryProperties?.options || []).map((option) => (
-                <SelectItem key={option}>{option}</SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div className='w-full flex justify-end'>
-            <Button type='submit' color='primary'>
-              Tampilkan
-            </Button>
-          </div>
-        </form>
-        <div className='w-full aspect-[10/5] flex border'>
-          <div className='m-auto'>[chart part 2]</div>
-        </div>
-      </div>
-      <div className='w-full space-y-2'>
-        <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
-          <div className='w-full'>
-            <Select
-              className='max-w-xs'
-              label={numericProperties?.label_name}
-              placeholder={`Pilih ${numericProperties?.label_name}`}
-              isRequired={numericProperties?.required}
-              selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
-              onChange={(e) => {
-                const { value } = e.target
+                    setCategoryProperties((current) => (current ? { ...current, value } : current))
+                  }}
+                >
+                  {(categoryProperties?.options || []).map((option) => (
+                    <SelectItem key={option}>{option}</SelectItem>
+                  ))}
+                </Select>
+              </div>
+              <div className='w-full flex justify-end'>
+                <Button type='submit' color='primary'>
+                  Tampilkan
+                </Button>
+              </div>
+            </form>
+          </CardHeader>
+          <CardBody className='w-full'>
+            <ChartFisikPart2 />
+          </CardBody>
+        </Card>
+        <Card className='w-full space-y-2'>
+          <CardHeader>
+            <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
+              <div className='w-full'>
+                <Select
+                  className='max-w-xs'
+                  label={numericProperties?.label_name}
+                  placeholder={`Pilih ${numericProperties?.label_name}`}
+                  isRequired={numericProperties?.required}
+                  selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
+                  onChange={(e) => {
+                    const { value } = e.target
 
-                setNumericProperties((current) => (current ? { ...current, value } : current))
-              }}
-            >
-              {(numericProperties?.options || []).map((option) => (
-                <SelectItem key={option}>{option}</SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div className='w-full flex justify-end'>
-            <Button type='submit' color='primary'>
-              Tampilkan
-            </Button>
-          </div>
-        </form>
-        <div className='w-full aspect-[10/5] flex border'>
-          <div className='m-auto'>[chart part 3]</div>
-        </div>
+                    setNumericProperties((current) => (current ? { ...current, value } : current))
+                  }}
+                >
+                  {(numericProperties?.options || []).map((option) => (
+                    <SelectItem key={option}>{option}</SelectItem>
+                  ))}
+                </Select>
+              </div>
+              <div className='w-full flex justify-end'>
+                <Button type='submit' color='primary'>
+                  Tampilkan
+                </Button>
+              </div>
+            </form>
+          </CardHeader>
+          <CardBody className='w-full'>
+            <ChartFisikPart3 />
+          </CardBody>
+        </Card>
       </div>
     </div>
   )
