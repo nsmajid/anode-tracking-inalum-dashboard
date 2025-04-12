@@ -2,19 +2,15 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Spinner } from '@heroui/react'
-import dynamic from 'next/dynamic'
 
 import ChartLayout from '@/layouts/chart'
 import { getErrorMessage } from '@/utils/error'
 import api from '@/utils/api'
 import { DefaultApiResponse } from '@/types/api'
 import { ChartItem, DashboardSettingItem } from '@/types/dashboard-settings'
-import { EnumChartCode, EnumChartType } from '@/types/chart'
+import { EnumChartType } from '@/types/chart'
 import DashboardWithSlider from '@/components/DashboardWithSlider'
-
-const ChartFisik = dynamic(() => import('@/components/charts/ChartFisik'), { ssr: false })
-const ChartKorelasi = dynamic(() => import('@/components/charts/ChartKorelasi'), { ssr: false })
-const ChartGrade = dynamic(() => import('@/components/charts/ChartGrade'), { ssr: false })
+import RenderCharts from '@/components/RenderCharts'
 
 export default function ChartPage() {
   const router = useRouter()
@@ -80,13 +76,7 @@ export default function ChartPage() {
 
   return (
     <div className='w-full space-y-6'>
-      {charts.map((chart) => (
-        <div key={chart.id} className='w-full'>
-          {chart.chart_code === EnumChartCode.FISIK && <ChartFisik chart={chart} />}
-          {chart.chart_code === EnumChartCode.KORELASI && <ChartKorelasi chart={chart} />}
-          {chart.chart_code === EnumChartCode.GRADE && <ChartGrade chart={chart} />}
-        </div>
-      ))}
+      <RenderCharts charts={charts} />
     </div>
   )
 }

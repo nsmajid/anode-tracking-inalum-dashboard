@@ -1,18 +1,13 @@
-import { ChartItem, DashboardSettingItem } from '@/types/dashboard-settings'
-
 import { memo, useMemo, useRef } from 'react'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import { ChevronLeft, ChevronRight } from 'react-feather'
 import clsx from 'clsx'
-import dynamic from 'next/dynamic'
 
-import { EnumChartCode } from '@/types/chart'
+import RenderCharts from './RenderCharts'
 
-const ChartFisik = dynamic(() => import('./charts/ChartFisik'), { ssr: false })
-const ChartKorelasi = dynamic(() => import('./charts/ChartKorelasi'), { ssr: false })
-const ChartGrade = dynamic(() => import('./charts/ChartGrade'), { ssr: false })
+import { ChartItem, DashboardSettingItem } from '@/types/dashboard-settings'
 
 const settings = {
   dots: false,
@@ -77,14 +72,8 @@ const DashboardWithSlider: React.FC<Props> = ({ dashboard, charts }) => {
         autoplaySpeed={dashboard?.dashboard_slide_timer ? Number(dashboard?.dashboard_slide_timer) * 60000 : undefined}
       >
         {Object.values(groupedChartsBySlide).map((charts, i) => (
-          <div key={i} className='w-full px-16'>
-            {charts.map((chart, idx) => (
-              <div key={idx} className='w-full'>
-                {chart.chart_code === EnumChartCode.FISIK && <ChartFisik chart={chart} />}
-                {chart.chart_code === EnumChartCode.KORELASI && <ChartKorelasi chart={chart} />}
-                {chart.chart_code === EnumChartCode.GRADE && <ChartGrade chart={chart} />}
-              </div>
-            ))}
+          <div key={i} className='w-full px-16 space-y-6'>
+            <RenderCharts charts={charts} />
           </div>
         ))}
       </Slider>
