@@ -1,25 +1,16 @@
 import { Button, DateRangePicker, NumberInput, Select, SelectItem, Skeleton } from '@heroui/react'
 import { parseDate } from '@internationalized/date'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { memo, useMemo, useState } from 'react'
 
-import { DefaultApiResponse } from '@/types/api'
 import { ChartItem } from '@/types/dashboard-settings'
-import api from '@/utils/api'
 import { fixIsoDate } from '@/utils/date'
-import { getErrorMessage } from '@/utils/error'
+import { useDisplayChart } from '@/hooks/display-chart'
 
 type Props = {
   chart: ChartItem
 }
 
 const ChartFisik: React.FC<Props> = ({ chart }) => {
-  const requesting = useRef<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [chartData, setChartData] = useState<{
-    chart_name: string
-  } | null>(null)
-
   // PART 1 filters
   const [parametersProperties, setParametersProperties] = useState<{
     label_name: string
@@ -97,171 +88,145 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       : null
   }, [lotProperties])
 
-  useEffect(() => {
-    if (requesting.current) return
-    ;(async () => {
-      try {
-        setLoading(true)
-        requesting.current = true
-        const { data } = await api.get<
-          DefaultApiResponse<{
-            meta: {
-              chart_name: string
-            }
-            chart: {
-              parts: {
-                1: {
-                  parameters: {
-                    default: string | null
+  const { loading, chartData } = useDisplayChart<{
+    chart: {
+      parts: {
+        1: {
+          parameters: {
+            default: string | null
+            label_name: string
+            name: string
+            required: boolean
+            value: string[]
+          }
+          filters: {
+            options: {
+              lot: {
+                label_name: string
+                name: string
+                default: string | null
+                required: boolean
+                value: Array<{
+                  lot: string
+                  start_cycle: string
+                  end_cycle: string
+                }>
+              }
+              cycle: {
+                label_name: string
+                value: {
+                  start_cycle: {
                     label_name: string
                     name: string
-                    required: boolean
-                    value: string[]
-                  }
-                  filters: {
-                    options: {
-                      lot: {
-                        label_name: string
-                        name: string
-                        default: string | null
-                        required: boolean
-                        value: Array<{
-                          lot: string
-                          start_cycle: string
-                          end_cycle: string
-                        }>
-                      }
-                      cycle: {
-                        label_name: string
-                        value: {
-                          start_cycle: {
-                            label_name: string
-                            name: string
-                            default: string | null
-                            required: boolean
-                          }
-                          end_cycle: {
-                            label_name: string
-                            name: string
-                            default: string | null
-                            required: boolean
-                          }
-                        }
-                      }
-                      daterange: {
-                        label_name: string
-                        value: {
-                          start_daterange: {
-                            label_name: string
-                            name: string
-                            default: string | null
-                            required: boolean
-                          }
-                          end_daterange: {
-                            label_name: string
-                            name: string
-                            default: string | null
-                            required: boolean
-                          }
-                        }
-                        required: false
-                      }
-                    }
-                  }
-                }
-                2: {
-                  categories: {
-                    label_name: string
-                    name: string
-                    value: string[]
                     default: string | null
                     required: boolean
                   }
-                }
-                3: {
-                  numerics: {
+                  end_cycle: {
                     label_name: string
                     name: string
-                    value: string[]
                     default: string | null
                     required: boolean
                   }
                 }
               }
+              daterange: {
+                label_name: string
+                value: {
+                  start_daterange: {
+                    label_name: string
+                    name: string
+                    default: string | null
+                    required: boolean
+                  }
+                  end_daterange: {
+                    label_name: string
+                    name: string
+                    default: string | null
+                    required: boolean
+                  }
+                }
+                required: false
+              }
             }
-          }>
-        >('/api/display-chart', {
-          params: {
-            find: 'id',
-            id: chart.id
           }
-        })
-
-        setChartData({
-          chart_name: data.data.meta.chart_name
-        })
-
-        const { parameters, filters } = data.data.chart.parts[1]
-        const { lot, cycle, daterange } = filters.options
-
-        setParametersProperties({
-          ...parameters,
-          options: parameters.value,
-          value: parameters.default || null
-        })
-        setLotProperties({
-          ...lot,
-          options: lot.value,
-          value: lot.default || null
-        })
-        setCycleProperties({
-          label_name: cycle.label_name,
-          start: {
-            ...cycle.value.start_cycle,
-            value: cycle.value.start_cycle.default || null
-          },
-          end: {
-            ...cycle.value.end_cycle,
-            value: cycle.value.end_cycle.default || null
+        }
+        2: {
+          categories: {
+            label_name: string
+            name: string
+            value: string[]
+            default: string | null
+            required: boolean
           }
-        })
-        setDateRangeProperties({
-          label_name: daterange.label_name,
-          start: {
-            ...daterange.value.start_daterange,
-            label_name: `${daterange.label_name} ${daterange.value.start_daterange.label_name}`,
-            value: daterange.value.start_daterange.default || null
-          },
-          end: {
-            ...daterange.value.end_daterange,
-            label_name: `${daterange.label_name} ${daterange.value.end_daterange.label_name}`,
-            value: daterange.value.end_daterange.default || null
+        }
+        3: {
+          numerics: {
+            label_name: string
+            name: string
+            value: string[]
+            default: string | null
+            required: boolean
           }
-        })
-
-        const { categories } = data.data.chart.parts[2]
-
-        setCategoryProperties({
-          ...categories,
-          options: categories.value,
-          value: categories.default || null
-        })
-
-        const { numerics } = data.data.chart.parts[3]
-
-        setNumericProperties({
-          ...numerics,
-          options: numerics.value,
-          value: numerics.default || null
-        })
-      } catch (error) {
-        toast.error(getErrorMessage(error))
-      } finally {
-        setLoading(false)
-        requesting.current = false
+        }
       }
-    })()
-  }, [chart])
+    }
+  }>(chart.id, {
+    onLoadChart: (data) => {
+      const { parameters, filters } = data.chart.parts[1]
+      const { lot, cycle, daterange } = filters.options
+
+      setParametersProperties({
+        ...parameters,
+        options: parameters.value,
+        value: parameters.default || null
+      })
+      setLotProperties({
+        ...lot,
+        options: lot.value,
+        value: lot.default || null
+      })
+      setCycleProperties({
+        label_name: cycle.label_name,
+        start: {
+          ...cycle.value.start_cycle,
+          value: cycle.value.start_cycle.default || null
+        },
+        end: {
+          ...cycle.value.end_cycle,
+          value: cycle.value.end_cycle.default || null
+        }
+      })
+      setDateRangeProperties({
+        label_name: daterange.label_name,
+        start: {
+          ...daterange.value.start_daterange,
+          label_name: `${daterange.label_name} ${daterange.value.start_daterange.label_name}`,
+          value: daterange.value.start_daterange.default || null
+        },
+        end: {
+          ...daterange.value.end_daterange,
+          label_name: `${daterange.label_name} ${daterange.value.end_daterange.label_name}`,
+          value: daterange.value.end_daterange.default || null
+        }
+      })
+
+      const { categories } = data.chart.parts[2]
+
+      setCategoryProperties({
+        ...categories,
+        options: categories.value,
+        value: categories.default || null
+      })
+
+      const { numerics } = data.chart.parts[3]
+
+      setNumericProperties({
+        ...numerics,
+        options: numerics.value,
+        value: numerics.default || null
+      })
+    }
+  })
 
   if (loading) {
     return (

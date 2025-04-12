@@ -1,52 +1,15 @@
-import { DefaultApiResponse } from '@/types/api'
-import { ChartItem } from '@/types/dashboard-settings'
-import api from '@/utils/api'
-import { getErrorMessage } from '@/utils/error'
 import { Skeleton } from '@heroui/react'
-import { memo, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { memo } from 'react'
+
+import { useDisplayChart } from '@/hooks/display-chart'
+import { ChartItem } from '@/types/dashboard-settings'
 
 type Props = {
   chart: ChartItem
 }
 
 const ChartKorelasi: React.FC<Props> = ({ chart }) => {
-  const requesting = useRef<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [chartData, setChartData] = useState<{
-    chart_name: string
-  } | null>(null)
-
-  useEffect(() => {
-    if (requesting.current) return
-    ;(async () => {
-      try {
-        setLoading(true)
-        requesting.current = true
-        const { data } = await api.get<
-          DefaultApiResponse<{
-            meta: {
-              chart_name: string
-            }
-          }>
-        >('/api/display-chart', {
-          params: {
-            find: 'id',
-            id: chart.id
-          }
-        })
-
-        setChartData({
-          chart_name: data.data.meta.chart_name
-        })
-      } catch (error) {
-        toast.error(getErrorMessage(error))
-      } finally {
-        setLoading(false)
-        requesting.current = false
-      }
-    })()
-  }, [chart])
+  const { loading, chartData } = useDisplayChart(chart.id)
 
   if (loading) {
     return (
