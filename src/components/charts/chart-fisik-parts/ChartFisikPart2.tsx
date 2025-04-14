@@ -1,15 +1,28 @@
+import { Spinner } from '@heroui/react'
 import { memo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 
-const ChartFisikPart2: React.FC = () => {
+import { ChartFisikPart2Data } from '@/types/chart'
+
+type Props = {
+  loading: boolean
+  data: ChartFisikPart2Data | null
+}
+
+const ChartFisikPart2: React.FC<Props> = ({ loading, data }) => {
   return (
-    <div className='w-full'>
+    <div className='w-full relative'>
+      {loading && (
+        <div className='w-full absolute inset-0 bg-background/50 flex items-center justify-center z-10'>
+          <Spinner size='lg' />
+        </div>
+      )}
       <ReactApexChart
         type='bar'
         series={[
           {
             name: '',
-            data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            data: data?.datasets || []
           }
         ]}
         options={{
@@ -18,18 +31,21 @@ const ChartFisikPart2: React.FC = () => {
             height: 350
           },
           xaxis: {
-            categories: [
-              'Gedung 1',
-              'Gedung 2',
-              'Gedung 3',
-              'Gedung 4',
-              'Gedung 5',
-              'Gedung 6',
-              'Gedung 7',
-              'Gedung 8',
-              'Gedung 9',
-              'Gedung 0'
-            ]
+            title: {
+              text: data?.['x-label'] || '',
+              style: {
+                fontSize: '18px'
+              }
+            },
+            categories: data?.labels || []
+          },
+          yaxis: {
+            title: {
+              text: data?.['y-label'] || '',
+              style: {
+                fontSize: '18px'
+              }
+            }
           }
         }}
       />

@@ -10,7 +10,7 @@ import {
   Skeleton
 } from '@heroui/react'
 import { parseDate } from '@internationalized/date'
-import { memo, useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 import ChartFisikPart1 from './chart-fisik-parts/ChartFisikPart1'
 import ChartFisikPart2 from './chart-fisik-parts/ChartFisikPart2'
@@ -19,6 +19,7 @@ import ChartFisikPart3 from './chart-fisik-parts/ChartFisikPart3'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { useDisplayChart } from '@/hooks/display-chart'
+import { ChartFisikPart1Data, ChartFisikPart2Data, ChartFisikPart3Data } from '@/types/chart'
 
 type Props = {
   chart: ChartItem
@@ -103,7 +104,15 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       : null
   }, [lotProperties])
 
-  const { loading, chartData } = useDisplayChart<{
+  const [part1Data, setPart1Data] = useState<ChartFisikPart1Data | null>(null)
+
+  const [loadingPart2, setLoadingPart2] = useState<boolean>(false)
+  const [part2Data, setPart2Data] = useState<ChartFisikPart2Data | null>(null)
+
+  const [loadingPart3, setLoadingPart3] = useState<boolean>(false)
+  const [part3Data, setPart3Data] = useState<ChartFisikPart3Data | null>(null)
+
+  const { loading, loadingChart, chartData, getDisplayChart } = useDisplayChart<{
     chart: {
       parts: {
         1: {
@@ -241,8 +250,208 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
         options: numerics.value,
         value: numerics.default || null
       })
+    },
+    onShowChart: (part, data) => {
+      if (part && data) {
+        const chart = (
+          data as {
+            chart: ChartFisikPart1Data
+          }
+        ).chart
+
+        if (part === '1') {
+          setPart1Data(chart)
+        }
+        if (part === '2') {
+          setPart2Data(chart)
+        }
+        if (part === '3') {
+          setPart3Data(chart)
+        }
+      }
     }
   })
+
+  const onSubmitChartPart2 = useCallback(() => {
+    let params: Record<string, string> = {
+      part: '2'
+    }
+
+    if (parametersProperties?.value) {
+      params = {
+        ...params,
+        [parametersProperties.name]: parametersProperties.value
+      }
+    }
+
+    if (lotProperties?.value) {
+      params = {
+        ...params,
+        [lotProperties.name]: lotProperties.value
+      }
+    }
+
+    if (cycleProperties?.start.value) {
+      params = {
+        ...params,
+        [cycleProperties.start.name]: cycleProperties.start.value
+      }
+    }
+
+    if (cycleProperties?.end.value) {
+      params = {
+        ...params,
+        [cycleProperties.end.name]: cycleProperties.end.value
+      }
+    }
+
+    if (dateRangeProperties?.start.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.start.name]: dateRangeProperties.start.value
+      }
+    }
+
+    if (dateRangeProperties?.end.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.end.name]: dateRangeProperties.end.value
+      }
+    }
+
+    if (categoryProperties?.value) {
+      params = {
+        ...params,
+        [categoryProperties.name]: categoryProperties.value
+      }
+    }
+
+    setLoadingPart2(true)
+    getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
+      setLoadingPart2(false)
+    })
+  }, [getDisplayChart, parametersProperties, lotProperties, cycleProperties, dateRangeProperties, categoryProperties])
+
+  const onSubmitChartPart3 = useCallback(() => {
+    let params: Record<string, string> = {
+      part: '3'
+    }
+
+    if (parametersProperties?.value) {
+      params = {
+        ...params,
+        [parametersProperties.name]: parametersProperties.value
+      }
+    }
+
+    if (lotProperties?.value) {
+      params = {
+        ...params,
+        [lotProperties.name]: lotProperties.value
+      }
+    }
+
+    if (cycleProperties?.start.value) {
+      params = {
+        ...params,
+        [cycleProperties.start.name]: cycleProperties.start.value
+      }
+    }
+
+    if (cycleProperties?.end.value) {
+      params = {
+        ...params,
+        [cycleProperties.end.name]: cycleProperties.end.value
+      }
+    }
+
+    if (dateRangeProperties?.start.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.start.name]: dateRangeProperties.start.value
+      }
+    }
+
+    if (dateRangeProperties?.end.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.end.name]: dateRangeProperties.end.value
+      }
+    }
+
+    if (numericProperties?.value) {
+      params = {
+        ...params,
+        [numericProperties.name]: numericProperties.value
+      }
+    }
+
+    setLoadingPart3(true)
+    getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
+      setLoadingPart3(false)
+    })
+  }, [getDisplayChart, parametersProperties, lotProperties, cycleProperties, dateRangeProperties, numericProperties])
+
+  const onSubmitChartPart1 = useCallback(() => {
+    let params: Record<string, string> = {
+      part: '1'
+    }
+
+    if (parametersProperties?.value) {
+      params = {
+        ...params,
+        [parametersProperties.name]: parametersProperties.value
+      }
+    }
+
+    if (lotProperties?.value) {
+      params = {
+        ...params,
+        [lotProperties.name]: lotProperties.value
+      }
+    }
+
+    if (cycleProperties?.start.value) {
+      params = {
+        ...params,
+        [cycleProperties.start.name]: cycleProperties.start.value
+      }
+    }
+
+    if (cycleProperties?.end.value) {
+      params = {
+        ...params,
+        [cycleProperties.end.name]: cycleProperties.end.value
+      }
+    }
+
+    if (dateRangeProperties?.start.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.start.name]: dateRangeProperties.start.value
+      }
+    }
+
+    if (dateRangeProperties?.end.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.end.name]: dateRangeProperties.end.value
+      }
+    }
+
+    getDisplayChart(params, { isSubmitChart: true, part: params.part }).then(() => {
+      onSubmitChartPart2()
+      onSubmitChartPart3()
+    })
+  }, [
+    getDisplayChart,
+    parametersProperties,
+    lotProperties,
+    cycleProperties,
+    dateRangeProperties,
+    onSubmitChartPart2,
+    onSubmitChartPart3
+  ])
 
   if (loading) {
     return (
@@ -257,13 +466,20 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       <h3 className='text-2xl font-semibold text-center'>{chartData?.chart_name}</h3>
       <Card className='w-full space-y-2'>
         <CardHeader>
-          <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
+          <form
+            className='w-full space-y-2'
+            onSubmit={(e) => {
+              e.preventDefault()
+              onSubmitChartPart1()
+            }}
+          >
             <div className='w-full'>
               <Select
                 className='max-w-xs'
                 label={parametersProperties?.label_name}
                 placeholder={`Pilih ${parametersProperties?.label_name}`}
                 isRequired={parametersProperties?.required}
+                isDisabled={loadingChart}
                 selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
                 onChange={(e) => {
                   const { value } = e.target
@@ -283,7 +499,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                   label={lotProperties?.label_name}
                   placeholder={`Pilih ${lotProperties?.label_name}`}
                   isRequired={lotProperties?.required}
-                  isDisabled={!parametersProperties?.value}
+                  isDisabled={loadingChart || !parametersProperties?.value}
                   selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
                   onChange={(e) => {
                     const { value } = e.target
@@ -304,7 +520,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                   <NumberInput
                     className='w-full max-w-[15rem]'
                     label={`${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`}
-                    isDisabled={!lotProperties?.value}
+                    isDisabled={loadingChart || !lotProperties?.value}
                     isRequired={cycleProperties?.start?.required}
                     minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
                     maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
@@ -331,7 +547,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                   <NumberInput
                     className='w-full max-w-[15rem]'
                     label={`${cycleProperties?.label_name} ${cycleProperties?.end.label_name}`}
-                    isDisabled={!lotProperties?.value || !cycleProperties?.start?.value}
+                    isDisabled={loadingChart || !lotProperties?.value || !cycleProperties?.start?.value}
                     isRequired={cycleProperties?.end?.required}
                     minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
                     maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
@@ -364,6 +580,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                 className='max-w-xs'
                 label={dateRangeProperties?.label_name}
                 isRequired={dateRangeProperties?.required}
+                isDisabled={loadingChart}
                 value={
                   dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
                     ? {
@@ -392,82 +609,76 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
               />
             </div>
             <div className='w-full flex justify-end'>
-              <Button type='submit' color='primary'>
+              <Button type='submit' color='primary' isLoading={loadingChart}>
                 Tampilkan
               </Button>
             </div>
           </form>
         </CardHeader>
         <CardBody className='w-full'>
-          <ChartFisikPart1 />
+          <ChartFisikPart1 data={part1Data} loading={loadingChart} />
         </CardBody>
       </Card>
-      <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        <Card className='w-full space-y-2'>
-          <CardHeader>
-            <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
-              <div className='w-full'>
-                <Select
-                  className='max-w-xs'
-                  label={categoryProperties?.label_name}
-                  placeholder={`Pilih ${categoryProperties?.label_name}`}
-                  isRequired={categoryProperties?.required}
-                  selectedKeys={categoryProperties?.value ? [categoryProperties?.value] : []}
-                  onChange={(e) => {
-                    const { value } = e.target
+      {part1Data && (
+        <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-6'>
+          <Card className='w-full space-y-2'>
+            <CardHeader>
+              <div className='w-full space-y-2'>
+                <div className='w-full'>
+                  <Select
+                    className='max-w-xs'
+                    label={categoryProperties?.label_name}
+                    placeholder={`Pilih ${categoryProperties?.label_name}`}
+                    isRequired={categoryProperties?.required}
+                    selectedKeys={categoryProperties?.value ? [categoryProperties?.value] : []}
+                    onChange={(e) => {
+                      const { value } = e.target
 
-                    setCategoryProperties((current) => (current ? { ...current, value } : current))
-                  }}
-                >
-                  {(categoryProperties?.options || []).map((option) => (
-                    <SelectItem key={option}>{option}</SelectItem>
-                  ))}
-                </Select>
+                      setCategoryProperties((current) => (current ? { ...current, value } : current))
+                      onSubmitChartPart2()
+                    }}
+                  >
+                    {(categoryProperties?.options || []).map((option) => (
+                      <SelectItem key={option}>{option}</SelectItem>
+                    ))}
+                  </Select>
+                </div>
               </div>
-              <div className='w-full flex justify-end'>
-                <Button type='submit' color='primary'>
-                  Tampilkan
-                </Button>
-              </div>
-            </form>
-          </CardHeader>
-          <CardBody className='w-full'>
-            <ChartFisikPart2 />
-          </CardBody>
-        </Card>
-        <Card className='w-full space-y-2'>
-          <CardHeader>
-            <form onSubmit={(e) => e.preventDefault()} className='w-full space-y-2'>
-              <div className='w-full'>
-                <Select
-                  className='max-w-xs'
-                  label={numericProperties?.label_name}
-                  placeholder={`Pilih ${numericProperties?.label_name}`}
-                  isRequired={numericProperties?.required}
-                  selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
-                  onChange={(e) => {
-                    const { value } = e.target
+            </CardHeader>
+            <CardBody className='w-full'>
+              <ChartFisikPart2 loading={loadingPart2} data={part2Data} />
+            </CardBody>
+          </Card>
+          <Card className='w-full space-y-2'>
+            <CardHeader>
+              <div className='w-full space-y-2'>
+                <div className='w-full'>
+                  <Select
+                    className='max-w-xs'
+                    label={numericProperties?.label_name}
+                    placeholder={`Pilih ${numericProperties?.label_name}`}
+                    isRequired={numericProperties?.required}
+                    selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
+                    onChange={(e) => {
+                      const { value } = e.target
 
-                    setNumericProperties((current) => (current ? { ...current, value } : current))
-                  }}
-                >
-                  {(numericProperties?.options || []).map((option) => (
-                    <SelectItem key={option}>{option}</SelectItem>
-                  ))}
-                </Select>
+                      setNumericProperties((current) => (current ? { ...current, value } : current))
+                      onSubmitChartPart3()
+                    }}
+                  >
+                    {(numericProperties?.options || []).map((option) => (
+                      <SelectItem key={option}>{option}</SelectItem>
+                    ))}
+                  </Select>
+                </div>
               </div>
-              <div className='w-full flex justify-end'>
-                <Button type='submit' color='primary'>
-                  Tampilkan
-                </Button>
-              </div>
-            </form>
-          </CardHeader>
-          <CardBody className='w-full'>
-            <ChartFisikPart3 />
-          </CardBody>
-        </Card>
-      </div>
+            </CardHeader>
+            <CardBody className='w-full'>
+              <ChartFisikPart3 loading={loadingPart3} data={part3Data} />
+            </CardBody>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
