@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { fontSans, fontMono } from '@/config/fonts'
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'
+import { ProfileProvider } from '@/hooks/profile'
 
 export default function App({ Component, pageProps }: AppLayoutProps) {
   const router = useRouter()
@@ -14,7 +15,11 @@ export default function App({ Component, pageProps }: AppLayoutProps) {
 
   return (
     <HeroUIProvider navigate={router.push}>
-      <NextThemesProvider>{getLayout(<Component {...pageProps} />)}</NextThemesProvider>
+      <NextThemesProvider>
+        <ProfileProvider>
+          {getLayout(<Component {...pageProps} />)}
+        </ProfileProvider>
+      </NextThemesProvider>
       <Toaster />
     </HeroUIProvider>
   )

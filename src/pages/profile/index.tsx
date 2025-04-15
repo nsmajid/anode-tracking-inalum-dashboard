@@ -1,55 +1,11 @@
-import { useEffect, useState } from 'react'
-
-import AppLayout from '@/layouts/app'
-import api from '@/utils/api'
-import { DefaultApiResponse } from '@/types/api'
-import { getErrorMessage } from '@/utils/error'
-import toast from 'react-hot-toast'
-import { getAuthHeaders, UID_KEY } from '@/config/constants'
 import { Avatar, Skeleton } from '@heroui/react'
+
+import DefaultLayout from '@/layouts/default'
 import { title } from '@/components/primitives'
+import { useProfile } from '@/hooks/profile'
 
 export default function ProfilePage() {
-  const [loading, setLoading] = useState<boolean>(false)
-  const [profile, setProfile] = useState<{
-    name: string
-    photo: string
-    username: string
-    roles: string[]
-  } | null>(null)
-
-  useEffect(() => {
-    (async () => {
-      setLoading(true)
-      try {
-        const headers = await getAuthHeaders()
-        const { data } = await api.get<
-          DefaultApiResponse<{
-            profile: {
-              id: string
-              name: string
-              photo: string
-              username: string
-            }
-            groups: {
-              [key: string]: string
-            }
-          }>
-        >('/api/user-profile', { params: { uid: headers?.[UID_KEY.header] } })
-
-        setProfile({
-          name: data.data.profile.name,
-          photo: data.data.profile.photo,
-          username: data.data.profile.username,
-          roles: Object.values(data.data.groups)
-        })
-      } catch (error) {
-        toast.error(getErrorMessage(error))
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [])
+  const { profile, loading } = useProfile()
 
   return (
     <div className='w-full space-y-6'>
@@ -81,4 +37,4 @@ export default function ProfilePage() {
   )
 }
 
-ProfilePage.getLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>
+ProfilePage.getLayout = (page: React.ReactNode) => <DefaultLayout>{page}</DefaultLayout>

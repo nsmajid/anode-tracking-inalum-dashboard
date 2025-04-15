@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import AppLayout from '@/layouts/app'
+import DefaultLayout from '@/layouts/default'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -17,4 +17,4 @@ export default function IndexPage() {
   return <div className='w-full'>Welcome</div>
 }
 
-IndexPage.getLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>
+IndexPage.getLayout = (page: React.ReactNode) => <DefaultLayout>{page}</DefaultLayout>

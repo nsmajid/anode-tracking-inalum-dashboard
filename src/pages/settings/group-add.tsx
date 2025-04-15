@@ -1,6 +1,6 @@
 'use client'
 import ChartGroupForm from '@/components/forms/ChartGroupForm'
-import AppLayout from '@/layouts/app'
+import DefaultLayout from '@/layouts/default'
 
 export default function GroupAddPage() {
   return (
@@ -10,4 +10,4 @@ export default function GroupAddPage() {
   )
 }
 
-GroupAddPage.getLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>
+GroupAddPage.getLayout = (page: React.ReactNode) => <DefaultLayout>{page}</DefaultLayout>

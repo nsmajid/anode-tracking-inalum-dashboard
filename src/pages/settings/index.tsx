@@ -7,7 +7,7 @@ import { Copy, Edit, Globe, Lock, MoreVertical, PieChart, Plus, Trash } from 're
 import { subtitle, title } from '@/components/primitives'
 import { useDashboardSettings } from '@/hooks/dashboard-settings'
 import { useMounted } from '@/hooks/mounted'
-import AppLayout from '@/layouts/app'
+import DefaultLayout from '@/layouts/default'
 import { EnumChartType } from '@/types/chart'
 
 export default function IndexPage() {
@@ -22,13 +22,13 @@ export default function IndexPage() {
 
   return (
     <div className='w-full space-y-6'>
-      <div className='w-full flex items-end gap-6'>
+      <div className='w-full flex flex-col lg:flex-row items-end gap-6'>
         <div className='w-full space-y-2'>
           <h2 className={title()}>Pengaturan</h2>
           <p className={subtitle()}>Kelola chart group anda di sini</p>
         </div>
-        <Link href='/settings/group-add'>
-          <Button color='primary' size='lg' startContent={<Plus />}>
+        <Link href='/settings/group-add' className='w-full lg:w-fit'>
+          <Button color='primary' size='lg' className='w-full lg:w-fit' startContent={<Plus />}>
             Tambah
           </Button>
         </Link>
@@ -125,4 +125,4 @@ export default function IndexPage() {
   )
 }
 
-IndexPage.getLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>
+IndexPage.getLayout = (page: React.ReactNode) => <DefaultLayout>{page}</DefaultLayout>

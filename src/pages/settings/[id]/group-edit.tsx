@@ -1,6 +1,6 @@
 'use client'
 import ChartGroupForm from '@/components/forms/ChartGroupForm'
-import AppLayout from '@/layouts/app'
+import DefaultLayout from '@/layouts/default'
 import { useParams } from 'next/navigation'
 
 export default function GroupEditPage() {
@@ -13,4 +13,4 @@ export default function GroupEditPage() {
   )
 }
 
-GroupEditPage.getLayout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>
+GroupEditPage.getLayout = (page: React.ReactNode) => <DefaultLayout>{page}</DefaultLayout>
