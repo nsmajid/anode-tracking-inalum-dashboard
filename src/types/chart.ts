@@ -23,7 +23,21 @@ export type ChartFisikPart1Data = DefaultChartData & {
     average: number
   }
 }
-
 export type ChartFisikPart2Data = DefaultChartData
-
 export type ChartFisikPart3Data = DefaultChartData
+
+export type ChartGradePart1Data = Omit<DefaultChartData, 'datasets'> & {
+  datasets: Array<{
+    label: string
+    data: number[]
+    custom_hover: boolean
+    hover?: Array<Array<{ label: string; value: number }>>
+  }>
+  info: Array<{
+    label: string
+    min: number
+    max: number
+    average: number
+  }>
+}
+export type ChartGradePart2or3Data = ChartGradePart1Data

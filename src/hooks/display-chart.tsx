@@ -63,6 +63,7 @@ export const useDisplayChart = <T extends object>(
           if (chart) options?.onLoadChart?.(chart as T)
         }
       } catch (error) {
+        console.error(error)
         toast.error(getErrorMessage(error))
       } finally {
         setLoading(false)
