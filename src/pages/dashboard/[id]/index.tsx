@@ -46,18 +46,20 @@ export default function ChartPage() {
 
           const is_public = !!Number(data.data.dashboard.dashboard_public)
 
-          const headers = await getAuthHeaders()
-          const is_has_session = !!headers?.[SESSION_KEY.cookie]
-          const redirectAuthURL = `${BACKOFFICE_URL}/auth-check?external=1&id=${chartId}`
+          if (!is_public) {
+            const headers = await getAuthHeaders()
+            const is_has_session = !!headers?.[SESSION_KEY.header]
+            const redirectAuthURL = `${BACKOFFICE_URL}/auth-check?external=1&id=${chartId}`
 
-          if (is_has_session) {
-            if (profileStatus === 401) {
+            if (is_has_session) {
+              if (profileStatus === 401) {
+                window.location.href = redirectAuthURL
+                return
+              }
+            } else {
               window.location.href = redirectAuthURL
               return
             }
-          } else {
-            window.location.href = redirectAuthURL
-            return
           }
 
           setDashboard({

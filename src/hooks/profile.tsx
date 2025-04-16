@@ -46,7 +46,9 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
         setProfileStatus(error.response?.status || 401)
       }
     } finally {
-      setLoading(false)
+      setTimeout(() => {
+        setLoading(false)
+      }, 100)
     }
   }, [])
 
