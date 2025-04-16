@@ -12,13 +12,14 @@ import { link as linkStyles } from '@heroui/theme'
 import NextLink from 'next/link'
 import clsx from 'clsx'
 import { useMemo } from 'react'
-import { Settings, User } from 'react-feather'
+import { Grid, Settings, User } from 'react-feather'
 import { useRouter } from 'next/router'
 
 import { siteConfig } from '@/config/site'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Logo } from '@/components/icons'
 import { useProfile } from '@/hooks/profile'
+import { BACKOFFICE_URL } from '@/config/constants'
 
 export const Navbar = () => {
   const router = useRouter()
@@ -33,6 +34,12 @@ export const Navbar = () => {
               href: '/settings',
               icon: Settings,
               active: router.pathname.startsWith('/settings')
+            },
+            {
+              label: 'Web Anode Tracking',
+              href: BACKOFFICE_URL,
+              icon: Grid,
+              active: false
             }
           ]
         : [])

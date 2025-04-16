@@ -9,6 +9,7 @@ import { useDashboardSettings } from '@/hooks/dashboard-settings'
 import { useMounted } from '@/hooks/mounted'
 import DefaultLayout from '@/layouts/default'
 import { EnumChartType } from '@/types/chart'
+import toast from 'react-hot-toast'
 
 export default function IndexPage() {
   const mounted = useMounted()
@@ -19,6 +20,11 @@ export default function IndexPage() {
       getDashboardSettings()
     }
   }, [mounted])
+
+  const onCopy = (id: number) => {
+    navigator.clipboard.writeText(`${window.location.origin}/dashboard/${id}`)
+    toast.success('URL berhasil disalin')
+  }
 
   return (
     <div className='w-full space-y-6'>
@@ -48,7 +54,14 @@ export default function IndexPage() {
                       <PieChart className='w-12 h-12' />
                     </div>
                     <div className='w-full space-y-1'>
-                      <div className='text-lg font-semibold'>{r.dashboard_name}</div>
+                      <a
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='w-fit block text-lg font-semibold underline hover:text-primary transition-all'
+                        href={`${window.location.origin}/dashboard/${r.id}`}
+                      >
+                        {r.dashboard_name}
+                      </a>
                       <div className='flex flex-wrap items-center gap-4'>
                         {r.dashboard_public ? (
                           <Chip color='primary' className='pl-2' startContent={<Globe className='w-3 h-3' />}>
@@ -84,9 +97,9 @@ export default function IndexPage() {
                           <DropdownItem
                             key='copy'
                             startContent={<Copy className='w-4 h-4' />}
-                            onClick={() => alert('TODO')}
+                            onPress={() => onCopy(r.id)}
                           >
-                            Copy URL
+                            Salin URL
                           </DropdownItem>
                           <DropdownItem
                             key='edit'
