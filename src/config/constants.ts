@@ -6,6 +6,7 @@ export const THEME_TYPE = {
 }
 
 export const BASE_API_URL = 'https://at-dev.dolapps.my.id'
+export const BACKOFFICE_URL = 'https://at-dev.dolapps.my.id'
 
 export const API_KEY_HEADER = {
   'DOLKODE-API-KEY': 'iDk77driVS'
@@ -23,18 +24,23 @@ export const REMOTE_ADDR_KEY = {
   header: 'at-remote-addr'
 }
 
-export const saveAuthHeaders = (payload: { ids: string, uid: string }) => {
+export const saveAuthHeaders = (payload: { ids: string; uid: string }) => {
   Cookie.set(SESSION_KEY.cookie, payload.ids)
   Cookie.set(UID_KEY.cookie, `${payload.uid}`)
 }
 
-export const getAuthHeaders = async () => {
-  const response = await fetch('/api/get-ip')
-  const data = await response.json()
+export const getAuthHeaders = async (preventFetchIP?: boolean) => {
+  let data: { ip: string } | undefined
+
+  if (!preventFetchIP) {
+    const response = await fetch('/api/get-ip')
+
+    data = await response.json()
+  }
 
   const session = Cookie.get(SESSION_KEY.cookie)
   const uid = Cookie.get(UID_KEY.cookie)
-  const remoteAddr = data.ip
+  const remoteAddr = preventFetchIP ? undefined : data?.ip
 
   return {
     [SESSION_KEY.header]: session,

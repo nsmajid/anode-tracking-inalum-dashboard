@@ -11,8 +11,11 @@ import { ChartItem, DashboardSettingItem } from '@/types/dashboard-settings'
 import { EnumChartType } from '@/types/chart'
 import DashboardWithSlider from '@/components/DashboardWithSlider'
 import RenderCharts from '@/components/RenderCharts'
+import { useProfile } from '@/hooks/profile'
+import { BACKOFFICE_URL, getAuthHeaders, SESSION_KEY } from '@/config/constants'
 
 export default function ChartPage() {
+  const { profileStatus } = useProfile()
   const router = useRouter()
   const chartId = router.query?.id as string
   const [loading, setLoading] = useState<boolean>(false)
@@ -41,12 +44,28 @@ export default function ChartPage() {
             }>
           >('/api/dashboard', { params: { id: chartId } })
 
+          const is_public = !!Number(data.data.dashboard.dashboard_public)
+
+          const headers = await getAuthHeaders()
+          const is_has_session = !!headers?.[SESSION_KEY.cookie]
+          const redirectAuthURL = `${BACKOFFICE_URL}/auth-check?external=1&id=${chartId}`
+
+          if (is_has_session) {
+            if (profileStatus === 401) {
+              window.location.href = redirectAuthURL
+              return
+            }
+          } else {
+            window.location.href = redirectAuthURL
+            return
+          }
+
           setDashboard({
             id: Number(data.data.dashboard.id),
             dashboard_name: data.data.dashboard.dashboard_name,
             dashboard_type: data.data.dashboard.dashboard_type,
             dashboard_resolution_id: Number(data.data.dashboard.dashboard_resolution_id),
-            dashboard_public: !!Number(data.data.dashboard.dashboard_public),
+            dashboard_public: is_public,
             dashboard_has_slider: !!Number(data.data.dashboard.dashboard_has_slider),
             dashboard_number_of_slider: Number(data.data.dashboard.dashboard_number_of_slider || 0),
             dashboard_slide_timer: Number(data.data.dashboard.dashboard_slide_timer || 0),
@@ -60,7 +79,7 @@ export default function ChartPage() {
         }
       })()
     }
-  }, [chartId])
+  }, [chartId, profileStatus])
 
   if (loading) {
     return (
