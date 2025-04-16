@@ -60,7 +60,7 @@ const validationSchemas: AnyObjectSchema = yup.object({
   dashboard_resolution_id: yup.string().required('Resolusi wajib dipilih'),
   dashboard_has_slider: yup.boolean().default(false),
   dashboard_public: yup.boolean().default(false),
-  plant_ids: yup.array().of(yup.string()).min(1, 'Pilih minimal 1 plant/lokasi'),
+  plant_ids: yup.array().of(yup.string()).default([]),
   dashboard_slide_timer: yup.number().nullable().default(null),
   dashboard_slides: yup
     .array()
@@ -281,16 +281,6 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
     [swapChartItem]
   )
 
-  const existingOptionIds = useMemo(() => {
-    if (isUseSlider) {
-      return slideItems.reduce((acc, slide) => {
-        return [...acc, ...slide.slide_charts.map((chart) => chart._id)]
-      }, [] as string[])
-    } else {
-      return chartItems.map((chart) => chart._id)
-    }
-  }, [slideItems, chartItems, isUseSlider])
-
   const onAddCallback = useCallback(
     (items: ChartItem[]) => {
       if (isUseSlider) {
@@ -498,7 +488,6 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                   <CheckboxGroup
                     label='Pilih plant/lokasi'
                     size='lg'
-                    isRequired
                     isDisabled={loadingRefData}
                     value={rhf.watch('plant_ids')}
                     onValueChange={(value) => rhf.setValue('plant_ids', value)}
@@ -771,7 +760,6 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                 options={charts}
                 isOpen={isOpenAddChart}
                 onOpenChange={onOpenChangeAddChart}
-                existingOptionIds={existingOptionIds}
                 onAddCallback={onAddCallback}
               />
               <Divider className='mt-6' />

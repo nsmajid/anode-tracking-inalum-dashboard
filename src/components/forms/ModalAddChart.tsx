@@ -1,31 +1,26 @@
 import { ChartItem } from '@/types/dashboard-settings'
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 
 type Props = {
   isOpen: boolean
   onOpenChange: () => void
   onAddCallback: (options: ChartItem[]) => void
   options: ChartItem[]
-  existingOptionIds: string[]
 }
 
-const ModalAddChart: React.FC<Props> = ({ isOpen, onOpenChange, options, existingOptionIds, onAddCallback }) => {
+const ModalAddChart: React.FC<Props> = ({ isOpen, onOpenChange, options, onAddCallback }) => {
   const [selected, setSelected] = useState<string[]>([])
-  const filteredOptions = useMemo(
-    () => options.filter((option) => !existingOptionIds.includes(option.id)),
-    [options, existingOptionIds]
-  )
 
   useEffect(() => {
     setSelected([])
   }, [isOpen])
 
   const onAdd = useCallback(() => {
-    const selectedRecords = filteredOptions.filter((option) => selected.includes(option.id))
+    const selectedRecords = options.filter((option) => selected.includes(option.id))
 
     onAddCallback(selectedRecords)
-  }, [selected, filteredOptions, onAddCallback])
+  }, [selected, options, onAddCallback])
 
   return (
     <>
@@ -35,9 +30,9 @@ const ModalAddChart: React.FC<Props> = ({ isOpen, onOpenChange, options, existin
             <>
               <ModalHeader className='flex flex-col gap-1'>Pilih Chart</ModalHeader>
               <ModalBody>
-                {filteredOptions.length > 0 ? (
+                {options.length > 0 ? (
                   <CheckboxGroup size='lg' value={selected} onValueChange={setSelected}>
-                    {filteredOptions.map((option) => (
+                    {options.map((option) => (
                       <Checkbox key={option.id} value={option.id}>
                         {option.chart_name}
                       </Checkbox>

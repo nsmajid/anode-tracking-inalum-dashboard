@@ -29,9 +29,18 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data }) => {
         options={{
           chart: {
             type: 'bar',
-            height: 350
+            height: 350,
+            zoom: {
+              type: 'x',
+              enabled: true,
+              autoScaleYaxis: true
+            },
+            toolbar: {
+              autoSelected: 'zoom'
+            }
           },
           xaxis: {
+            type: 'datetime',
             title: {
               text: data?.['x-label'] || '',
               style: {

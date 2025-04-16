@@ -10,7 +10,7 @@ import {
   Skeleton
 } from '@heroui/react'
 import { parseDate } from '@internationalized/date'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import ChartFisikPart1 from './chart-fisik-parts/ChartFisikPart1'
 import ChartFisikPart2 from './chart-fisik-parts/ChartFisikPart2'
@@ -20,6 +20,7 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartFisikPart1Data, ChartFisikPart2Data, ChartFisikPart3Data } from '@/types/chart'
+import { X } from 'react-feather'
 
 type Props = {
   chart: ChartItem
@@ -112,10 +113,13 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   const [loadingPart3, setLoadingPart3] = useState<boolean>(false)
   const [part3Data, setPart3Data] = useState<ChartFisikPart3Data | null>(null)
 
+  const [chartNames, setChartNames] = useState<Record<number, string>>({})
+
   const { loading, loadingChart, chartData, getDisplayChart } = useDisplayChart<{
     chart: {
       parts: {
         1: {
+          title: string
           parameters: {
             default: string | null
             label_name: string
@@ -175,6 +179,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
           }
         }
         2: {
+          title: string
           categories: {
             label_name: string
             name: string
@@ -184,6 +189,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
           }
         }
         3: {
+          title: string
           numerics: {
             label_name: string
             name: string
@@ -196,6 +202,12 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
     }
   }>(chart.id, {
     onLoadChart: (data) => {
+      setChartNames({
+        1: data.chart.parts?.[1]?.title,
+        2: data.chart.parts?.[2]?.title,
+        3: data.chart.parts?.[3]?.title
+      })
+
       const { parameters, filters } = data.chart.parts[1]
       const { lot, cycle, daterange } = filters.options
 
@@ -250,6 +262,10 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
         options: numerics.value,
         value: numerics.default || null
       })
+
+      setTimeout(() => {
+        document.getElementById('submit-part1')?.click()
+      }, 1000)
     },
     onShowChart: (part, data) => {
       if (part && data) {
@@ -453,6 +469,14 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
     onSubmitChartPart3
   ])
 
+  useEffect(() => {
+    if (categoryProperties?.value) onSubmitChartPart2()
+  }, [categoryProperties?.value])
+
+  useEffect(() => {
+    if (numericProperties?.value) onSubmitChartPart3()
+  }, [numericProperties?.value])
+
   if (loading) {
     return (
       <Skeleton className='rounded-lg'>
@@ -501,13 +525,34 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                   isRequired={lotProperties?.required}
                   isDisabled={loadingChart || !parametersProperties?.value}
                   selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
+                  endContent={
+                    lotProperties?.value ? (
+                      <X
+                        className='w-4 h-4 cursor-pointer'
+                        onClick={() => {
+                          setLotProperties((current) => (current ? { ...current, value: null } : current))
+                          setCycleProperties((current) =>
+                            current
+                              ? { ...current, start: { ...current.start, value: null }, end: { ...current.end, value: null } }
+                              : current
+                          )
+                        }}
+                      />
+                    ) : undefined
+                  }
                   onChange={(e) => {
                     const { value } = e.target
+
+                    const lotRow = (lotProperties?.options || []).find((option) => option.lot === value)
 
                     setLotProperties((current) => (current ? { ...current, value } : current))
                     setCycleProperties((current) =>
                       current
-                        ? { ...current, start: { ...current.start, value: null }, end: { ...current.end, value: null } }
+                        ? {
+                            ...current,
+                            start: { ...current.start, value: lotRow?.start_cycle || null },
+                            end: { ...current.end, value: lotRow?.end_cycle || null }
+                          }
                         : current
                     )
                   }}
@@ -577,17 +622,43 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
             </div>
             <div className='w-full'>
               <DateRangePicker
+                showMonthAndYearPickers
                 className='max-w-xs'
                 label={dateRangeProperties?.label_name}
                 isRequired={dateRangeProperties?.required}
                 isDisabled={loadingChart}
+                selectorButtonPlacement='start'
+                endContent={
+                  dateRangeProperties?.start?.value && dateRangeProperties?.end?.value ? (
+                    <X
+                      className='w-8 h-8 cursor-pointer'
+                      onClick={() => {
+                        setDateRangeProperties((current) =>
+                          current
+                            ? {
+                                ...current,
+                                start: {
+                                  ...current.start,
+                                  value: null
+                                },
+                                end: {
+                                  ...current.end,
+                                  value: null
+                                }
+                              }
+                            : current
+                        )
+                      }}
+                    />
+                  ) : undefined
+                }
                 value={
                   dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
                     ? {
                         start: parseDate(fixIsoDate(dateRangeProperties?.start?.value)),
                         end: parseDate(fixIsoDate(dateRangeProperties?.end?.value))
                       }
-                    : undefined
+                    : null
                 }
                 onChange={(value) => {
                   setDateRangeProperties((current) =>
@@ -608,8 +679,9 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                 }}
               />
             </div>
-            <div className='w-full flex justify-end'>
-              <Button type='submit' color='primary' isLoading={loadingChart}>
+            <div className='w-full flex justify-between items-center gap-2'>
+              <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+              <Button type='submit' id='submit-part1' color='primary' isLoading={loadingChart}>
                 Tampilkan
               </Button>
             </div>
@@ -623,7 +695,8 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
         <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-6'>
           <Card className='w-full space-y-2'>
             <CardHeader>
-              <div className='w-full space-y-2'>
+              <div className='w-full space-y-3'>
+                <div className='text-xl font-semibold'>{chartNames?.[2]}</div>
                 <div className='w-full'>
                   <Select
                     className='max-w-xs'
@@ -634,8 +707,8 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                     onChange={(e) => {
                       const { value } = e.target
 
+                      if (!value) return
                       setCategoryProperties((current) => (current ? { ...current, value } : current))
-                      onSubmitChartPart2()
                     }}
                   >
                     {(categoryProperties?.options || []).map((option) => (
@@ -651,7 +724,8 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
           </Card>
           <Card className='w-full space-y-2'>
             <CardHeader>
-              <div className='w-full space-y-2'>
+              <div className='w-full space-y-3'>
+                <div className='text-xl font-semibold'>{chartNames?.[3]}</div>
                 <div className='w-full'>
                   <Select
                     className='max-w-xs'
@@ -662,8 +736,8 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                     onChange={(e) => {
                       const { value } = e.target
 
+                      if (!value) return
                       setNumericProperties((current) => (current ? { ...current, value } : current))
-                      onSubmitChartPart3()
                     }}
                   >
                     {(numericProperties?.options || []).map((option) => (

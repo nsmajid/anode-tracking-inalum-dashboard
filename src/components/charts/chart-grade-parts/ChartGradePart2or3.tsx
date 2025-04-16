@@ -78,7 +78,7 @@ const ChartGradePart2or3: React.FC<Props> = ({ loading, data }) => {
 
               if (is_custom_tooltip) {
                 return renderToStaticMarkup(
-                  <div className='w-fit rounded-md'>
+                  <div className='w-fit rounded-md text-black'>
                     <div className='px-2 py-1 bg-gray-100'>{label}</div>
                     <div className='px-2 py-1'>
                       <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
@@ -99,7 +99,7 @@ const ChartGradePart2or3: React.FC<Props> = ({ loading, data }) => {
               }
 
               return renderToStaticMarkup(
-                <div className='w-fit rounded-md'>
+                <div className='w-fit rounded-md text-black'>
                   <div className='px-2 py-1 bg-gray-100'>{label}</div>
                   <div className='px-2 py-1'>
                     <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
