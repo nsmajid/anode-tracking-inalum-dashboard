@@ -7,7 +7,8 @@ export enum EnumChartCode {
   FISIK = 'fisik',
   KORELASI = 'korelasi',
   GRADE = 'grade',
-  QC = 'qc'
+  QC = 'qc',
+  PNP = 'pnp'
 }
 
 export type DefaultChartData = {
@@ -67,4 +68,12 @@ export type ChartQCPart3Data = DefaultChartData & {
     max: number
     average: number
   }
+}
+
+export type ChartPnPPart1Data = Omit<DefaultChartData, 'datasets'> & {
+  notes: (string | null)[]
+  datasets: Array<{
+    label: string
+    data: number[]
+  }>
 }

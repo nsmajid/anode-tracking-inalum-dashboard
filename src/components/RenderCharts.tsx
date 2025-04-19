@@ -8,6 +8,7 @@ const ChartFisik = dynamic(() => import('./charts/ChartFisik'), { ssr: false })
 const ChartKorelasi = dynamic(() => import('./charts/ChartKorelasi'), { ssr: false })
 const ChartGrade = dynamic(() => import('./charts/ChartGrade'), { ssr: false })
 const ChartQC = dynamic(() => import('./charts/ChartQC'), { ssr: false })
+const ChartPnP = dynamic(() => import('./charts/ChartPnP'), { ssr: false })
 
 const RenderCharts: React.FC<{ charts: ChartItem[] }> = ({ charts }) => {
   return (
@@ -18,6 +19,7 @@ const RenderCharts: React.FC<{ charts: ChartItem[] }> = ({ charts }) => {
           {chart.chart_code === EnumChartCode.KORELASI && <ChartKorelasi chart={chart} />}
           {chart.chart_code === EnumChartCode.GRADE && <ChartGrade chart={chart} />}
           {chart.chart_code === EnumChartCode.QC && <ChartQC chart={chart} />}
+          {chart.chart_code === EnumChartCode.PNP && <ChartPnP chart={chart} />}
         </div>
       ))}
     </>
