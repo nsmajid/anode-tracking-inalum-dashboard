@@ -36,7 +36,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
       option_name: string
       option_value: string
     }>
-    value: string | null
+    value: string[]
   } | null>(null)
   const [lotProperties, setLotProperties] = useState<{
     label_name: string
@@ -124,10 +124,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
         1: {
           title: string
           parameters: {
-            default: {
-              option_name: string
-              option_value: string
-            } | null
+            default: string[] | null
             label_name: string
             name: string
             required: boolean
@@ -223,7 +220,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
       setParametersProperties({
         ...parameters,
         options: parameters.value,
-        value: parameters?.default?.option_value || null
+        value: parameters?.default || []
       })
       setLotProperties({
         ...lot,
@@ -317,7 +314,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
     if (parametersProperties?.value) {
       params = {
         ...params,
-        [parametersProperties.name]: parametersProperties.value
+        [parametersProperties.name]: parametersProperties.value.join(',')
       }
     }
 
@@ -377,7 +374,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
     if (parametersProperties?.value) {
       params = {
         ...params,
-        [parametersProperties.name]: parametersProperties.value
+        [parametersProperties.name]: parametersProperties.value.join(',')
       }
     }
 
@@ -437,7 +434,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
     if (parametersProperties?.value) {
       params = {
         ...params,
-        [parametersProperties.name]: parametersProperties.value
+        [parametersProperties.name]: parametersProperties.value.join(',')
       }
     }
 
@@ -525,11 +522,21 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
                 placeholder={`Pilih ${parametersProperties?.label_name}`}
                 isRequired={parametersProperties?.required}
                 isDisabled={loadingChart}
-                selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
+                selectionMode='multiple'
+                selectedKeys={parametersProperties?.value ?? []}
                 onChange={(e) => {
                   const { value } = e.target
+                  const selectedValues = value.split(',')
 
-                  setParametersProperties((current) => (current ? { ...current, value } : current))
+                  setParametersProperties((current) => {
+                    if (current) {
+                      return {
+                        ...current,
+                        value: selectedValues
+                      }
+                    }
+                    return current
+                  })
                 }}
               >
                 {(parametersProperties?.options || []).map((option) => (
