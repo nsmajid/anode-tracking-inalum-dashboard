@@ -79,7 +79,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data }) => {
                                 color: '#fff',
                                 background: '#FF4560'
                               },
-                              text: 'Min'
+                              text: `Min: ${chart?.line_min}`
                             }
                           }
                         ]
@@ -95,7 +95,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data }) => {
                                 color: '#fff',
                                 background: '#28a745'
                               },
-                              text: 'Max'
+                              text: `Max: ${chart?.line_max}`
                             }
                           }
                         ]
