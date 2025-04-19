@@ -5,6 +5,7 @@ import { Card, CardBody, Spinner } from '@heroui/react'
 import { Activity, Minus, Plus } from 'react-feather'
 
 import { ChartGradePart1Data } from '@/types/chart'
+import { format } from 'date-fns'
 
 type Props = {
   loading: boolean
@@ -54,6 +55,7 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
             }
           },
           xaxis: {
+            type: 'datetime',
             title: {
               text: data?.['x-label'] || '',
               style: {
@@ -85,15 +87,16 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
               const lists = series?.hover?.[dataPointIndex] ?? []
               const label = series?.label
               const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
+              const parsedLabel = (w as unknown as { globals: { labels: number[] } }).globals.labels[dataPointIndex]
 
-              if (is_custom_tooltip) {
-                return renderToStaticMarkup(
-                  <div className='w-fit rounded-md text-black'>
-                    <div className='px-2 py-1 bg-gray-100'>{label}</div>
-                    <div className='px-2 py-1'>
-                      <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                      {value}
-                    </div>
+              return renderToStaticMarkup(
+                <div className='w-fit rounded-md text-black'>
+                  <div className='px-2 py-1 bg-gray-100'>{format(new Date(parsedLabel), 'dd MMM yyyy')}</div>
+                  <div className='px-2 py-1'>
+                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
+                    {label}: {value}
+                  </div>
+                  {is_custom_tooltip && (
                     <div className='px-2 py-1'>
                       <ul className='list-disc pl-4'>
                         {lists.map((list) => (
@@ -104,17 +107,7 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
                         ))}
                       </ul>
                     </div>
-                  </div>
-                )
-              }
-
-              return renderToStaticMarkup(
-                <div className='w-fit rounded-md text-black'>
-                  <div className='px-2 py-1 bg-gray-100'>{label}</div>
-                  <div className='px-2 py-1'>
-                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                    {value}
-                  </div>
+                  )}
                 </div>
               )
             }
