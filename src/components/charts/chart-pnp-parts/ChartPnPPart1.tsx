@@ -5,6 +5,7 @@ import { Spinner } from '@heroui/react'
 import { ChartPnPPart1Data } from '@/types/chart'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { format } from 'date-fns'
+import { fixIsoDate } from '@/utils/date'
 
 type Props = {
   loading: boolean
@@ -85,7 +86,7 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data }) => {
               const notes = data?.notes?.[dataPointIndex]
               const label = series?.label
               const color = (w as unknown as { globals: { colors: string[], labels: number[] } }).globals.colors[seriesIndex]
-              const parsedLabel = (w as unknown as { globals: { labels: number[] } }).globals.labels[dataPointIndex]
+              const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''
 
               return renderToStaticMarkup(
                 <div className='w-fit rounded-md text-black'>

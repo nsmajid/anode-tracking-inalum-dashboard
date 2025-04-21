@@ -6,6 +6,7 @@ import { Activity, Minus, Plus } from 'react-feather'
 
 import { ChartGradePart1Data } from '@/types/chart'
 import { format } from 'date-fns'
+import { fixIsoDate } from '@/utils/date'
 
 type Props = {
   loading: boolean
@@ -87,7 +88,7 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
               const lists = series?.hover?.[dataPointIndex] ?? []
               const label = series?.label
               const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
-              const parsedLabel = (w as unknown as { globals: { labels: number[] } }).globals.labels[dataPointIndex]
+              const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''
 
               return renderToStaticMarkup(
                 <div className='w-fit rounded-md text-black'>
