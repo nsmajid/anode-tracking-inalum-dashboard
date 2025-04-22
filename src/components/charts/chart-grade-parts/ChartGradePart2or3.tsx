@@ -75,15 +75,16 @@ const ChartGradePart2or3: React.FC<Props> = ({ loading, data }) => {
               const lists = series?.hover?.[dataPointIndex] ?? []
               const label = series?.label
               const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
+              const yLabel = data?.labels?.[dataPointIndex] ?? ''
 
-              if (is_custom_tooltip) {
-                return renderToStaticMarkup(
-                  <div className='w-fit rounded-md text-black'>
-                    <div className='px-2 py-1 bg-gray-100'>{label}</div>
-                    <div className='px-2 py-1'>
-                      <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                      {value}
-                    </div>
+              return renderToStaticMarkup(
+                <div className='w-fit rounded-md text-black'>
+                  <div className='px-2 py-1 bg-gray-100'>{yLabel}</div>
+                  <div className='px-2 py-1'>
+                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
+                    {label}: {value}
+                  </div>
+                  {is_custom_tooltip && (
                     <div className='px-2 py-1'>
                       <ul className='list-disc pl-4'>
                         {lists.map((list) => (
@@ -94,17 +95,7 @@ const ChartGradePart2or3: React.FC<Props> = ({ loading, data }) => {
                         ))}
                       </ul>
                     </div>
-                  </div>
-                )
-              }
-
-              return renderToStaticMarkup(
-                <div className='w-fit rounded-md text-black'>
-                  <div className='px-2 py-1 bg-gray-100'>{label}</div>
-                  <div className='px-2 py-1'>
-                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                    {value}
-                  </div>
+                  )}
                 </div>
               )
             }

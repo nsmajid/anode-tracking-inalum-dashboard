@@ -1,0 +1,292 @@
+import { Button, Card, CardBody, CardHeader, DateRangePicker, Select, SelectItem, Skeleton } from '@heroui/react'
+import { memo, useCallback, useState } from 'react'
+import { X } from 'react-feather'
+import { parseDate } from '@internationalized/date'
+
+import ChartResumePart1 from './chart-resume-parts/ChartResumePart1'
+
+import { useDisplayChart } from '@/hooks/display-chart'
+import { ChartItem } from '@/types/dashboard-settings'
+import { fixIsoDate, getMaxDateInMonth } from '@/utils/date'
+import { ChartResumePart1Data } from '@/types/chart'
+
+type Props = {
+  chart: ChartItem
+}
+
+const ChartResume: React.FC<Props> = ({ chart }) => {
+  const [lotProperties, setLotProperties] = useState<{
+    label_name: string
+    name: string
+    required: boolean
+    value: string | null
+    options: Array<{
+      lot: string
+      start_cycle: string
+      end_cycle: string
+    }>
+  } | null>(null)
+  const [dateRangeProperties, setDateRangeProperties] = useState<{
+    label_name: string
+    required: boolean
+    start: {
+      label_name: string
+      name: string
+      required: boolean
+      value: string | null
+    }
+    end: {
+      label_name: string
+      name: string
+      required: boolean
+      value: string | null
+    }
+  } | null>(null)
+
+  const [part1Data, setPart1Data] = useState<ChartResumePart1Data | null>(null)
+  const [chartNames, setChartNames] = useState<Record<number, string>>({})
+
+  const { loading, chartData, loadingChart, getDisplayChart } = useDisplayChart<{
+    chart: {
+      parts: {
+        1: {
+          title: string
+          filters: {
+            options: {
+              lot: {
+                label_name: string
+                name: string
+                default: string | null
+                required: boolean
+                value: Array<{
+                  lot: string
+                  start_cycle: string
+                  end_cycle: string
+                }>
+              }
+              daterange: {
+                label_name: string
+                value: {
+                  start_monthrange: {
+                    label_name: string
+                    name: string
+                    default: string | null
+                    required: boolean
+                  }
+                  end_monthrange: {
+                    label_name: string
+                    name: string
+                    default: string | null
+                    required: boolean
+                  }
+                }
+                required: false
+              }
+            }
+          }
+        }
+      }
+    }
+  }>(chart.id, {
+    onLoadChart: (data) => {
+      setChartNames({ 1: data.chart.parts?.[1]?.title })
+
+      const { filters } = data.chart.parts[1]
+      const { lot, daterange } = filters.options
+
+      setLotProperties({
+        ...lot,
+        options: lot.value,
+        value: lot.default || null
+      })
+      setDateRangeProperties({
+        label_name: daterange.label_name,
+        required: daterange.required,
+        start: {
+          ...daterange.value.start_monthrange,
+          label_name: `${daterange.label_name} ${daterange.value.start_monthrange.label_name}`,
+          value: daterange.value.start_monthrange.default || null
+        },
+        end: {
+          ...daterange.value.end_monthrange,
+          label_name: `${daterange.label_name} ${daterange.value.end_monthrange.label_name}`,
+          value: daterange.value.end_monthrange.default || null
+        }
+      })
+
+      setTimeout(() => {
+        document.getElementById('submit-part1')?.click()
+      }, 1000)
+    },
+    onShowChart: (part, data) => {
+      if (part && data) {
+        const chart = (
+          data as {
+            chart: ChartResumePart1Data
+          }
+        ).chart
+
+        if (part === '1') {
+          setPart1Data(chart)
+        }
+      }
+    }
+  })
+
+  const onSubmitChart = useCallback(() => {
+    let params: Record<string, string> = {
+      part: '1'
+    }
+
+    if (lotProperties?.value) {
+      params = {
+        ...params,
+        [lotProperties.name]: lotProperties.value
+      }
+    }
+
+    if (dateRangeProperties?.start.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.start.name]: dateRangeProperties.start.value
+      }
+    }
+
+    if (dateRangeProperties?.end.value) {
+      params = {
+        ...params,
+        [dateRangeProperties.end.name]: dateRangeProperties.end.value
+      }
+    }
+
+    getDisplayChart(params, { isSubmitChart: true, part: params.part })
+  }, [getDisplayChart, lotProperties, dateRangeProperties])
+
+  if (loading) {
+    return (
+      <Skeleton className='rounded-lg'>
+        <div className='h-96 rounded-lg bg-default-300' />
+      </Skeleton>
+    )
+  }
+
+  return (
+    <div className='w-full space-y-6'>
+      <h3 className='text-2xl font-semibold text-center'>{chartData?.chart_name}</h3>
+      <Card className='w-full space-y-2'>
+        <CardHeader>
+          <form
+            className='w-full space-y-2'
+            onSubmit={(e) => {
+              e.preventDefault()
+              onSubmitChart()
+            }}
+          >
+            <div className='w-full space-y-1'>
+              <div className='w-full flex items-center gap-2'>
+                <Select
+                  className='w-full max-w-[13rem]'
+                  label={lotProperties?.label_name}
+                  placeholder={`Pilih ${lotProperties?.label_name}`}
+                  isRequired={lotProperties?.required}
+                  isDisabled={loadingChart}
+                  selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
+                  endContent={
+                    lotProperties?.value ? (
+                      <X
+                        className='w-4 h-4 cursor-pointer'
+                        onClick={() => {
+                          setLotProperties((current) => (current ? { ...current, value: null } : current))
+                        }}
+                      />
+                    ) : undefined
+                  }
+                  onChange={(e) => {
+                    const { value } = e.target
+
+                    setLotProperties((current) => (current ? { ...current, value } : current))
+                  }}
+                >
+                  {(lotProperties?.options || []).map((option) => (
+                    <SelectItem key={option.lot}>{option.lot}</SelectItem>
+                  ))}
+                </Select>
+                <DateRangePicker
+                  showMonthAndYearPickers
+                  className='max-w-xs'
+                  label={dateRangeProperties?.label_name}
+                  isRequired={dateRangeProperties?.required}
+                  isDisabled={loadingChart}
+                  selectorButtonPlacement='start'
+                  endContent={
+                    dateRangeProperties?.start?.value && dateRangeProperties?.end?.value ? (
+                      <X
+                        className='w-8 h-8 cursor-pointer'
+                        onClick={() => {
+                          setDateRangeProperties((current) =>
+                            current
+                              ? {
+                                  ...current,
+                                  start: {
+                                    ...current.start,
+                                    value: null
+                                  },
+                                  end: {
+                                    ...current.end,
+                                    value: null
+                                  }
+                                }
+                              : current
+                          )
+                        }}
+                      />
+                    ) : undefined
+                  }
+                  value={
+                    dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
+                      ? {
+                          start: parseDate(fixIsoDate(dateRangeProperties?.start?.value)),
+                          end: parseDate(fixIsoDate(dateRangeProperties?.end?.value))
+                        }
+                      : null
+                  }
+                  onChange={(value) => {
+                    setDateRangeProperties((current) =>
+                      current
+                        ? {
+                            ...current,
+                            start: {
+                              ...current.start,
+                              value: value?.start?.set({ day: 1 })?.toString?.() || null
+                            },
+                            end: {
+                              ...current.end,
+                              value:
+                                value?.end
+                                  ?.set({ day: getMaxDateInMonth(value?.end?.toString() || '') })
+                                  ?.toString?.() || null
+                            }
+                          }
+                        : current
+                    )
+                  }}
+                />
+              </div>
+            </div>
+            <div className='w-full flex justify-between items-center gap-2'>
+              <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+              <Button type='submit' id='submit-part1' color='primary' isLoading={loadingChart}>
+                Tampilkan
+              </Button>
+            </div>
+          </form>
+        </CardHeader>
+        <CardBody className='w-full'>
+          <ChartResumePart1 loading={loadingChart} data={part1Data} />
+        </CardBody>
+      </Card>
+    </div>
+  )
+}
+
+export default memo(ChartResume)

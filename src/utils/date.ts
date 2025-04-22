@@ -9,3 +9,13 @@ export const fixIsoDate = (input: string) => {
 
   throw new Error('Invalid date format')
 }
+
+export const getMaxDateInMonth = (input: string) => {
+  const [year, month] = input.split('-').map(Number)
+
+  if (!year || !month) {
+    throw new Error('Invalid date format')
+  }
+
+  return new Date(year, month, 0).getDate()
+}

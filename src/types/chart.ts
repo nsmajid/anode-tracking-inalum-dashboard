@@ -8,7 +8,8 @@ export enum EnumChartCode {
   KORELASI = 'korelasi',
   GRADE = 'grade',
   QC = 'qc',
-  PNP = 'pnp'
+  PNP = 'pnp',
+  RESUME = 'resume'
 }
 
 export type DefaultChartData = {
@@ -75,5 +76,21 @@ export type ChartPnPPart1Data = Omit<DefaultChartData, 'datasets'> & {
   datasets: Array<{
     label: string
     data: number[]
+  }>
+}
+
+export type ChartResumePart1Data = Omit<DefaultChartData, 'datasets'> & {
+  notes: (string | null)[]
+  datasets: Array<{
+    label: string
+    data: number[]
+    custom_hover: boolean
+    hover?: Array<Array<{ jenis_anoda: string; berat: number; jumlah: number }>>
+  }>
+  info: Array<{
+    label: string
+    min: number
+    max: number
+    average: number
   }>
 }
