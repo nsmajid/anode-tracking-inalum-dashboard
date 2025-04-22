@@ -94,3 +94,13 @@ export type ChartResumePart1Data = Omit<DefaultChartData, 'datasets'> & {
     average: number
   }>
 }
+
+export type ChartKorelasiPart1Data = Omit<DefaultChartData, 'datasets'> & {
+  annotation: string | null
+  datasets: (number | null)[]
+  info: {
+    min: number | null
+    max: number
+    average: number
+  }
+}

@@ -80,7 +80,7 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
                     required: boolean
                   }
                 }
-                required: false
+                required: boolean
               }
             }
           }

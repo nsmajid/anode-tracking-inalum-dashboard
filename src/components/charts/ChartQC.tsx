@@ -179,7 +179,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
                     required: boolean
                   }
                 }
-                required: false
+                required: boolean
               }
             }
           }

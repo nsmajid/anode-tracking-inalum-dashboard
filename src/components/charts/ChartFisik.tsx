@@ -173,7 +173,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                     required: boolean
                   }
                 }
-                required: false
+                required: boolean
               }
             }
           }

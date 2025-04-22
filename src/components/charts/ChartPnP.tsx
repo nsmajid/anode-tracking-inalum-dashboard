@@ -74,7 +74,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
                     required: boolean
                   }
                 }
-                required: false
+                required: boolean
               }
               plant: {
                 default: string[] | null
