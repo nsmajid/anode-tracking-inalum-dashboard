@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: 'Anode Tracking Dashboard',
+  name: process.env.NEXT_PUBLIC_APP_NAME,
   description: '',
   navItems: [
     {

@@ -5,11 +5,11 @@ export const THEME_TYPE = {
   DARK: 'dark'
 }
 
-export const BASE_API_URL = 'https://at-dev.dolapps.my.id'
-export const BACKOFFICE_URL = 'https://at-dev.dolapps.my.id'
+export const BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL
+export const BACKOFFICE_URL = process.env.NEXT_PUBLIC_BACKOFFICE_URL
 
 export const API_KEY_HEADER = {
-  'DOLKODE-API-KEY': 'iDk77driVS'
+  'DOLKODE-API-KEY': process.env.NEXT_PUBLIC_DOLKODE_API_KEY
 }
 
 export const SESSION_KEY = {
