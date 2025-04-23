@@ -71,7 +71,8 @@ export default function ChartPage() {
             dashboard_has_slider: !!Number(data.data.dashboard.dashboard_has_slider),
             dashboard_number_of_slider: Number(data.data.dashboard.dashboard_number_of_slider || 0),
             dashboard_slide_timer: Number(data.data.dashboard.dashboard_slide_timer || 0),
-            dashboard_resolution: data.data.dashboard.dashboard_resolution
+            dashboard_resolution: data.data.dashboard.dashboard_resolution,
+            plants: null
           })
           setCharts(data.data.charts)
         } catch (error) {
