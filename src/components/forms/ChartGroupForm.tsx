@@ -36,6 +36,7 @@ import { useFieldArray } from 'react-hook-form'
 import { DefaultApiResponse } from '@/types/api'
 import { ChartItem } from '@/types/dashboard-settings'
 import clsx from 'clsx'
+import { EnumChartType } from '@/types/chart'
 
 type Props = {
   mode: 'ADD' | 'EDIT'
@@ -109,6 +110,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
   const { loadingRefData, getAllRefData, resolutions, plants, charts } = useRefData()
   const [loading, setLoading] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
+  const [chartType, setChartType] = useState<EnumChartType | null>(null)
   const { errors, rhf } = useHookForm<FormFields>(defaultValues, validationSchemas)
   const isUseSlider = useMemo(() => rhf.getValues('dashboard_has_slider'), [rhf.watch('dashboard_has_slider')])
   const {
@@ -152,6 +154,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                 dashboard_resolution_id: string
                 dashboard_has_slider: string
                 dashboard_slide_timer: string | null
+                dashboard_type: EnumChartType
               }
               plants: Array<{ plant_id: string }>
               charts: Array<ChartItem>
@@ -159,6 +162,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
           >('/api/dashboard', { params: { id: editUUID } })
 
           const { dashboard, plants = [], charts = [] } = data?.data ?? {}
+
+          setChartType(dashboard?.dashboard_type ?? null)
 
           const is_has_slider = dashboard?.dashboard_has_slider === '1'
 
@@ -385,13 +390,19 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
         }
       })
       toast.success('Data berhasil disimpan')
-      router.back()
+      setTimeout(() => {
+        router.push('/settings')
+        setSubmitting(false)
+      }, 1000)
     } catch (error) {
-      toast.error(getErrorMessage(error))
-    } finally {
       setSubmitting(false)
+      toast.error(getErrorMessage(error))
     }
   })
+
+  const isOnlyEditChart = useMemo(() => {
+    return mode === 'EDIT' && chartType === EnumChartType.BASIC
+  }, [mode, chartType])
 
   return (
     <div className='w-full space-y-6'>
@@ -418,6 +429,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                     type='text'
                     size='lg'
                     isRequired
+                    isDisabled={isOnlyEditChart}
+                    isReadOnly={isOnlyEditChart}
                     {...rhf.register('dashboard_name')}
                     value={rhf.watch('dashboard_name')}
                     isInvalid={!!(errors?.dashboard_name?.message || '')}
@@ -431,6 +444,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                     placeholder='Pilih resolusi'
                     size='lg'
                     isRequired
+                    isDisabled={isOnlyEditChart}
                     {...rhf.register('dashboard_resolution_id')}
                     selectedKeys={rhf.watch('dashboard_resolution_id') ? [rhf.watch('dashboard_resolution_id')] : []}
                     isLoading={loadingRefData}
@@ -444,7 +458,12 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                 </div>
                 <div className='col-span-12 lg:col-span-2'>
                   <div className='w-full h-full flex flex-col justify-center'>
-                    <Switch {...rhf.register('dashboard_public')} isSelected={rhf.watch('dashboard_public')}>
+                    <Switch
+                      isDisabled={isOnlyEditChart}
+                      isReadOnly={isOnlyEditChart}
+                      {...rhf.register('dashboard_public')}
+                      isSelected={rhf.watch('dashboard_public')}
+                    >
                       Public
                     </Switch>
                   </div>
@@ -452,6 +471,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                 <div className='col-span-12 lg:col-span-3'>
                   <div className='w-full h-full flex flex-col justify-center'>
                     <Switch
+                      isDisabled={isOnlyEditChart}
+                      isReadOnly={isOnlyEditChart}
                       {...rhf.register('dashboard_has_slider', {
                         onChange: () => {
                           replaceSlideItem([])
@@ -472,6 +493,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                       type='number'
                       min={0}
                       size='lg'
+                      isDisabled={isOnlyEditChart}
+                      isReadOnly={isOnlyEditChart}
                       endContent={
                         <div className='pointer-events-none flex items-center'>
                           <span className='text-default-400 text-small'>Menit</span>
@@ -488,7 +511,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                   <CheckboxGroup
                     label='Pilih plant/lokasi'
                     size='lg'
-                    isDisabled={loadingRefData}
+                    isDisabled={loadingRefData || isOnlyEditChart}
+                    isReadOnly={isOnlyEditChart}
                     value={rhf.watch('plant_ids')}
                     onValueChange={(value) => rhf.setValue('plant_ids', value)}
                     isInvalid={!!(errors?.plant_ids?.message || '')}

@@ -85,6 +85,16 @@ export default function IndexPage() {
                           <b>Resolusi:</b> {r.dashboard_resolution}
                         </div>
                       </div>
+                      {r.plants ? (
+                        <div className='flex flex-wrap items-center gap-2 py-1'>
+                          <div className='text-sm font-medium'>Plants: </div>
+                          {r.plants.split(',').map((p) => (
+                            <Chip key={p} color='warning' size='sm'>
+                              {p}
+                            </Chip>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                     <div>
                       <Dropdown>

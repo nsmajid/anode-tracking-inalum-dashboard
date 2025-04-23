@@ -10,6 +10,7 @@ export type DashboardSettingItem = {
   dashboard_number_of_slider: number
   dashboard_slide_timer: number
   dashboard_resolution: string
+  plants: string | null
 }
 
 export type DashboardResolutionItem = { id: string, dashboard_resolution: string }

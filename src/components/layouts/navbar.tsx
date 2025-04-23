@@ -16,7 +16,7 @@ import { Grid, Settings, User } from 'react-feather'
 import { useRouter } from 'next/router'
 
 import { siteConfig } from '@/config/site'
-import { ThemeSwitch } from '@/components/theme-switch'
+// import { ThemeSwitch } from '@/components/theme-switch'
 import { Logo } from '@/components/icons'
 import { useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL } from '@/config/constants'
@@ -65,7 +65,7 @@ export const Navbar = () => {
                   item.active && 'text-primary font-bold'
                 )}
                 color='foreground'
-                href={item.href}
+                href={item.href ?? '#'}
               >
                 <item.icon className='w-4 h-4 mr-2' />
                 {item.label}
@@ -77,7 +77,7 @@ export const Navbar = () => {
 
       <NavbarContent className='hidden sm:flex basis-1/5 sm:basis-full' justify='end'>
         <NavbarItem className='hidden sm:flex gap-4'>
-          <ThemeSwitch />
+          {/* <ThemeSwitch /> */}
           {profile && (
             <Link href='/profile' className='w-fit' color='foreground'>
               <User className='mr-2' />
@@ -87,7 +87,7 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent className='sm:hidden basis-1 pl-4' justify='end'>
-        <ThemeSwitch />
+        {/* <ThemeSwitch /> */}
         {profile && (
           <Link href='/profile' className='w-fit' color='foreground'>
             <User className='mr-2' />

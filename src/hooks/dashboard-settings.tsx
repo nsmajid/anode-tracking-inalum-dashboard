@@ -25,6 +25,7 @@ export const useDashboardSettings = () => {
             dashboard_number_of_slider: string
             dashboard_slide_timer: string | null
             dashboard_resolution: string
+            plants: string | null
           }>
         }>
       >('/api/dashboard')
@@ -39,7 +40,8 @@ export const useDashboardSettings = () => {
             dashboard_has_slider: !!Number(r.dashboard_has_slider || 0),
             dashboard_number_of_slider: Number(r.dashboard_number_of_slider || 0),
             dashboard_slide_timer: Number(r.dashboard_slide_timer || 0),
-            dashboard_resolution: r.dashboard_resolution
+            dashboard_resolution: r.dashboard_resolution,
+            plants: r.plants
           }
         })
       )

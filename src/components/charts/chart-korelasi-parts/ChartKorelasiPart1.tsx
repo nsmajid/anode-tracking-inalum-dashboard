@@ -44,7 +44,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data }) => {
               size: 6
             },
             stroke: {
-              width: 0
+              width: 2
             },
             xaxis: {
               title: {
