@@ -15,7 +15,7 @@ export default function App({ Component, pageProps }: AppLayoutProps) {
 
   return (
     <HeroUIProvider navigate={router.push}>
-      <NextThemesProvider>
+      <NextThemesProvider defaultTheme='light' forcedTheme='light'>
         <ProfileProvider>
           {getLayout(<Component {...pageProps} />)}
         </ProfileProvider>
