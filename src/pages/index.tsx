@@ -33,7 +33,7 @@ export default function IndexPage() {
   if (!profile) {
     return (
       <div className='w-full flex min-h-[60dvh]'>
-        <div className='text-sm italic'>404 Not Found</div>
+        <div className='text-sm italic m-auto'>404 Not Found</div>
       </div>
     )
   }

@@ -72,9 +72,7 @@ const DashboardWithSlider: React.FC<Props> = ({ dashboard, charts }) => {
         autoplaySpeed={dashboard?.dashboard_slide_timer ? Number(dashboard?.dashboard_slide_timer) * 60000 : undefined}
       >
         {Object.values(groupedChartsBySlide).map((charts, i) => (
-          <div key={i} className='w-full px-16 space-y-6 pb-4'>
-            <RenderCharts charts={charts} />
-          </div>
+          <RenderCharts key={i} charts={charts} wrapperClassName='px-16 space-y-6 pb-4' />
         ))}
       </Slider>
     </div>

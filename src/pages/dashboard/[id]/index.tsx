@@ -96,11 +96,7 @@ export default function ChartPage() {
     return <DashboardWithSlider dashboard={dashboard} charts={charts} />
   }
 
-  return (
-    <div className='w-full space-y-6'>
-      <RenderCharts charts={charts} />
-    </div>
-  )
+  return <RenderCharts charts={charts} wrapperClassName='space-y-6' />
 }
 
 ChartPage.getLayout = (page: React.ReactNode) => <ChartLayout>{page}</ChartLayout>
