@@ -1,32 +1,37 @@
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { Spinner } from '@heroui/react'
+
 import { Head } from './head'
 
 import { Navbar } from '@/components/layouts/navbar'
 import { Footer } from '@/components/layouts/footer'
-import { useEffect } from 'react'
 import { useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL, getAuthHeaders, SESSION_KEY } from '@/config/constants'
-import { useRouter } from 'next/router'
-import { Spinner } from '@heroui/react'
 
 const redirectAuthURL = `${BACKOFFICE_URL}/auth-check?external=1`
+
+const restrictedRoutes = ['/settings', '/profile']
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { loading, profileStatus } = useProfile()
 
   useEffect(() => {
-    if (!loading && router.pathname.startsWith('/settings')) {
+    if (!loading && restrictedRoutes.some((v) => router.pathname.startsWith(v))) {
       (async () => {
         const headers = await getAuthHeaders()
         const is_has_session = !!headers?.[SESSION_KEY.header]
 
         if (is_has_session) {
           if (profileStatus === 401) {
-            // window.location.href = redirectAuthURL
+            window.location.href = redirectAuthURL
+
             return
           }
         } else {
           window.location.href = redirectAuthURL
+
           return
         }
       })()
