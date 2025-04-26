@@ -135,7 +135,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
       })
 
       setTimeout(() => {
-        document.getElementById('submit-chart')?.click()
+        document.getElementById(`submit-part1-${chart.id}`)?.click()
       }, 1000)
     },
     onShowChart: (part, data) => {
@@ -303,7 +303,13 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
-              <Button type='submit' id='submit-chart' color='primary' isLoading={loadingChart} className='print:hidden'>
+              <Button
+                type='submit'
+                id={`submit-part1-${chart.id}`}
+                color='primary'
+                isLoading={loadingChart}
+                className='print:hidden'
+              >
                 Tampilkan
               </Button>
             </div>
