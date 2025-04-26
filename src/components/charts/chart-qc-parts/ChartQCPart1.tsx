@@ -18,9 +18,9 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data }) => {
           <Spinner size='lg' />
         </div>
       )}
-      <div className='w-full grid grid-cols-2 gap-6'>
+      <div className='w-full grid grid-cols-2 print:grid-cols-1 gap-6'>
         {data?.map((chart, i) => (
-          <div className='w-full space-y-4' key={i}>
+          <div className='w-full space-y-4 break-inside-avoid-page' key={i}>
             <ReactApexChart
               type='line'
               series={[
@@ -105,8 +105,8 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data }) => {
               }}
             />
             {chart?.info && (
-              <div className='w-full flex justify-center pb-6'>
-                <div className='w-full max-w-md grid grid-cols-1 lg:grid-cols-3 gap-4'>
+              <div className='w-full flex justify-center pb-6 break-inside-avoid-page'>
+                <div className='w-full max-w-md grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>
                   <Card>
                     <CardBody>
                       <div className='w-full text-center text-xl font-bold mb-1'>{chart.info.average}</div>

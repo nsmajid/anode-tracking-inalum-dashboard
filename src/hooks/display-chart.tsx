@@ -4,12 +4,15 @@ import toast from 'react-hot-toast'
 import { DefaultApiResponse } from '@/types/api'
 import api from '@/utils/api'
 import { getErrorMessage } from '@/utils/error'
+import { atom, useSetAtom } from 'jotai'
 
 type RequestOptions = {
   isSubmitChart?: boolean
   part?: string
   preventLoading?: boolean
 }
+
+export const atomDisablePrint = atom<boolean>(true)
 
 export const useDisplayChart = <T extends object>(
   chartId: string,
@@ -24,6 +27,7 @@ export const useDisplayChart = <T extends object>(
   const [chartData, setChartData] = useState<{
     chart_name: string
   } | null>(null)
+  const setDisablePrint = useSetAtom(atomDisablePrint)
 
   const getDisplayChart = useCallback(
     async (customParams?: object, requestOptions?: RequestOptions) => {
@@ -35,6 +39,7 @@ export const useDisplayChart = <T extends object>(
             setLoading(true)
           }
         }
+        setDisablePrint(true)
         requesting.current = true
         const { data } = await api.get<
           DefaultApiResponse<{
@@ -68,6 +73,7 @@ export const useDisplayChart = <T extends object>(
       } finally {
         setLoading(false)
         setLoadingChart(false)
+        setDisablePrint(false)
         requesting.current = false
       }
     },

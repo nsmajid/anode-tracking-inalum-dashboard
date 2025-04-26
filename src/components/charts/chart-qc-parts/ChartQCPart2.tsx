@@ -18,41 +18,43 @@ const ChartQCPart2: React.FC<Props> = ({ loading, data }) => {
           <Spinner size='lg' />
         </div>
       )}
-      <ReactApexChart
-        type='bar'
-        series={[
-          {
-            name: '',
-            data: data?.datasets || []
-          }
-        ]}
-        options={{
-          chart: {
-            type: 'bar',
-            height: 350
-          },
-          xaxis: {
-            title: {
-              text: data?.['x-label'] || '',
-              style: {
-                fontSize: '18px'
-              }
+      <div className='w-full'>
+        <ReactApexChart
+          type='bar'
+          series={[
+            {
+              name: '',
+              data: data?.datasets || []
+            }
+          ]}
+          options={{
+            chart: {
+              type: 'bar',
+              height: 350
             },
-            categories: data?.labels || []
-          },
-          yaxis: {
-            title: {
-              text: data?.['y-label'] || '',
-              style: {
-                fontSize: '18px'
+            xaxis: {
+              title: {
+                text: data?.['x-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
+              },
+              categories: data?.labels || []
+            },
+            yaxis: {
+              title: {
+                text: data?.['y-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
               }
             }
-          }
-        }}
-      />
+          }}
+        />
+      </div>
       {data?.info && (
         <div className='w-full flex justify-center pb-6'>
-          <div className='w-full max-w-md grid grid-cols-1 lg:grid-cols-3 gap-4'>
+          <div className='w-full max-w-md grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>
             <Card>
               <CardBody>
                 <div className='w-full text-center text-xl font-bold mb-1'>{data.info.average}</div>

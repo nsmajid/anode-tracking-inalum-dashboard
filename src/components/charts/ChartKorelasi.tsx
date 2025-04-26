@@ -352,7 +352,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
   return (
     <div className='w-full space-y-6'>
       <h3 className='text-2xl font-semibold text-center'>{chartData?.chart_name}</h3>
-      <Card className='w-full space-y-2'>
+      <Card className='w-full space-y-2 print:shadow-none'>
         <CardHeader>
           <form
             className='w-full space-y-2'
@@ -566,7 +566,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
-              <Button type='submit' id='submit-part1' color='primary' isLoading={loadingChart}>
+              <Button type='submit' id='submit-part1' color='primary' isLoading={loadingChart} className='print:hidden'>
                 Tampilkan
               </Button>
             </div>

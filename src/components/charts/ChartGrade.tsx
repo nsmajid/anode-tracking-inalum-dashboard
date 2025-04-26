@@ -439,7 +439,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
   return (
     <div className='w-full space-y-6'>
       <h3 className='text-2xl font-semibold text-center'>{chartData?.chart_name}</h3>
-      <Card className='w-full space-y-2'>
+      <Card className='w-full space-y-2 print:shadow-none'>
         <CardHeader>
           <form
             className='w-full space-y-2'
@@ -617,7 +617,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
-              <Button type='submit' id='submit-part1' color='primary' isLoading={loadingChart}>
+              <Button type='submit' id='submit-part1' color='primary' isLoading={loadingChart} className='print:hidden'>
                 Tampilkan
               </Button>
             </div>
@@ -628,8 +628,8 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
         </CardBody>
       </Card>
       {part1Data && (
-        <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-6'>
-          <Card className='w-full space-y-2'>
+        <div className='w-full grid grid-cols-1 lg:grid-cols-2 print:grid-cols-1 gap-6'>
+          <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
             <CardHeader>
               <div className='w-full space-y-3'>
                 <div className='text-xl font-semibold'>{chartNames?.[2]}</div>
@@ -658,7 +658,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
               <ChartGradePart2or3 loading={loadingPart2} data={part2Data} />
             </CardBody>
           </Card>
-          <Card className='w-full space-y-2'>
+          <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
             <CardHeader>
               <div className='w-full space-y-3'>
                 <div className='text-xl font-semibold'>{chartNames?.[3]}</div>

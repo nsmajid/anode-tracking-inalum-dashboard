@@ -89,7 +89,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data }) => {
         />
         {data?.info && (
           <div className='w-full flex justify-center pb-6'>
-            <div className='w-full max-w-md grid grid-cols-1 lg:grid-cols-3 gap-4'>
+            <div className='w-full max-w-md grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>
               <Card>
                 <CardBody>
                   <div className='w-full text-center text-xl font-bold mb-1'>{data.info.average || 0}</div>

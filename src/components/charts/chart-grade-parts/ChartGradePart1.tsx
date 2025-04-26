@@ -117,14 +117,14 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
       />
       {(data?.info || []).length > 0 && (
         <div className='w-full flex justify-center pb-6'>
-          <div className='w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-4'>
+          <div className='w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-4'>
             {(data?.info || []).map((info, i) => (
               <Card key={info.label} style={{ backgroundColor: fixedColors?.[i] }}>
                 <CardBody className='space-y-4'>
                   <div className='w-full flex justify-center gap-2'>
                     <div className='text-lg font-bold bg-background px-5 py-1 rounded-3xl'>{info.label}</div>
                   </div>
-                  <div className='w-full grid grid-cols-1 lg:grid-cols-3 gap-4'>
+                  <div className='w-full grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>
                     <Card>
                       <CardBody>
                         <div className='w-full text-center text-xl font-bold mb-1'>{info.average}</div>
