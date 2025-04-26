@@ -31,7 +31,11 @@ export default function IndexPage() {
   }
 
   if (!profile) {
-    return <div className='w-full'>404 Not Found</div>
+    return (
+      <div className='w-full flex min-h-[60dvh]'>
+        <div className='text-sm italic'>404 Not Found</div>
+      </div>
+    )
   }
 
   return (
