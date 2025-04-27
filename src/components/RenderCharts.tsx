@@ -3,12 +3,13 @@ import { memo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { useAtomValue } from 'jotai'
 import { useReactToPrint } from 'react-to-print'
-import { Spinner, Tooltip } from '@heroui/react'
+import { Button, Spinner, Tooltip } from '@heroui/react'
 import { Printer } from 'react-feather'
 
 import { atomDisablePrint } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { EnumChartCode } from '@/types/chart'
+import { useChartFilter } from '@/hooks/chart-filter'
 
 const ChartFisik = dynamic(() => import('./charts/ChartFisik'), { ssr: false })
 const ChartKorelasi = dynamic(() => import('./charts/ChartKorelasi'), { ssr: false })
@@ -33,22 +34,24 @@ const RenderCharts: React.FC<{
       setPrinting(false)
     }
   })
+  const { setTrigger, saving } = useChartFilter()
 
   return (
     <>
-      {!isDisablePrint && (
-        <div className='w-full flex justify-end'>
-          <div>
-            {printing ? (
-              <Spinner size='sm' />
-            ) : (
-              <Tooltip content='Cetak Chart' placement='left' color='foreground'>
-                <Printer className='cursor-pointer' onClick={() => reactToPrintFn()} />
-              </Tooltip>
-            )}
-          </div>
+      <div className='w-full flex justify-end items-center gap-2'>
+        <Button color='primary' isLoading={saving} onPress={() => setTrigger((current) => current + 1)}>
+          Simpan Filter
+        </Button>
+        <div className={clsx(isDisablePrint && 'invisible')}>
+          {printing ? (
+            <Spinner size='sm' className='mx-5' />
+          ) : (
+            <Tooltip content='Cetak Chart' placement='bottom-end' color='foreground'>
+              <Button variant='light' color='primary' onPress={() => reactToPrintFn()} startContent={<Printer />} />
+            </Tooltip>
+          )}
         </div>
-      )}
+      </div>
       <div ref={refToPrint} className={clsx('w-full print:p-4', wrapperClassName)}>
         {charts.map((chart) => (
           <div key={chart.id} className='w-full break-inside-avoid-page'>

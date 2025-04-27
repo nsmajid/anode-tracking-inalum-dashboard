@@ -32,6 +32,7 @@ import {
   QCParametersFilterStateProperties
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
+import { useChartFilter } from '@/hooks/chart-filter'
 
 type Props = {
   chart: ChartItem
@@ -257,6 +258,22 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
     }
   })
 
+  useChartFilter({
+    chart,
+    filters: useMemo(
+      () =>
+        buildChartFilters({
+          qc_parameters: parametersProperties,
+          lot: lotProperties,
+          cycle: cycleProperties,
+          date_range: dateRangeProperties,
+          category: categoryProperties,
+          numeric: numericProperties
+        }),
+      [lotProperties, dateRangeProperties, cycleProperties, categoryProperties, numericProperties, parametersProperties]
+    )
+  })
+
   const onSubmitChartPart2 = useCallback(() => {
     const params: ReturnType<typeof buildChartFilters> = {
       part: '2',
@@ -300,8 +317,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
         qc_parameters: parametersProperties,
         lot: lotProperties,
         cycle: cycleProperties,
-        date_range: dateRangeProperties,
-        numeric: numericProperties
+        date_range: dateRangeProperties
       })
     }
 

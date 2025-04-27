@@ -10,6 +10,7 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { ChartPnPPart1Data, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
+import { useChartFilter } from '@/hooks/chart-filter'
 
 type Props = {
   chart: ChartItem
@@ -127,6 +128,18 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
         }
       }
     }
+  })
+
+  useChartFilter({
+    chart,
+    filters: useMemo(
+      () =>
+        buildChartFilters({
+          plant: plantProperties,
+          date_range: dateRangeProperties
+        }),
+      [plantProperties, dateRangeProperties]
+    )
   })
 
   const onSubmitChart = useCallback(() => {

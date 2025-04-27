@@ -29,6 +29,7 @@ import {
   NumericFilterStateProperties
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
+import { useChartFilter } from '@/hooks/chart-filter'
 
 type Props = {
   chart: ChartItem
@@ -224,6 +225,21 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
         }
       }
     }
+  })
+
+  useChartFilter({
+    chart,
+    filters: useMemo(
+      () =>
+        buildChartFilters({
+          lot: lotProperties,
+          cycle: cycleProperties,
+          date_range: dateRangeProperties,
+          category: categoryProperties,
+          numeric: numericProperties
+        }),
+      [lotProperties, cycleProperties, dateRangeProperties, categoryProperties, numericProperties]
+    )
   })
 
   const onSubmitChartPart2 = useCallback(() => {

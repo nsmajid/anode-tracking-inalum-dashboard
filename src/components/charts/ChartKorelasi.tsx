@@ -9,7 +9,7 @@ import {
   SelectItem,
   Skeleton
 } from '@heroui/react'
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { X } from 'react-feather'
 import { parseDate } from '@internationalized/date'
 
@@ -26,6 +26,7 @@ import {
   KorelasiParametersMinMaxFilterStateProperties
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
+import { useChartFilter } from '@/hooks/chart-filter'
 
 type Props = {
   chart: ChartItem
@@ -210,6 +211,33 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
         }
       }
     }
+  })
+
+  useChartFilter({
+    chart,
+    filters: useMemo(
+      () =>
+        buildChartFilters({
+          korelasi_parameters_1: parameter1Properties,
+          korelasi_parameters_1_min: parameter1MinProperties,
+          korelasi_parameters_1_max: parameter1MaxProperties,
+          korelasi_parameters_2: parameter2Properties,
+          korelasi_parameters_2_min: parameter2MinProperties,
+          korelasi_parameters_2_max: parameter2MaxProperties,
+          class: classProperties,
+          date_range: dateRangeProperties
+        }),
+      [
+        parameter1Properties,
+        parameter1MinProperties,
+        parameter1MaxProperties,
+        parameter2Properties,
+        parameter2MinProperties,
+        parameter2MaxProperties,
+        classProperties,
+        dateRangeProperties
+      ]
+    )
   })
 
   const onSubmitChartPart1 = useCallback(() => {

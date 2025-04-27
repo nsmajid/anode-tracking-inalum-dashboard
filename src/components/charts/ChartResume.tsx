@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardHeader, DateRangePicker, Select, SelectItem, Skeleton } from '@heroui/react'
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { X } from 'react-feather'
 import { parseDate } from '@internationalized/date'
 
@@ -10,6 +10,7 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate, getMaxDateInMonth } from '@/utils/date'
 import { ChartResumePart1Data, DateRangeFilterStateProperties, LotFilterStateProperties } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
+import { useChartFilter } from '@/hooks/chart-filter'
 
 type Props = {
   chart: ChartItem
@@ -107,6 +108,18 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
         }
       }
     }
+  })
+
+  useChartFilter({
+    chart,
+    filters: useMemo(
+      () =>
+        buildChartFilters({
+          lot: lotProperties,
+          date_range: dateRangeProperties
+        }),
+      [lotProperties, dateRangeProperties]
+    )
   })
 
   const onSubmitChart = useCallback(() => {
