@@ -267,7 +267,6 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 placeholder={`Pilih ${parameter1Properties?.label_name}`}
                 isRequired={parameter1Properties?.required}
                 isDisabled={loadingChart}
-                selectionMode='multiple'
                 selectedKeys={parameter1Properties?.value ? [parameter1Properties?.value] : []}
                 onChange={(e) => {
                   const { value } = e.target
@@ -324,7 +323,6 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 placeholder={`Pilih ${parameter2Properties?.label_name}`}
                 isRequired={parameter2Properties?.required}
                 isDisabled={loadingChart}
-                selectionMode='multiple'
                 selectedKeys={parameter2Properties?.value ? [parameter2Properties?.value] : []}
                 onChange={(e) => {
                   const { value } = e.target
