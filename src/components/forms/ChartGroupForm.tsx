@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { ArrowLeft, Check, Menu, Plus, Trash2 } from 'react-feather'
 import { Input } from '@heroui/input'
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -22,6 +23,8 @@ import * as yup from 'yup'
 import { Method } from 'axios'
 import toast from 'react-hot-toast'
 import { DragDropContext, Draggable, DragStart, Droppable, DropResult } from 'react-beautiful-dnd'
+import { useFieldArray } from 'react-hook-form'
+import clsx from 'clsx'
 
 import { title } from '../primitives'
 
@@ -32,10 +35,8 @@ import { useMounted } from '@/hooks/mounted'
 import { useHookForm } from '@/hooks/form'
 import api from '@/utils/api'
 import { getErrorMessage } from '@/utils/error'
-import { useFieldArray } from 'react-hook-form'
 import { DefaultApiResponse } from '@/types/api'
 import { ChartItem } from '@/types/dashboard-settings'
-import clsx from 'clsx'
 import { EnumChartType } from '@/types/chart'
 
 type Props = {
@@ -51,9 +52,9 @@ type FormFields = {
   plant_ids: string[]
   dashboard_slide_timer: number | null
   dashboard_slides: Array<{
-    slide_charts: Array<{ _id: string; name: string }>
+    slide_charts: Array<{ _id: string; name: string; default?: string | null }>
   }>
-  dashboard_charts: Array<{ _id: string; name: string }>
+  dashboard_charts: Array<{ _id: string; name: string; default?: string | null }>
 }
 
 const validationSchemas: AnyObjectSchema = yup.object({
@@ -190,7 +191,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                     }
                     acc[slideIndex].slide_charts.push({
                       _id: chart.chart_id,
-                      name: chart.chart_name
+                      name: chart.chart_name,
+                      default: chart.default
                     })
 
                     return acc
@@ -202,7 +204,8 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
             replaceChartItem(
               charts.map((chart) => ({
                 _id: chart.chart_id,
-                name: chart.chart_name
+                name: chart.chart_name,
+                default: chart.default
               }))
             )
           }
@@ -316,11 +319,11 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
     let method: Method | undefined
 
     if (mode === 'ADD') {
-      apiUrl = `/api/dashboard`
+      apiUrl = `/api/edashboard`
       method = 'POST'
     }
     if (mode === 'EDIT' && editUUID) {
-      apiUrl = `/api/dashboard/${editUUID}`
+      apiUrl = `/api/edashboard/${editUUID}`
       method = 'PUT'
     }
 
@@ -336,6 +339,7 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
       plant_ids: string[]
       dashboard_slide_timer: number | null
       chart_ids: Array<{ id: string; order: number; slide: number }>
+      default: string[]
     } = {
       dashboard_name: data.dashboard_name,
       dashboard_resolution_id: data.dashboard_resolution_id,
@@ -362,7 +366,19 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
             id: chart._id,
             order: i + 1,
             slide: 0
-          }))
+          })),
+      default: data.dashboard_has_slider
+        ? data.dashboard_slides.reduce(
+            (acc, slide) => {
+              slide.slide_charts.map((chart) => {
+                acc.push(chart?.default || '')
+              })
+
+              return acc
+            },
+            [] as (typeof payload)['default']
+          )
+        : data.dashboard_charts.map((chart) => chart?.default || '')
     }
 
     const formData = new URLSearchParams()
@@ -378,7 +394,9 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
       formData.append(`chart_ids[${i}][order]`, String(chartId.order))
       formData.append(`chart_ids[${i}][slide]`, String(chartId.slide))
     })
-
+    payload.default.forEach((id, i) => {
+      formData.append(`default[${i}]`, id)
+    })
     try {
       setSubmitting(true)
       await api({
@@ -525,260 +543,271 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                     ))}
                   </CheckboxGroup>
                 </div>
-                {rhf.watch('dashboard_has_slider') ? (
-                  <div className='col-span-12 lg:col-span-9 space-y-4'>
-                    <div>
-                      Slide ({slideItems.length}) <span className='text-small text-danger-500'>*</span>
-                    </div>
-                    {slideItems.length > 0 ? (
-                      <div className='w-full rounded-xl p-4 shadow-inner bg-default-100'>
-                        <DragDropContext enableDefaultSensors onDragStart={onDragSlideStart} onDragEnd={onDragSlideEnd}>
-                          <Droppable droppableId='droppable-slides' isDropDisabled={dragMode !== 'slide'}>
-                            {(droppableProvided) => (
-                              <div
-                                className='w-full space-y-4 py-2'
-                                {...droppableProvided.droppableProps}
-                                ref={droppableProvided.innerRef}
-                              >
-                                {slideItems.map((slide, i) => {
-                                  return (
-                                    <Draggable key={i} index={i} draggableId={`draggable-slide-item-${i}`}>
-                                      {(provSlide) => (
-                                        <div
-                                          className='w-full p-4 space-y-4 shadow rounded-xl bg-background'
-                                          {...provSlide.draggableProps}
-                                          ref={provSlide.innerRef}
-                                        >
-                                          <div className='w-full flex items-center gap-4'>
-                                            <div {...provSlide.dragHandleProps}>
-                                              <Button
-                                                isIconOnly
-                                                color='default'
-                                                size='sm'
-                                                variant='flat'
-                                                startContent={<Menu />}
-                                                isLoading={loadingRefData}
-                                              />
-                                            </div>
-                                            <div className='w-full text-lg font-semibold'>Slide ke {i + 1}</div>
-                                            <div className='flex items-center gap-2'>
-                                              <Button
-                                                isIconOnly
-                                                color='primary'
-                                                size='sm'
-                                                variant='flat'
-                                                startContent={<Plus />}
-                                                isLoading={loadingRefData}
-                                                onPress={() => {
-                                                  setCurrentSlideIndex(i)
-                                                  onOpenAddChart()
-                                                }}
-                                              />
-                                              <Button
-                                                isIconOnly
-                                                color='danger'
-                                                size='sm'
-                                                variant='flat'
-                                                startContent={<Trash2 />}
-                                                onPress={() => removeSlideItem(i)}
-                                              />
-                                            </div>
-                                          </div>
-                                          <Divider />
-                                          <Droppable
-                                            droppableId={`droppable-slide-${i}`}
-                                            isDropDisabled={dragMode !== 'chart'}
+
+                <div className='col-span-12 lg:col-span-9 space-y-4'>
+                  {mode === 'EDIT' && (
+                    <Alert
+                      color='warning'
+                      description='Menghapus chart item yang sudah ada akan menyebabkan hilangnya filter default yang sebelumnya telah disimpan ketika anda menyimpan group chart ini'
+                      title='PERINGATAN'
+                      variant='faded'
+                    />
+                  )}
+                  {rhf.watch('dashboard_has_slider') ? (
+                    <>
+                      <div>
+                        Slide ({slideItems.length}) <span className='text-small text-danger-500'>*</span>
+                      </div>
+                      {slideItems.length > 0 ? (
+                        <div className='w-full rounded-xl p-4 shadow-inner bg-default-100'>
+                          <DragDropContext enableDefaultSensors onDragStart={onDragSlideStart} onDragEnd={onDragSlideEnd}>
+                            <Droppable droppableId='droppable-slides' isDropDisabled={dragMode !== 'slide'}>
+                              {(droppableProvided) => (
+                                <div
+                                  className='w-full space-y-4 py-2'
+                                  {...droppableProvided.droppableProps}
+                                  ref={droppableProvided.innerRef}
+                                >
+                                  {slideItems.map((slide, i) => {
+                                    return (
+                                      <Draggable key={i} index={i} draggableId={`draggable-slide-item-${i}`}>
+                                        {(provSlide) => (
+                                          <div
+                                            className='w-full p-4 space-y-4 shadow rounded-xl bg-background'
+                                            {...provSlide.draggableProps}
+                                            ref={provSlide.innerRef}
                                           >
-                                            {(droppableProvidedSlide, { isDraggingOver }) => (
-                                              <div
-                                                className={clsx(
-                                                  'w-full space-y-4 py-2',
-                                                  dragMode === 'chart' && 'pb-20',
-                                                  isDraggingOver && 'px-2 bg-primary-50 rounded-xl'
-                                                )}
-                                                {...droppableProvidedSlide.droppableProps}
-                                                ref={droppableProvidedSlide.innerRef}
-                                              >
-                                                {slide.slide_charts.map((chart, idx) => (
-                                                  <Draggable
-                                                    key={idx}
-                                                    index={idx}
-                                                    draggableId={`draggable-chart-item-${i}-${idx}`}
-                                                  >
-                                                    {(prov) => (
-                                                      <div
-                                                        className='w-full'
-                                                        {...prov.draggableProps}
-                                                        style={{
-                                                          ...prov.draggableProps.style,
-                                                          userSelect: 'none',
-                                                          position: 'static'
-                                                        }}
-                                                        ref={prov.innerRef}
-                                                      >
-                                                        <div className='w-full p-4 space-y-4 border-2 rounded-xl bg-background'>
-                                                          <div className='w-full flex items-start gap-4'>
-                                                            <div {...prov.dragHandleProps}>
-                                                              <Menu className='w-6 h-6' />
-                                                            </div>
-                                                            <div className='w-full'>{chart.name}</div>
-                                                            <div
-                                                              role='button'
-                                                              title='Hapus'
-                                                              className='cursor-pointer'
-                                                              onClick={() => {
-                                                                updateSlideItem(i, {
-                                                                  slide_charts: slideItems[i].slide_charts.filter(
-                                                                    (r) => r._id !== chart._id
-                                                                  )
-                                                                })
-                                                              }}
-                                                            >
-                                                              <Trash2 className='w-6 h-6 text-danger' />
+                                            <div className='w-full flex items-center gap-4'>
+                                              <div {...provSlide.dragHandleProps}>
+                                                <Button
+                                                  isIconOnly
+                                                  color='default'
+                                                  size='sm'
+                                                  variant='flat'
+                                                  startContent={<Menu />}
+                                                  isLoading={loadingRefData}
+                                                />
+                                              </div>
+                                              <div className='w-full text-lg font-semibold'>Slide ke {i + 1}</div>
+                                              <div className='flex items-center gap-2'>
+                                                <Button
+                                                  isIconOnly
+                                                  color='primary'
+                                                  size='sm'
+                                                  variant='flat'
+                                                  startContent={<Plus />}
+                                                  isLoading={loadingRefData}
+                                                  onPress={() => {
+                                                    setCurrentSlideIndex(i)
+                                                    onOpenAddChart()
+                                                  }}
+                                                />
+                                                <Button
+                                                  isIconOnly
+                                                  color='danger'
+                                                  size='sm'
+                                                  variant='flat'
+                                                  startContent={<Trash2 />}
+                                                  onPress={() => removeSlideItem(i)}
+                                                />
+                                              </div>
+                                            </div>
+                                            <Divider />
+                                            <Droppable
+                                              droppableId={`droppable-slide-${i}`}
+                                              isDropDisabled={dragMode !== 'chart'}
+                                            >
+                                              {(droppableProvidedSlide, { isDraggingOver }) => (
+                                                <div
+                                                  className={clsx(
+                                                    'w-full space-y-4 py-2',
+                                                    dragMode === 'chart' && 'pb-20',
+                                                    isDraggingOver && 'px-2 bg-primary-50 rounded-xl'
+                                                  )}
+                                                  {...droppableProvidedSlide.droppableProps}
+                                                  ref={droppableProvidedSlide.innerRef}
+                                                >
+                                                  {slide.slide_charts.map((chart, idx) => (
+                                                    <Draggable
+                                                      key={idx}
+                                                      index={idx}
+                                                      draggableId={`draggable-chart-item-${i}-${idx}`}
+                                                    >
+                                                      {(prov) => (
+                                                        <div
+                                                          className='w-full'
+                                                          {...prov.draggableProps}
+                                                          style={{
+                                                            ...prov.draggableProps.style,
+                                                            userSelect: 'none',
+                                                            position: 'static'
+                                                          }}
+                                                          ref={prov.innerRef}
+                                                        >
+                                                          <div className='w-full p-4 space-y-4 border-2 rounded-xl bg-background'>
+                                                            <div className='w-full flex items-start gap-4'>
+                                                              <div {...prov.dragHandleProps}>
+                                                                <Menu className='w-6 h-6' />
+                                                              </div>
+                                                              <div className='w-full'>{chart.name}</div>
+                                                              <div
+                                                                role='button'
+                                                                title='Hapus'
+                                                                className='cursor-pointer'
+                                                                onClick={() => {
+                                                                  updateSlideItem(i, {
+                                                                    slide_charts: slideItems[i].slide_charts.filter(
+                                                                      (r) => r._id !== chart._id
+                                                                    )
+                                                                  })
+                                                                }}
+                                                              >
+                                                                <Trash2 className='w-6 h-6 text-danger' />
+                                                              </div>
                                                             </div>
                                                           </div>
                                                         </div>
+                                                      )}
+                                                    </Draggable>
+                                                  ))}
+                                                  {slide.slide_charts.length < 1 && !isDraggingOver && (
+                                                    <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
+                                                      <div className='m-auto text-sm text-primary-300'>
+                                                        Belum ada chart yang ditambahkan
                                                       </div>
-                                                    )}
-                                                  </Draggable>
-                                                ))}
-                                                {slide.slide_charts.length < 1 && !isDraggingOver && (
-                                                  <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
-                                                    <div className='m-auto text-sm text-primary-300'>
-                                                      Belum ada chart yang ditambahkan
                                                     </div>
-                                                  </div>
-                                                )}
-                                                {droppableProvidedSlide.placeholder}
+                                                  )}
+                                                  {droppableProvidedSlide.placeholder}
+                                                </div>
+                                              )}
+                                            </Droppable>
+                                            {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                            // @ts-ignore */}
+                                            {!!(errors?.dashboard_slides?.[i]?.slide_charts?.message || '') && (
+                                              <div className='w-full text-small text-danger-500'>
+                                                {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-ignore */}
+                                                {(errors?.dashboard_slides?.[i]?.slide_charts?.message as string) || ''}
                                               </div>
                                             )}
-                                          </Droppable>
-                                          {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                          // @ts-ignore */}
-                                          {!!(errors?.dashboard_slides?.[i]?.slide_charts?.message || '') && (
-                                            <div className='w-full text-small text-danger-500'>
-                                              {/* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-ignore */}
-                                              {(errors?.dashboard_slides?.[i]?.slide_charts?.message as string) || ''}
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </Draggable>
-                                  )
-                                })}
-                                {droppableProvided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-                        </DragDropContext>
+                                          </div>
+                                        )}
+                                      </Draggable>
+                                    )
+                                  })}
+                                  {droppableProvided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
+                          </DragDropContext>
+                        </div>
+                      ) : (
+                        <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
+                          <div className='m-auto text-sm text-primary-300'>Belum ada slide yang ditambahkan</div>
+                        </div>
+                      )}
+                      {!!(errors?.dashboard_slides?.message || '') && (
+                        <div className='w-full text-small text-danger-500'>
+                          {(errors?.dashboard_slides?.message as string) || ''}
+                        </div>
+                      )}
+                      <Button
+                        color='primary'
+                        size='lg'
+                        variant='flat'
+                        startContent={<Plus />}
+                        className='w-full'
+                        isLoading={loadingRefData}
+                        onPress={onAddSlide}
+                      >
+                        Tambah Slide
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        Chart ({chartItems.length}) <span className='text-small text-danger-500'>*</span>
                       </div>
-                    ) : (
-                      <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
-                        <div className='m-auto text-sm text-primary-300'>Belum ada slide yang ditambahkan</div>
-                      </div>
-                    )}
-                    {!!(errors?.dashboard_slides?.message || '') && (
-                      <div className='w-full text-small text-danger-500'>
-                        {(errors?.dashboard_slides?.message as string) || ''}
-                      </div>
-                    )}
-                    <Button
-                      color='primary'
-                      size='lg'
-                      variant='flat'
-                      startContent={<Plus />}
-                      className='w-full'
-                      isLoading={loadingRefData}
-                      onPress={onAddSlide}
-                    >
-                      Tambah Slide
-                    </Button>
-                  </div>
-                ) : (
-                  <div className='col-span-12 lg:col-span-9 space-y-4'>
-                    <div>
-                      Chart ({chartItems.length}) <span className='text-small text-danger-500'>*</span>
-                    </div>
-                    {chartItems.length > 0 ? (
-                      <div className='w-full rounded-xl p-4 shadow-inner bg-default-100'>
-                        <DragDropContext enableDefaultSensors onDragEnd={onDragChartEnd}>
-                          <Droppable droppableId='droppable-charts'>
-                            {(droppableProvided) => (
-                              <div
-                                className='w-full space-y-4 py-2'
-                                {...droppableProvided.droppableProps}
-                                ref={droppableProvided.innerRef}
-                              >
-                                {chartItems.map((chart, idx) => (
-                                  <Draggable key={idx} index={idx} draggableId={`draggable-chart-item-${idx}`}>
-                                    {(prov) => (
-                                      <div
-                                        className='w-full'
-                                        {...prov.draggableProps}
-                                        style={{
-                                          ...prov.draggableProps.style,
-                                          userSelect: 'none',
-                                          position: 'static'
-                                        }}
-                                        ref={prov.innerRef}
-                                      >
-                                        <div className='w-full p-4 space-y-4 border-2 rounded-xl bg-background'>
-                                          <div className='w-full flex items-start gap-4'>
-                                            <div {...prov.dragHandleProps}>
-                                              <Menu className='w-6 h-6' />
-                                            </div>
-                                            <div className='w-full'>{chart.name}</div>
-                                            <div
-                                              role='button'
-                                              title='Hapus'
-                                              className='cursor-pointer'
-                                              onClick={() => removeChartItem(idx)}
-                                            >
-                                              <Trash2 className='w-6 h-6 text-danger' />
+                      {chartItems.length > 0 ? (
+                        <div className='w-full rounded-xl p-4 shadow-inner bg-default-100'>
+                          <DragDropContext enableDefaultSensors onDragEnd={onDragChartEnd}>
+                            <Droppable droppableId='droppable-charts'>
+                              {(droppableProvided) => (
+                                <div
+                                  className='w-full space-y-4 py-2'
+                                  {...droppableProvided.droppableProps}
+                                  ref={droppableProvided.innerRef}
+                                >
+                                  {chartItems.map((chart, idx) => (
+                                    <Draggable key={idx} index={idx} draggableId={`draggable-chart-item-${idx}`}>
+                                      {(prov) => (
+                                        <div
+                                          className='w-full'
+                                          {...prov.draggableProps}
+                                          style={{
+                                            ...prov.draggableProps.style,
+                                            userSelect: 'none',
+                                            position: 'static'
+                                          }}
+                                          ref={prov.innerRef}
+                                        >
+                                          <div className='w-full p-4 space-y-4 border-2 rounded-xl bg-background'>
+                                            <div className='w-full flex items-start gap-4'>
+                                              <div {...prov.dragHandleProps}>
+                                                <Menu className='w-6 h-6' />
+                                              </div>
+                                              <div className='w-full'>{chart.name}</div>
+                                              <div
+                                                role='button'
+                                                title='Hapus'
+                                                className='cursor-pointer'
+                                                onClick={() => removeChartItem(idx)}
+                                              >
+                                                <Trash2 className='w-6 h-6 text-danger' />
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
+                                      )}
+                                    </Draggable>
+                                  ))}
+                                  {chartItems.length < 1 && (
+                                    <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
+                                      <div className='m-auto text-sm text-primary-300'>
+                                        Belum ada chart yang ditambahkan
                                       </div>
-                                    )}
-                                  </Draggable>
-                                ))}
-                                {chartItems.length < 1 && (
-                                  <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
-                                    <div className='m-auto text-sm text-primary-300'>
-                                      Belum ada chart yang ditambahkan
                                     </div>
-                                  </div>
-                                )}
-                                {droppableProvided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-                        </DragDropContext>
-                      </div>
-                    ) : (
-                      <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
-                        <div className='m-auto text-sm text-primary-300'>Belum ada chart yang ditambahkan</div>
-                      </div>
-                    )}
-                    {!!(errors?.dashboard_charts?.message || '') && (
-                      <div className='w-full text-small text-danger-500'>
-                        {(errors?.dashboard_charts?.message as string) || ''}
-                      </div>
-                    )}
-                    <Button
-                      color='primary'
-                      size='lg'
-                      variant='flat'
-                      startContent={<Plus />}
-                      className='w-full'
-                      isLoading={loadingRefData}
-                      onPress={onOpenChangeAddChart}
-                    >
-                      Tambah Chart
-                    </Button>
-                  </div>
-                )}
+                                  )}
+                                  {droppableProvided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
+                          </DragDropContext>
+                        </div>
+                      ) : (
+                        <div className='w-full flex min-h-32 border-2 border-dashed border-primary-100 rounded-xl'>
+                          <div className='m-auto text-sm text-primary-300'>Belum ada chart yang ditambahkan</div>
+                        </div>
+                      )}
+                      {!!(errors?.dashboard_charts?.message || '') && (
+                        <div className='w-full text-small text-danger-500'>
+                          {(errors?.dashboard_charts?.message as string) || ''}
+                        </div>
+                      )}
+                      <Button
+                        color='primary'
+                        size='lg'
+                        variant='flat'
+                        startContent={<Plus />}
+                        className='w-full'
+                        isLoading={loadingRefData}
+                        onPress={onOpenChangeAddChart}
+                      >
+                        Tambah Chart
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <ModalAddChart
                 options={charts}

@@ -1,4 +1,4 @@
-import { EnumChartType } from "./chart"
+import { EnumChartType } from './chart'
 
 export type DashboardSettingItem = {
   id: number
@@ -13,6 +13,14 @@ export type DashboardSettingItem = {
   plants: string | null
 }
 
-export type DashboardResolutionItem = { id: string, dashboard_resolution: string }
-export type PlantItem = { id: string, plant_name: string }
-export type ChartItem = { id: string, chart_id: string, chart_name: string, chart_code: string, chart_order: string, chart_slide: string }
+export type DashboardResolutionItem = { id: string; dashboard_resolution: string }
+export type PlantItem = { id: string; plant_name: string }
+export type ChartItem = {
+  id: string
+  chart_id: string
+  chart_name: string
+  chart_code: string
+  chart_order: string
+  chart_slide: string
+  default?: string | null
+}
