@@ -28,6 +28,7 @@ import {
   LotFilterStateProperties,
   NumericFilterStateProperties
 } from '@/types/chart'
+import { buildChartFilters } from '@/utils/chart-filters'
 
 type Props = {
   chart: ChartItem
@@ -226,152 +227,51 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
   })
 
   const onSubmitChartPart2 = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '2'
-    }
-
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (cycleProperties?.start.value) {
-      params = {
-        ...params,
-        [cycleProperties.start.name]: cycleProperties.start.value
-      }
-    }
-
-    if (cycleProperties?.end.value) {
-      params = {
-        ...params,
-        [cycleProperties.end.name]: cycleProperties.end.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    if (categoryProperties?.value) {
-      params = {
-        ...params,
-        [categoryProperties.name]: categoryProperties.value
-      }
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '2',
+      ...buildChartFilters({
+        lot: lotProperties,
+        cycle: cycleProperties,
+        date_range: dateRangeProperties,
+        category: categoryProperties
+      })
     }
 
     setLoadingPart2(true)
-    getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string, preventLoading: true }).finally(() => {
       setLoadingPart2(false)
     })
   }, [getDisplayChart, lotProperties, cycleProperties, dateRangeProperties, categoryProperties])
 
   const onSubmitChartPart3 = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '3'
-    }
-
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (cycleProperties?.start.value) {
-      params = {
-        ...params,
-        [cycleProperties.start.name]: cycleProperties.start.value
-      }
-    }
-
-    if (cycleProperties?.end.value) {
-      params = {
-        ...params,
-        [cycleProperties.end.name]: cycleProperties.end.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    if (numericProperties?.value) {
-      params = {
-        ...params,
-        [numericProperties.name]: numericProperties.value
-      }
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '3',
+      ...buildChartFilters({
+        lot: lotProperties,
+        cycle: cycleProperties,
+        date_range: dateRangeProperties,
+        category: categoryProperties,
+        numeric: numericProperties
+      })
     }
 
     setLoadingPart3(true)
-    getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string, preventLoading: true }).finally(() => {
       setLoadingPart3(false)
     })
   }, [getDisplayChart, lotProperties, cycleProperties, dateRangeProperties, numericProperties])
 
   const onSubmitChartPart1 = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '1'
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '1',
+      ...buildChartFilters({
+        lot: lotProperties,
+        cycle: cycleProperties,
+        date_range: dateRangeProperties
+      })
     }
 
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (cycleProperties?.start.value) {
-      params = {
-        ...params,
-        [cycleProperties.start.name]: cycleProperties.start.value
-      }
-    }
-
-    if (cycleProperties?.end.value) {
-      params = {
-        ...params,
-        [cycleProperties.end.name]: cycleProperties.end.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    getDisplayChart(params, { isSubmitChart: true, part: params.part }).then(() => {
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string }).then(() => {
       onSubmitChartPart2()
       onSubmitChartPart3()
     })

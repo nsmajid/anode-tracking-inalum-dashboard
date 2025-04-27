@@ -9,6 +9,7 @@ import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate, getMaxDateInMonth } from '@/utils/date'
 import { ChartResumePart1Data, DateRangeFilterStateProperties, LotFilterStateProperties } from '@/types/chart'
+import { buildChartFilters } from '@/utils/chart-filters'
 
 type Props = {
   chart: ChartItem
@@ -109,32 +110,15 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
   })
 
   const onSubmitChart = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '1'
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '1',
+      ...buildChartFilters({
+        lot: lotProperties,
+        date_range: dateRangeProperties
+      })
     }
 
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    getDisplayChart(params, { isSubmitChart: true, part: params.part })
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string })
   }, [getDisplayChart, lotProperties, dateRangeProperties])
 
   if (loading) {

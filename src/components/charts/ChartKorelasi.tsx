@@ -25,6 +25,7 @@ import {
   KorelasiParametersFilterStateProperties,
   KorelasiParametersMinMaxFilterStateProperties
 } from '@/types/chart'
+import { buildChartFilters } from '@/utils/chart-filters'
 
 type Props = {
   chart: ChartItem
@@ -212,71 +213,18 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
   })
 
   const onSubmitChartPart1 = useCallback(() => {
-    let params: Record<string, string | number> = {
-      part: '1'
-    }
-
-    if (parameter1Properties?.value) {
-      params = {
-        ...params,
-        [parameter1Properties.name]: parameter1Properties.value
-      }
-    }
-
-    if (parameter2Properties?.value) {
-      params = {
-        ...params,
-        [parameter2Properties.name]: parameter2Properties.value
-      }
-    }
-
-    if (parameter1MinProperties?.value) {
-      params = {
-        ...params,
-        [parameter1MinProperties.name]: parameter1MinProperties.value
-      }
-    }
-
-    if (parameter1MaxProperties?.value) {
-      params = {
-        ...params,
-        [parameter1MaxProperties.name]: parameter1MaxProperties.value
-      }
-    }
-
-    if (parameter2MinProperties?.value) {
-      params = {
-        ...params,
-        [parameter2MinProperties.name]: parameter2MinProperties.value
-      }
-    }
-
-    if (parameter2MaxProperties?.value) {
-      params = {
-        ...params,
-        [parameter2MaxProperties.name]: parameter2MaxProperties.value
-      }
-    }
-
-    if (classProperties?.value) {
-      params = {
-        ...params,
-        [classProperties.name]: classProperties.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '1',
+      ...buildChartFilters({
+        korelasi_parameters_1: parameter1Properties,
+        korelasi_parameters_1_min: parameter1MinProperties,
+        korelasi_parameters_1_max: parameter1MaxProperties,
+        korelasi_parameters_2: parameter2Properties,
+        korelasi_parameters_2_min: parameter2MinProperties,
+        korelasi_parameters_2_max: parameter2MaxProperties,
+        class: classProperties,
+        date_range: dateRangeProperties
+      })
     }
 
     getDisplayChart(params, { isSubmitChart: true, part: params.part as string })

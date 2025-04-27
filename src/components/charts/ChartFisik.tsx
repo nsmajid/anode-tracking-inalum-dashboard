@@ -34,6 +34,7 @@ import {
   LabelViewFilterStateProperties,
   NumericFilterStateProperties
 } from '@/types/chart'
+import { buildChartFilters } from '@/utils/chart-filters'
 
 type Props = {
   chart: ChartItem
@@ -263,69 +264,16 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   })
 
   const onSubmitChartPart2 = useCallback(() => {
-    let params: Record<string, string | Array<{ name: string; value: string }>> = {
-      part: '2'
-    }
-
-    if (parametersProperties?.value) {
-      params = {
-        ...params,
-        [parametersProperties.name]: parametersProperties.value
-      }
-    }
-
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (cycleProperties?.start.value) {
-      params = {
-        ...params,
-        [cycleProperties.start.name]: cycleProperties.start.value
-      }
-    }
-
-    if (cycleProperties?.end.value) {
-      params = {
-        ...params,
-        [cycleProperties.end.name]: cycleProperties.end.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    if (categoryProperties && categoryProperties?.values?.some((r) => !!r.value)) {
-      params = {
-        ...params,
-        [categoryProperties.name]: categoryProperties.values
-          .filter((r) => !!r.value)
-          .map((r) => ({
-            name: r.name,
-            value: r.value as string
-          }))
-      }
-    }
-
-    if (labelViewsProperties?.value) {
-      params = {
-        ...params,
-        [labelViewsProperties.name]: labelViewsProperties.value
-      }
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '2',
+      ...buildChartFilters({
+        parameters: parametersProperties,
+        lot: lotProperties,
+        cycle: cycleProperties,
+        date_range: dateRangeProperties,
+        nested_category: categoryProperties,
+        label_view: labelViewsProperties
+      })
     }
 
     setLoadingPart2(true)
@@ -343,68 +291,21 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   ])
 
   const onSubmitChartPart3 = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '3'
-    }
-
-    if (parametersProperties?.value) {
-      params = {
-        ...params,
-        [parametersProperties.name]: parametersProperties.value
-      }
-    }
-
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (cycleProperties?.start.value) {
-      params = {
-        ...params,
-        [cycleProperties.start.name]: cycleProperties.start.value
-      }
-    }
-
-    if (cycleProperties?.end.value) {
-      params = {
-        ...params,
-        [cycleProperties.end.name]: cycleProperties.end.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    if (numericProperties?.value) {
-      params = {
-        ...params,
-        [numericProperties.name]: numericProperties.value
-      }
-    }
-
-    if (labelViewsProperties?.value) {
-      params = {
-        ...params,
-        [labelViewsProperties.name]: labelViewsProperties.value
-      }
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '3',
+      ...buildChartFilters({
+        parameters: parametersProperties,
+        lot: lotProperties,
+        cycle: cycleProperties,
+        date_range: dateRangeProperties,
+        nested_category: categoryProperties,
+        label_view: labelViewsProperties,
+        numeric: numericProperties
+      })
     }
 
     setLoadingPart3(true)
-    getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string, preventLoading: true }).finally(() => {
       setLoadingPart3(false)
     })
   }, [
@@ -418,60 +319,19 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   ])
 
   const onSubmitChartPart1 = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '1'
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '1',
+      ...buildChartFilters({
+        parameters: parametersProperties,
+        lot: lotProperties,
+        cycle: cycleProperties,
+        date_range: dateRangeProperties,
+        nested_category: categoryProperties,
+        label_view: labelViewsProperties
+      })
     }
 
-    if (parametersProperties?.value) {
-      params = {
-        ...params,
-        [parametersProperties.name]: parametersProperties.value
-      }
-    }
-
-    if (lotProperties?.value) {
-      params = {
-        ...params,
-        [lotProperties.name]: lotProperties.value
-      }
-    }
-
-    if (cycleProperties?.start.value) {
-      params = {
-        ...params,
-        [cycleProperties.start.name]: cycleProperties.start.value
-      }
-    }
-
-    if (cycleProperties?.end.value) {
-      params = {
-        ...params,
-        [cycleProperties.end.name]: cycleProperties.end.value
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    if (labelViewsProperties?.value) {
-      params = {
-        ...params,
-        [labelViewsProperties.name]: labelViewsProperties.value
-      }
-    }
-
-    getDisplayChart(params, { isSubmitChart: true, part: params.part }).then(() => {
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string }).then(() => {
       onSubmitChartPart2()
       onSubmitChartPart3()
     })

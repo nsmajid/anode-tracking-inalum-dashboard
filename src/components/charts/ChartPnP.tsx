@@ -9,6 +9,7 @@ import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { ChartPnPPart1Data, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
+import { buildChartFilters } from '@/utils/chart-filters'
 
 type Props = {
   chart: ChartItem
@@ -129,32 +130,15 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
   })
 
   const onSubmitChart = useCallback(() => {
-    let params: Record<string, string> = {
-      part: '1'
+    const params: ReturnType<typeof buildChartFilters> = {
+      part: '1',
+      ...buildChartFilters({
+        plant: plantProperties,
+        date_range: dateRangeProperties
+      })
     }
 
-    if (plantProperties?.name && selectedSubPlantType.length > 0) {
-      params = {
-        ...params,
-        [plantProperties.name]: selectedSubPlantType.join(',')
-      }
-    }
-
-    if (dateRangeProperties?.start.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.start.name]: dateRangeProperties.start.value
-      }
-    }
-
-    if (dateRangeProperties?.end.value) {
-      params = {
-        ...params,
-        [dateRangeProperties.end.name]: dateRangeProperties.end.value
-      }
-    }
-
-    getDisplayChart(params, { isSubmitChart: true, part: params.part })
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string })
   }, [getDisplayChart, dateRangeProperties, plantProperties, selectedSubPlantType])
 
   if (loading) {
