@@ -6,7 +6,7 @@ import { Head } from './head'
 
 import { Navbar } from '@/components/layouts/navbar'
 import { Footer } from '@/components/layouts/footer'
-import { useProfile } from '@/hooks/profile'
+import { RoleType, useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL, getAuthHeaders, SESSION_KEY } from '@/config/constants'
 
 const redirectAuthURL = `${BACKOFFICE_URL}/auth-check?external=1`
@@ -15,7 +15,7 @@ const restrictedRoutes = ['/settings', '/profile']
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { loading, profileStatus } = useProfile()
+  const { loading, profileStatus, profile } = useProfile()
 
   useEffect(() => {
     if (!loading && restrictedRoutes.some((v) => router.pathname.startsWith(v))) {
@@ -50,7 +50,15 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
     <div className='relative flex flex-col min-h-[100dvh]'>
       <Head />
       <Navbar />
-      <main className='container mx-auto max-w-7xl px-6 flex-grow pt-16'>{children}</main>
+      <main className='container mx-auto max-w-7xl px-6 flex-grow pt-16'>
+        {router.pathname.startsWith('/settings') && !profile?.roles.includes(RoleType.ADMINISTRATOR) ? (
+          <div className='w-full flex min-h-[60dvh]'>
+            <div className='text-sm italic m-auto'>404 Not Found</div>
+          </div>
+        ) : (
+          children
+        )}
+      </main>
       <Footer />
     </div>
   )

@@ -1,4 +1,4 @@
-import { Avatar, Skeleton } from '@heroui/react'
+import { Avatar, Chip, Skeleton } from '@heroui/react'
 
 import DefaultLayout from '@/layouts/default'
 import { title } from '@/components/primitives'
@@ -25,11 +25,22 @@ export default function ProfilePage() {
           </div>
         </div>
       ) : (
-        <div className='w-full flex items-center gap-3'>
-          <Avatar src={profile?.photo} className='w-24 h-24' />
-          <div className='w-full space-y-1'>
-            <div className='text-xl font-bold'>{profile?.name}</div>
-            <div className='text-base'>@{profile?.username}</div>
+        <div className='w-full space-y-3'>
+          <div className='w-full flex items-center gap-3'>
+            <Avatar src={profile?.photo} className='w-24 h-24' />
+            <div className='w-full space-y-1'>
+              <div className='text-xl font-bold'>{profile?.name}</div>
+              <div className='text-base'>@{profile?.username}</div>
+              {(profile?.roles || []).length > 0 && (
+                <div className='inline-flex items-center gap-1 pt-1'>
+                  {(profile?.roles || []).map((role) => (
+                    <Chip key={role} color='primary' size='sm'>
+                      {role}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

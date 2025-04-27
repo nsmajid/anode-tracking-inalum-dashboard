@@ -52,7 +52,7 @@ export default function IndexPage() {
           ))}
           {records.length < 1 && (
             <div className='w-full flex min-h-[60dvh]'>
-              <div className='text-sm italic'>Tidak ada data</div>
+              <div className='text-sm italic m-auto'>Tidak ada data</div>
             </div>
           )}
         </>

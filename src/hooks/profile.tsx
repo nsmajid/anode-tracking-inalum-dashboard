@@ -1,14 +1,19 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import { isAxiosError } from 'axios'
+
 import { DefaultApiResponse } from '@/types/api'
 import api from '@/utils/api'
 import { getAuthHeaders, UID_KEY } from '@/config/constants'
-import { isAxiosError } from 'axios'
+
+export enum RoleType {
+  ADMINISTRATOR = 'Administrator'
+}
 
 interface Profile {
   name: string
   photo: string
   username: string
-  roles: string[]
+  roles: RoleType[]
 }
 
 interface ProfileContextType {
@@ -29,15 +34,18 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true)
     try {
       const headers = await getAuthHeaders()
-      const { data } = await api.get<DefaultApiResponse<{ profile: Profile }>>('/api/user-profile', {
-        params: { uid: headers?.[UID_KEY.header] }
-      })
+      const { data } = await api.get<DefaultApiResponse<{ profile: Profile; groups: RoleType[] }>>(
+        '/api/user-profile',
+        {
+          params: { uid: headers?.[UID_KEY.header] }
+        }
+      )
 
       setProfile({
         name: data.data.profile.name,
         photo: data.data.profile.photo,
         username: data.data.profile.username,
-        roles: data.data.profile.roles
+        roles: data.data.groups || []
       })
       setProfileStatus(200)
     } catch (error) {
@@ -56,7 +64,11 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     fetchProfile()
   }, [])
 
-  return <ProfileContext.Provider value={{ profile, loading, profileStatus, fetchProfile }}>{children}</ProfileContext.Provider>
+  return (
+    <ProfileContext.Provider value={{ profile, loading, profileStatus, fetchProfile }}>
+      {children}
+    </ProfileContext.Provider>
+  )
 }
 
 export const useProfile = () => {

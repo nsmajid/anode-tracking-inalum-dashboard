@@ -18,7 +18,7 @@ import { useRouter } from 'next/router'
 import { siteConfig } from '@/config/site'
 // import { ThemeSwitch } from '@/components/theme-switch'
 import { Logo } from '@/components/icons'
-import { useProfile } from '@/hooks/profile'
+import { RoleType, useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL } from '@/config/constants'
 
 export const Navbar = () => {
@@ -29,12 +29,16 @@ export const Navbar = () => {
     return [
       ...(profile
         ? [
-            {
-              label: 'Pengaturan',
-              href: '/settings',
-              icon: Settings,
-              active: router.pathname.startsWith('/settings')
-            },
+            ...(profile.roles.includes(RoleType.ADMINISTRATOR)
+              ? [
+                  {
+                    label: 'Pengaturan',
+                    href: '/settings',
+                    icon: Settings,
+                    active: router.pathname.startsWith('/settings')
+                  }
+                ]
+              : []),
             {
               label: 'Web Anode Tracking',
               href: BACKOFFICE_URL,
