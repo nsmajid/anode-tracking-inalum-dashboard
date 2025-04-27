@@ -319,11 +319,11 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
     let method: Method | undefined
 
     if (mode === 'ADD') {
-      apiUrl = `/api/edashboard`
+      apiUrl = `/api/dashboard`
       method = 'POST'
     }
     if (mode === 'EDIT' && editUUID) {
-      apiUrl = `/api/edashboard/${editUUID}`
+      apiUrl = `/api/dashboard/${editUUID}`
       method = 'PUT'
     }
 
