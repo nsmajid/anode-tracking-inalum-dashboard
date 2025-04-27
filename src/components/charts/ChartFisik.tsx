@@ -77,6 +77,13 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       value: string | null
     }
   } | null>(null)
+  const [labelViewsProperties, setLabelViewsProperties] = useState<{
+    label_name: string
+    name: string
+    required: boolean
+    options: string[]
+    value: string | null
+  } | null>(null)
   // END of PART 1 filters
 
   // PART 2 filters
@@ -177,6 +184,13 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          label_views: {
+            label_name: string
+            name: string
+            default: string | null
+            required: boolean
+            value: string[]
+          }
         }
         2: {
           title: string
@@ -208,7 +222,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
         3: data.chart.parts?.[3]?.title
       })
 
-      const { parameters, filters } = data.chart.parts[1]
+      const { parameters, filters, label_views } = data.chart.parts[1]
       const { lot, cycle, daterange } = filters.options
 
       setParametersProperties({
@@ -245,6 +259,11 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
           label_name: `${daterange.label_name} ${daterange.value.end_daterange.label_name}`,
           value: daterange.value.end_daterange.default || null
         }
+      })
+      setLabelViewsProperties({
+        ...label_views,
+        options: label_views.value,
+        value: label_views.default || null
       })
 
       const { categories } = data.chart.parts[2]
@@ -342,11 +361,26 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       }
     }
 
+    if (labelViewsProperties?.value) {
+      params = {
+        ...params,
+        [labelViewsProperties.name]: labelViewsProperties.value
+      }
+    }
+
     setLoadingPart2(true)
     getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
       setLoadingPart2(false)
     })
-  }, [getDisplayChart, parametersProperties, lotProperties, cycleProperties, dateRangeProperties, categoryProperties])
+  }, [
+    getDisplayChart,
+    parametersProperties,
+    lotProperties,
+    cycleProperties,
+    dateRangeProperties,
+    labelViewsProperties,
+    categoryProperties
+  ])
 
   const onSubmitChartPart3 = useCallback(() => {
     let params: Record<string, string> = {
@@ -402,11 +436,26 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       }
     }
 
+    if (labelViewsProperties?.value) {
+      params = {
+        ...params,
+        [labelViewsProperties.name]: labelViewsProperties.value
+      }
+    }
+
     setLoadingPart3(true)
     getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
       setLoadingPart3(false)
     })
-  }, [getDisplayChart, parametersProperties, lotProperties, cycleProperties, dateRangeProperties, numericProperties])
+  }, [
+    getDisplayChart,
+    parametersProperties,
+    lotProperties,
+    cycleProperties,
+    dateRangeProperties,
+    labelViewsProperties,
+    numericProperties
+  ])
 
   const onSubmitChartPart1 = useCallback(() => {
     let params: Record<string, string> = {
@@ -455,6 +504,13 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       }
     }
 
+    if (labelViewsProperties?.value) {
+      params = {
+        ...params,
+        [labelViewsProperties.name]: labelViewsProperties.value
+      }
+    }
+
     getDisplayChart(params, { isSubmitChart: true, part: params.part }).then(() => {
       onSubmitChartPart2()
       onSubmitChartPart3()
@@ -465,6 +521,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
     lotProperties,
     cycleProperties,
     dateRangeProperties,
+    labelViewsProperties,
     onSubmitChartPart2,
     onSubmitChartPart3
   ])
@@ -620,7 +677,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                 </div>
               </div>
             </div>
-            <div className='w-full'>
+            <div className='w-full flex items-center gap-2'>
               <DateRangePicker
                 showMonthAndYearPickers
                 className='max-w-xs'
@@ -678,6 +735,23 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                   )
                 }}
               />
+              <Select
+                className='max-w-xs'
+                label={labelViewsProperties?.label_name}
+                placeholder={`Pilih ${labelViewsProperties?.label_name}`}
+                isRequired={labelViewsProperties?.required}
+                isDisabled={loadingChart}
+                selectedKeys={labelViewsProperties?.value ? [labelViewsProperties?.value] : []}
+                onChange={(e) => {
+                  const { value } = e.target
+
+                  setLabelViewsProperties((current) => (current ? { ...current, value } : current))
+                }}
+              >
+                {(labelViewsProperties?.options || []).map((option) => (
+                  <SelectItem key={option}>{option}</SelectItem>
+                ))}
+              </Select>
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{chartNames?.[1]}</div>

@@ -40,7 +40,7 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data }) => {
             }
           },
           xaxis: {
-            type: 'datetime',
+            // type: 'datetime',
             title: {
               text: data?.['x-label'] || '',
               style: {
