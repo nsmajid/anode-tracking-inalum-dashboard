@@ -8,40 +8,15 @@ import ChartResumePart1 from './chart-resume-parts/ChartResumePart1'
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate, getMaxDateInMonth } from '@/utils/date'
-import { ChartResumePart1Data } from '@/types/chart'
+import { ChartResumePart1Data, DateRangeFilterStateProperties, LotFilterStateProperties } from '@/types/chart'
 
 type Props = {
   chart: ChartItem
 }
 
 const ChartResume: React.FC<Props> = ({ chart }) => {
-  const [lotProperties, setLotProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: string | null
-    options: Array<{
-      lot: string
-      start_cycle: string
-      end_cycle: string
-    }>
-  } | null>(null)
-  const [dateRangeProperties, setDateRangeProperties] = useState<{
-    label_name: string
-    required: boolean
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
+  const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
+  const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
 
   const [part1Data, setPart1Data] = useState<ChartResumePart1Data | null>(null)
   const [chartNames, setChartNames] = useState<Record<number, string>>({})

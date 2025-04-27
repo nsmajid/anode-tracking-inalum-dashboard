@@ -11,6 +11,7 @@ import {
 } from '@heroui/react'
 import { parseDate } from '@internationalized/date'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { X } from 'react-feather'
 
 import ChartQCPart1 from './chart-qc-parts/ChartQCPart1'
 import ChartQCPart2 from './chart-qc-parts/ChartQCPart2'
@@ -19,8 +20,17 @@ import ChartQCPart3 from './chart-qc-parts/ChartQCPart3'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { useDisplayChart } from '@/hooks/display-chart'
-import { ChartQCPart1Data, ChartQCPart2Data, ChartQCPart3Data } from '@/types/chart'
-import { X } from 'react-feather'
+import {
+  CategoryFilterStateProperties,
+  ChartQCPart1Data,
+  ChartQCPart2Data,
+  ChartQCPart3Data,
+  CycleFilterStateProperties,
+  DateRangeFilterStateProperties,
+  LotFilterStateProperties,
+  NumericFilterStateProperties,
+  QCParametersFilterStateProperties
+} from '@/types/chart'
 
 type Props = {
   chart: ChartItem
@@ -28,78 +38,18 @@ type Props = {
 
 const ChartQC: React.FC<Props> = ({ chart }) => {
   // PART 1 filters
-  const [parametersProperties, setParametersProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: Array<{
-      option_name: string
-      option_value: string
-    }>
-    value: string[]
-  } | null>(null)
-  const [lotProperties, setLotProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: string | null
-    options: Array<{
-      lot: string
-      start_cycle: string
-      end_cycle: string
-    }>
-  } | null>(null)
-  const [cycleProperties, setCycleProperties] = useState<{
-    label_name: string
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
-  const [dateRangeProperties, setDateRangeProperties] = useState<{
-    label_name: string
-    required: boolean
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
+  const [parametersProperties, setParametersProperties] = useState<QCParametersFilterStateProperties | null>(null)
+  const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
+  const [cycleProperties, setCycleProperties] = useState<CycleFilterStateProperties | null>(null)
+  const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
   // END of PART 1 filters
 
   // PART 2 filters
-  const [categoryProperties, setCategoryProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: string[]
-    value: string | null
-  } | null>(null)
+  const [categoryProperties, setCategoryProperties] = useState<CategoryFilterStateProperties | null>(null)
   // END of PART 2 filters
 
   // PART 3 filters
-  const [numericProperties, setNumericProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: string[]
-    value: string | null
-  } | null>(null)
+  const [numericProperties, setNumericProperties] = useState<NumericFilterStateProperties | null>(null)
   // END of PART 3 filters
 
   const rangeSelectedCycle = useMemo(() => {
@@ -535,6 +485,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
                         value: selectedValues
                       }
                     }
+
                     return current
                   })
                 }}
@@ -633,6 +584,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
                       if (value < Number(cycleProperties?.start?.value || 0)) {
                         return `${cycleProperties?.label_name} ${cycleProperties?.end.label_name} must be greater than ${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`
                       }
+
                       return true
                     }}
                     onValueChange={(value) => {

@@ -3,20 +3,15 @@ import { memo, useCallback, useMemo, useState } from 'react'
 import { X } from 'react-feather'
 import { parseDate } from '@internationalized/date'
 
+import ChartPnPPart1 from './chart-pnp-parts/ChartPnPPart1'
+
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
-import { ChartPnPPart1Data } from '@/types/chart'
-import ChartPnPPart1 from './chart-pnp-parts/ChartPnPPart1'
+import { ChartPnPPart1Data, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
 
 type Props = {
   chart: ChartItem
-}
-
-enum PlantType {
-  ANODE_ASSEMBLY = 'Anode Assembly',
-  BAKING = 'Baking',
-  GREEN = 'Green'
 }
 
 const ChartPnP: React.FC<Props> = ({ chart }) => {
@@ -25,28 +20,8 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
 
   const [selectedPlantType, setSelectedPlantType] = useState<PlantType | null>(null)
   const [selectedSubPlantType, setSelectedSubPlantType] = useState<string[]>([])
-  const [plantProperties, setPlantProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: Record<PlantType, Array<{ option_name: string; option_value: string }>>
-  } | null>(null)
-  const [dateRangeProperties, setDateRangeProperties] = useState<{
-    label_name: string
-    required: boolean
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
+  const [plantProperties, setPlantProperties] = useState<PlantFilterStateProperties | null>(null)
+  const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
   const subPlantOptions = useMemo(() => {
     return selectedPlantType ? plantProperties?.options?.[selectedPlantType] || [] : []
   }, [plantProperties, selectedPlantType])

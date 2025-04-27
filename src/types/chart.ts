@@ -122,6 +122,12 @@ export type CategoryFilterOptionProperties = {
   min?: string
 }
 
+export enum PlantType {
+  ANODE_ASSEMBLY = 'Anode Assembly',
+  BAKING = 'Baking',
+  GREEN = 'Green'
+}
+
 export type CategoryFilterProperties = {
   label_name: string
   name: string
@@ -133,7 +139,7 @@ export type CategoryFilterProperties = {
   options: Array<CategoryFilterOptionProperties>
 }
 
-export type CategoryFilterStateProperties = {
+export type NestedCategoryFilterStateProperties = {
   label_name: string
   name: string
   required: boolean
@@ -146,4 +152,125 @@ export type CategoryFilterStateProperties = {
     name: string
     value: string | null
   }>
+}
+
+export type ParametersFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: string[]
+  value: string | null
+}
+
+export type QCParametersFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: Array<{
+    option_name: string
+    option_value: string
+  }>
+  value: string[]
+}
+
+export type KorelasiParametersFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: Array<{
+    option_name: string
+    option_value: string
+  }>
+  value: string | null
+}
+
+export type KorelasiParametersMinMaxFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  value: number | null
+}
+
+export type ClassFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  value: number | null
+}
+
+export type LotFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  value: string | null
+  options: Array<{
+    lot: string
+    start_cycle: string
+    end_cycle: string
+  }>
+}
+
+export type CycleFilterStateProperties = {
+  label_name: string
+  start: {
+    label_name: string
+    name: string
+    required: boolean
+    value: string | null
+  }
+  end: {
+    label_name: string
+    name: string
+    required: boolean
+    value: string | null
+  }
+}
+
+export type DateRangeFilterStateProperties = {
+  label_name: string
+  required: boolean
+  range_max?: number
+  start: {
+    label_name: string
+    name: string
+    required: boolean
+    value: string | null
+  }
+  end: {
+    label_name: string
+    name: string
+    required: boolean
+    value: string | null
+  }
+}
+
+export type LabelViewFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: string[]
+  value: string | null
+}
+
+export type NumericFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: string[]
+  value: string | null
+}
+
+export type CategoryFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: string[]
+  value: string | null
+}
+
+export type PlantFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: Record<PlantType, Array<{ option_name: string; option_value: string }>>
 }

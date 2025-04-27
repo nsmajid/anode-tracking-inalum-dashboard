@@ -3,14 +3,14 @@ import { memo, useCallback, useMemo } from 'react'
 import { X } from 'react-feather'
 import clsx from 'clsx'
 
-import { CategoryFilterInputType, CategoryFilterStateProperties } from '@/types/chart'
+import { CategoryFilterInputType, NestedCategoryFilterStateProperties } from '@/types/chart'
 
 type Props = {
-  properties: CategoryFilterStateProperties | null
+  properties: NestedCategoryFilterStateProperties | null
   onChangeFilters: (values: Array<{ name: string; value: string | null }>) => void
 }
 
-type FilterItemProperty = CategoryFilterStateProperties['options'][number] & {
+type FilterItemProperty = NestedCategoryFilterStateProperties['options'][number] & {
   visible: boolean
   selected: boolean
   selected_name: string | null

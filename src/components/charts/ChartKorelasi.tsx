@@ -18,80 +18,31 @@ import ChartKorelasiPart1 from './chart-korelasi-parts/ChartKorelasiPart1'
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
-import { ChartKorelasiPart1Data } from '@/types/chart'
+import {
+  ChartKorelasiPart1Data,
+  ClassFilterStateProperties,
+  DateRangeFilterStateProperties,
+  KorelasiParametersFilterStateProperties,
+  KorelasiParametersMinMaxFilterStateProperties
+} from '@/types/chart'
 
 type Props = {
   chart: ChartItem
 }
 
 const ChartKorelasi: React.FC<Props> = ({ chart }) => {
-  const [parameter1Properties, setParameter1Properties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: Array<{
-      option_name: string
-      option_value: string
-    }>
-    value: string | null
-  } | null>(null)
-  const [parameter1MinProperties, setParameter1MinProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: number | null
-  } | null>(null)
-  const [parameter1MaxProperties, setParameter1MaxProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: number | null
-  } | null>(null)
-  const [parameter2Properties, setParameter2Properties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: Array<{
-      option_name: string
-      option_value: string
-    }>
-    value: string | null
-  } | null>(null)
-  const [parameter2MinProperties, setParameter2MinProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: number | null
-  } | null>(null)
-  const [parameter2MaxProperties, setParameter2MaxProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: number | null
-  } | null>(null)
-  const [dateRangeProperties, setDateRangeProperties] = useState<{
-    label_name: string
-    required: boolean
-    range_max: number
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
-  const [classProperties, setClassProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: number | null
-  } | null>(null)
+  const [parameter1Properties, setParameter1Properties] = useState<KorelasiParametersFilterStateProperties | null>(null)
+  const [parameter1MinProperties, setParameter1MinProperties] =
+    useState<KorelasiParametersMinMaxFilterStateProperties | null>(null)
+  const [parameter1MaxProperties, setParameter1MaxProperties] =
+    useState<KorelasiParametersMinMaxFilterStateProperties | null>(null)
+  const [parameter2Properties, setParameter2Properties] = useState<KorelasiParametersFilterStateProperties | null>(null)
+  const [parameter2MinProperties, setParameter2MinProperties] =
+    useState<KorelasiParametersMinMaxFilterStateProperties | null>(null)
+  const [parameter2MaxProperties, setParameter2MaxProperties] =
+    useState<KorelasiParametersMinMaxFilterStateProperties | null>(null)
+  const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [classProperties, setClassProperties] = useState<ClassFilterStateProperties | null>(null)
 
   const [part1Data, setPart1Data] = useState<ChartKorelasiPart1Data | null>(null)
   const [chartNames, setChartNames] = useState<Record<number, string>>({})

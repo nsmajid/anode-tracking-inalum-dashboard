@@ -16,18 +16,24 @@ import { X } from 'react-feather'
 import ChartFisikPart1 from './chart-fisik-parts/ChartFisikPart1'
 import ChartFisikPart2 from './chart-fisik-parts/ChartFisikPart2'
 import ChartFisikPart3 from './chart-fisik-parts/ChartFisikPart3'
+import CategoryFilter from './filters/CategoryFilter'
 
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { useDisplayChart } from '@/hooks/display-chart'
 import {
   CategoryFilterProperties,
-  CategoryFilterStateProperties,
+  NestedCategoryFilterStateProperties,
   ChartFisikPart1Data,
   ChartFisikPart2Data,
-  ChartFisikPart3Data
+  ChartFisikPart3Data,
+  ParametersFilterStateProperties,
+  LotFilterStateProperties,
+  CycleFilterStateProperties,
+  DateRangeFilterStateProperties,
+  LabelViewFilterStateProperties,
+  NumericFilterStateProperties
 } from '@/types/chart'
-import CategoryFilter from './filters/CategoryFilter'
 
 type Props = {
   chart: ChartItem
@@ -35,76 +41,19 @@ type Props = {
 
 const ChartFisik: React.FC<Props> = ({ chart }) => {
   // PART 1 filters
-  const [parametersProperties, setParametersProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: string[]
-    value: string | null
-  } | null>(null)
-  const [lotProperties, setLotProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    value: string | null
-    options: Array<{
-      lot: string
-      start_cycle: string
-      end_cycle: string
-    }>
-  } | null>(null)
-  const [cycleProperties, setCycleProperties] = useState<{
-    label_name: string
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
-  const [dateRangeProperties, setDateRangeProperties] = useState<{
-    label_name: string
-    required: boolean
-    start: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-    end: {
-      label_name: string
-      name: string
-      required: boolean
-      value: string | null
-    }
-  } | null>(null)
-  const [labelViewsProperties, setLabelViewsProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: string[]
-    value: string | null
-  } | null>(null)
+  const [parametersProperties, setParametersProperties] = useState<ParametersFilterStateProperties | null>(null)
+  const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
+  const [cycleProperties, setCycleProperties] = useState<CycleFilterStateProperties | null>(null)
+  const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [labelViewsProperties, setLabelViewsProperties] = useState<LabelViewFilterStateProperties | null>(null)
   // END of PART 1 filters
 
   // PART 2 filters
-  const [categoryProperties, setCategoryProperties] = useState<CategoryFilterStateProperties | null>(null)
+  const [categoryProperties, setCategoryProperties] = useState<NestedCategoryFilterStateProperties | null>(null)
   // END of PART 2 filters
 
   // PART 3 filters
-  const [numericProperties, setNumericProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: string[]
-    value: string | null
-  } | null>(null)
+  const [numericProperties, setNumericProperties] = useState<NumericFilterStateProperties | null>(null)
   // END of PART 3 filters
 
   const rangeSelectedCycle = useMemo(() => {
