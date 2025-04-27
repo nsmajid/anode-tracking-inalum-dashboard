@@ -11,6 +11,7 @@ import {
 } from '@heroui/react'
 import { parseDate } from '@internationalized/date'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { X } from 'react-feather'
 
 import ChartFisikPart1 from './chart-fisik-parts/ChartFisikPart1'
 import ChartFisikPart2 from './chart-fisik-parts/ChartFisikPart2'
@@ -19,8 +20,14 @@ import ChartFisikPart3 from './chart-fisik-parts/ChartFisikPart3'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { useDisplayChart } from '@/hooks/display-chart'
-import { ChartFisikPart1Data, ChartFisikPart2Data, ChartFisikPart3Data } from '@/types/chart'
-import { X } from 'react-feather'
+import {
+  CategoryFilterProperties,
+  CategoryFilterStateProperties,
+  ChartFisikPart1Data,
+  ChartFisikPart2Data,
+  ChartFisikPart3Data
+} from '@/types/chart'
+import CategoryFilter from './filters/CategoryFilter'
 
 type Props = {
   chart: ChartItem
@@ -87,13 +94,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   // END of PART 1 filters
 
   // PART 2 filters
-  const [categoryProperties, setCategoryProperties] = useState<{
-    label_name: string
-    name: string
-    required: boolean
-    options: string[]
-    value: string | null
-  } | null>(null)
+  const [categoryProperties, setCategoryProperties] = useState<CategoryFilterStateProperties | null>(null)
   // END of PART 2 filters
 
   // PART 3 filters
@@ -194,13 +195,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
         }
         2: {
           title: string
-          categories: {
-            label_name: string
-            name: string
-            value: string[]
-            default: string | null
-            required: boolean
-          }
+          categories: CategoryFilterProperties
         }
         3: {
           title: string
@@ -269,9 +264,20 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       const { categories } = data.chart.parts[2]
 
       setCategoryProperties({
-        ...categories,
-        options: categories.value,
-        value: categories.default || null
+        label_name: categories.label_name,
+        name: categories.name,
+        required: categories.required,
+        options: categories.options.map((r) => ({
+          label_name: r.label_name,
+          name: r.name,
+          type: r.type,
+          default: r.default,
+          required: r.required,
+          options: r.value || undefined,
+          max: r.max || undefined,
+          min: r.min || undefined
+        })),
+        values: categories.default || []
       })
 
       const { numerics } = data.chart.parts[3]
@@ -308,7 +314,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   })
 
   const onSubmitChartPart2 = useCallback(() => {
-    let params: Record<string, string> = {
+    let params: Record<string, string | Array<{ name: string; value: string }>> = {
       part: '2'
     }
 
@@ -354,10 +360,15 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
       }
     }
 
-    if (categoryProperties?.value) {
+    if (categoryProperties && categoryProperties?.values?.some((r) => !!r.value)) {
       params = {
         ...params,
-        [categoryProperties.name]: categoryProperties.value
+        [categoryProperties.name]: categoryProperties.values
+          .filter((r) => !!r.value)
+          .map((r) => ({
+            name: r.name,
+            value: r.value as string
+          }))
       }
     }
 
@@ -369,7 +380,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
     }
 
     setLoadingPart2(true)
-    getDisplayChart(params, { isSubmitChart: true, part: params.part, preventLoading: true }).finally(() => {
+    getDisplayChart(params, { isSubmitChart: true, part: params.part as string, preventLoading: true }).finally(() => {
       setLoadingPart2(false)
     })
   }, [
@@ -526,9 +537,18 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
     onSubmitChartPart3
   ])
 
+  const onChangeCategoryFilters = useCallback((values: Array<{ name: string; value: string | null }>) => {
+    setCategoryProperties((current) => (current ? { ...current, values } : current))
+  }, [])
+
+  const memoizedCategoryValues = useMemo(
+    () => (categoryProperties?.values || []).filter((r) => !!r.value),
+    [categoryProperties?.values]
+  )
+
   useEffect(() => {
-    if (categoryProperties?.value) onSubmitChartPart2()
-  }, [categoryProperties?.value])
+    onSubmitChartPart2()
+  }, [memoizedCategoryValues])
 
   useEffect(() => {
     if (numericProperties?.value) onSubmitChartPart3()
@@ -590,7 +610,11 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                           setLotProperties((current) => (current ? { ...current, value: null } : current))
                           setCycleProperties((current) =>
                             current
-                              ? { ...current, start: { ...current.start, value: null }, end: { ...current.end, value: null } }
+                              ? {
+                                  ...current,
+                                  start: { ...current.start, value: null },
+                                  end: { ...current.end, value: null }
+                                }
                               : current
                           )
                         }}
@@ -658,6 +682,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                       if (value < Number(cycleProperties?.start?.value || 0)) {
                         return `${cycleProperties?.label_name} ${cycleProperties?.end.label_name} must be greater than ${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`
                       }
+
                       return true
                     }}
                     onValueChange={(value) => {
@@ -778,23 +803,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
               <div className='w-full space-y-3'>
                 <div className='text-xl font-semibold'>{chartNames?.[2]}</div>
                 <div className='w-full'>
-                  <Select
-                    className='max-w-xs'
-                    label={categoryProperties?.label_name}
-                    placeholder={`Pilih ${categoryProperties?.label_name}`}
-                    isRequired={categoryProperties?.required}
-                    selectedKeys={categoryProperties?.value ? [categoryProperties?.value] : []}
-                    onChange={(e) => {
-                      const { value } = e.target
-
-                      if (!value) return
-                      setCategoryProperties((current) => (current ? { ...current, value } : current))
-                    }}
-                  >
-                    {(categoryProperties?.options || []).map((option) => (
-                      <SelectItem key={option}>{option}</SelectItem>
-                    ))}
-                  </Select>
+                  <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
                 </div>
               </div>
             </CardHeader>

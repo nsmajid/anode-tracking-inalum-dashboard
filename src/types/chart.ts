@@ -104,3 +104,46 @@ export type ChartKorelasiPart1Data = Omit<DefaultChartData, 'datasets'> & {
     average: number
   }
 }
+
+export enum CategoryFilterInputType {
+  NUMBER = 'number',
+  OPTIONS = 'options',
+  VALUE_OPTIONS = 'value_options'
+}
+
+export type CategoryFilterOptionProperties = {
+  label_name: string
+  name: string
+  type: CategoryFilterInputType
+  default: null | string
+  required: boolean
+  value?: Array<{ id: string; name: string }> | string[]
+  max?: string
+  min?: string
+}
+
+export type CategoryFilterProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  default: Array<{
+    name: string
+    value: string | null
+  }>
+  options: Array<CategoryFilterOptionProperties>
+}
+
+export type CategoryFilterStateProperties = {
+  label_name: string
+  name: string
+  required: boolean
+  options: Array<
+    Omit<CategoryFilterOptionProperties, 'value'> & {
+      options: CategoryFilterOptionProperties['value']
+    }
+  >
+  values: Array<{
+    name: string
+    value: string | null
+  }>
+}
