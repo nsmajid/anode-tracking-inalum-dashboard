@@ -40,34 +40,39 @@ const CategoryFilter: React.FC<Props> = ({ properties, onChangeFilters }) => {
       const values = properties?.values || []
 
       if (values?.[index]) {
-        onChangeFilters([
+        const newValues = [
           ...(properties?.values || []).slice(0, index),
           { name, value },
           ...(properties?.values || []).slice(index + 1)
-        ])
+        ]
+
+        if (name && value && properties?.options?.[index + 1]) {
+          newValues.push({
+            name: properties.options[index + 1].name,
+            value: null
+          })
+        }
+
+        onChangeFilters(newValues)
       } else {
         onChangeFilters([...(properties?.values || []), { name, value }])
       }
     },
-    [onChangeFilters, properties?.values]
+    [onChangeFilters, properties?.values, properties?.options]
   )
 
   const onRemove = useCallback(
-    (index: number, isLastItem: boolean) => {
+    (index: number) => {
       const values = properties?.values || []
 
-      if (isLastItem) {
-        values[index].value = null
-        onChangeFilters(values)
-      } else {
-        values.splice(index, 1)
-        onChangeFilters(values)
+      if (values[index - 1]) {
+        values[index - 1].value = null
       }
+      values.splice(index, 1)
+      onChangeFilters(values)
     },
     [onChangeFilters, properties?.values]
   )
-
-  console.log({ properties })
 
   return (
     <div className='w-full space-y-2'>
@@ -89,11 +94,7 @@ const CategoryFilter: React.FC<Props> = ({ properties, onChangeFilters }) => {
             filters={filters}
             currentValue={properties?.values?.[i]}
             onChange={(name, value) => onChange(i, name, value)}
-            onRemove={
-              (i < visibleFiltersLength - 1 && r.selected_value) || (i === filters.length - 1 && r.selected_value)
-                ? () => onRemove(i, i === filters.length - 1)
-                : undefined
-            }
+            onRemove={i > 0 && i === visibleFiltersLength - 1 ? () => onRemove(i) : undefined}
           />
         )
       })}
@@ -205,13 +206,21 @@ const FilterItem: React.FC<{
               <div className='w-full'>
                 <NumberInput
                   className='w-full'
-                  label={item.label_name}
+                  label={`${item.label_name} (${item.min} - ${item.max})`}
                   placeholder={`Masukkan ${item.label_name}`}
                   isRequired={item.required}
                   min={item.min ? Number(item.min) : undefined}
                   max={item.max ? Number(item.max) : undefined}
                   value={currentValue?.value ? Number(currentValue.value) : undefined}
-                  onValueChange={(value) => onChange(currentValue?.name || '', value?.toString?.() || null)}
+                  onValueChange={(value) => {
+                    const min = item.min ? Number(item.min) : undefined
+                    const max = item.max ? Number(item.max) : undefined
+
+                    if (typeof min === 'number' && typeof max === 'number') {
+                      if (value < min || value > max) return
+                    }
+                    onChange(currentValue?.name || '', value?.toString?.() || null)
+                  }}
                 />
               </div>
             )}

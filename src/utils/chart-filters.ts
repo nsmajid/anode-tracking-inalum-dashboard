@@ -136,15 +136,13 @@ export const buildChartFilters = (properties: BuildChartFiltersProperties) => {
     }
   }
 
-  if (nested_category && nested_category?.values?.some((r) => !!r.value)) {
+  if (nested_category && nested_category?.values.length > 0) {
     params = {
       ...params,
-      [nested_category.name]: nested_category.values
-        .filter((r) => !!r.value)
-        .map((r) => ({
-          name: r.name,
-          value: r.value as string
-        }))
+      [nested_category.name]: nested_category.values.map((r) => ({
+        name: r.name,
+        value: (r.value ?? '') as string
+      }))
     }
   }
 
