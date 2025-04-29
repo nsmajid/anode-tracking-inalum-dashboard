@@ -21,19 +21,21 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { useDisplayChart } from '@/hooks/display-chart'
 import {
-  CategoryFilterStateProperties,
+  CategoryFilterProperties,
   ChartQCPart1Data,
   ChartQCPart2Data,
   ChartQCPart3Data,
   CycleFilterStateProperties,
   DateRangeFilterStateProperties,
   LotFilterStateProperties,
+  NestedCategoryFilterStateProperties,
   NumericFilterStateProperties,
   QCParametersFilterStateProperties
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter } from '@/hooks/chart-filter'
 import toast from 'react-hot-toast'
+import CategoryFilter from './filters/CategoryFilter'
 
 type Props = {
   chart: ChartItem
@@ -48,7 +50,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
   // END of PART 1 filters
 
   // PART 2 filters
-  const [categoryProperties, setCategoryProperties] = useState<CategoryFilterStateProperties | null>(null)
+  const [categoryProperties, setCategoryProperties] = useState<NestedCategoryFilterStateProperties | null>(null)
   // END of PART 2 filters
 
   // PART 3 filters
@@ -139,13 +141,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
         }
         2: {
           title: string
-          categories: {
-            label_name: string
-            name: string
-            value: string[]
-            default: string | null
-            required: boolean
-          }
+          categories: CategoryFilterProperties
         }
         3: {
           title: string
@@ -209,9 +205,20 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
       const { categories } = data.chart.parts[2]
 
       setCategoryProperties({
-        ...categories,
-        options: categories.value,
-        value: categories.default || null
+        label_name: categories.label_name,
+        name: categories.name,
+        required: categories.required,
+        options: categories.options.map((r) => ({
+          label_name: r.label_name,
+          name: r.name,
+          type: r.type,
+          default: r.default,
+          required: r.required,
+          options: r.value || undefined,
+          max: r.max || undefined,
+          min: r.min || undefined
+        })),
+        values: categories.default || []
       })
 
       const { numerics } = data.chart.parts[3]
@@ -268,7 +275,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
           lot: lotProperties,
           cycle: cycleProperties,
           date_range: dateRangeProperties,
-          category: categoryProperties,
+          nested_category: categoryProperties,
           numeric: numericProperties
         }),
       [lotProperties, dateRangeProperties, cycleProperties, categoryProperties, numericProperties, parametersProperties]
@@ -283,7 +290,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
         lot: lotProperties,
         cycle: cycleProperties,
         date_range: dateRangeProperties,
-        category: categoryProperties
+        nested_category: categoryProperties
       })
     }
 
@@ -342,9 +349,18 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
     onSubmitChartPart3
   ])
 
+  const onChangeCategoryFilters = useCallback((values: Array<{ name: string; value: string | null }>) => {
+    setCategoryProperties((current) => (current ? { ...current, values } : current))
+  }, [])
+
+  const memoizedCategoryValues = useMemo(
+    () => (categoryProperties?.values || []).filter((r) => !!r.value),
+    [categoryProperties?.values]
+  )
+
   useEffect(() => {
-    if (categoryProperties?.value) onSubmitChartPart2()
-  }, [categoryProperties?.value])
+    onSubmitChartPart2()
+  }, [memoizedCategoryValues])
 
   useEffect(() => {
     if (numericProperties?.value) onSubmitChartPart3()
@@ -593,23 +609,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
               <div className='w-full space-y-3'>
                 <div className='text-xl font-semibold'>{chartNames?.[2]}</div>
                 <div className='w-full'>
-                  <Select
-                    className='max-w-xs'
-                    label={categoryProperties?.label_name}
-                    placeholder={`Pilih ${categoryProperties?.label_name}`}
-                    isRequired={categoryProperties?.required}
-                    selectedKeys={categoryProperties?.value ? [categoryProperties?.value] : []}
-                    onChange={(e) => {
-                      const { value } = e.target
-
-                      if (!value) return
-                      setCategoryProperties((current) => (current ? { ...current, value } : current))
-                    }}
-                  >
-                    {(categoryProperties?.options || []).map((option) => (
-                      <SelectItem key={option}>{option}</SelectItem>
-                    ))}
-                  </Select>
+                  <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
                 </div>
               </div>
             </CardHeader>
