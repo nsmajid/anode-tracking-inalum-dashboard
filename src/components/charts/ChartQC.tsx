@@ -33,6 +33,7 @@ import {
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter } from '@/hooks/chart-filter'
+import toast from 'react-hot-toast'
 
 type Props = {
   chart: ChartItem
@@ -319,6 +320,12 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
         cycle: cycleProperties,
         date_range: dateRangeProperties
       })
+    }
+
+    if (!dateRangeProperties?.start.value && !dateRangeProperties?.end.value && !lotProperties?.value) {
+      toast.error(`Mohon pilih ${dateRangeProperties?.label_name} atau ${lotProperties?.label_name}`)
+
+      return
     }
 
     getDisplayChart(params, { isSubmitChart: true, part: params.part as string }).then(() => {
