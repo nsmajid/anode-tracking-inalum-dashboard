@@ -10,6 +10,7 @@ import { atomDisablePrint } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { EnumChartCode } from '@/types/chart'
 import { useChartFilter } from '@/hooks/chart-filter'
+import { RoleType, useProfile } from '@/hooks/profile'
 
 const ChartFisik = dynamic(() => import('./charts/ChartFisik'), { ssr: false })
 const ChartKorelasi = dynamic(() => import('./charts/ChartKorelasi'), { ssr: false })
@@ -35,13 +36,16 @@ const RenderCharts: React.FC<{
     }
   })
   const { setTrigger, saving } = useChartFilter()
+  const { profile } = useProfile()
 
   return (
     <>
       <div className='w-full flex justify-end items-center gap-2'>
-        <Button color='primary' isLoading={saving} onPress={() => setTrigger((current) => current + 1)}>
-          Simpan Filter
-        </Button>
+        {profile?.roles?.includes?.(RoleType.ADMINISTRATOR) && (
+          <Button color='primary' isLoading={saving} onPress={() => setTrigger((current) => current + 1)}>
+            Simpan Filter
+          </Button>
+        )}
         <div className={clsx(isDisablePrint && 'invisible')}>
           {printing ? (
             <Spinner size='sm' className='mx-5' />
