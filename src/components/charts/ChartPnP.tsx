@@ -136,9 +136,10 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
       () =>
         buildChartFilters({
           plant: plantProperties,
+          selected_sub_plants: selectedSubPlantType,
           date_range: dateRangeProperties
         }),
-      [plantProperties, dateRangeProperties]
+      [plantProperties, selectedSubPlantType, dateRangeProperties]
     )
   })
 
@@ -147,6 +148,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
       part: '1',
       ...buildChartFilters({
         plant: plantProperties,
+        selected_sub_plants: selectedSubPlantType,
         date_range: dateRangeProperties
       })
     }
