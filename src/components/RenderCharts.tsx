@@ -9,7 +9,7 @@ import { Printer } from 'react-feather'
 import { atomDisablePrint } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { EnumChartCode } from '@/types/chart'
-import { useChartFilter } from '@/hooks/chart-filter'
+import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import { RoleType, useProfile } from '@/hooks/profile'
 
 const ChartFisik = dynamic(() => import('./charts/ChartFisik'), { ssr: false })
@@ -37,6 +37,7 @@ const RenderCharts: React.FC<{
   })
   const { setTrigger, saving } = useChartFilter()
   const { profile } = useProfile()
+  const { showFilter, setShowFilter } = useChartFilterVisibility()
 
   return (
     <>
@@ -46,6 +47,9 @@ const RenderCharts: React.FC<{
             Simpan Filter
           </Button>
         )}
+        <Button color='primary' onPress={() => setShowFilter((current) => !current)}>
+          {showFilter ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+        </Button>
         <div className={clsx(isDisablePrint && 'invisible')}>
           {printing ? (
             <Spinner size='sm' className='mx-5' />

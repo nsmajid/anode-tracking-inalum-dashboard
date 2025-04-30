@@ -17,6 +17,7 @@ export type DefaultChartData = {
   'y-label': string | null
   labels: string[]
   datasets: number[]
+  'text-filter'?: string
 }
 
 export type ChartFisikPart1Data = DefaultChartData & {

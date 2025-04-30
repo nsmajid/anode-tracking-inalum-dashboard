@@ -83,3 +83,14 @@ export const useChartFilter = (options?: Options) => {
     saving: useMemo(() => savingChartIds.length > 0, [savingChartIds])
   }
 }
+
+const atomShowFilter = atom<boolean>(false)
+
+export const useChartFilterVisibility = () => {
+  const [showFilter, setShowFilter] = useAtom(atomShowFilter)
+
+  return {
+    showFilter,
+    setShowFilter
+  }
+}
