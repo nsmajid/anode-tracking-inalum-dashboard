@@ -310,10 +310,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
     setCategoryProperties((current) => (current ? { ...current, values } : current))
   }, [])
 
-  const memoizedCategoryValues = useMemo(
-    () => (categoryProperties?.values || []).filter((r) => !!r.value),
-    [categoryProperties?.values]
-  )
+  const memoizedCategoryValues = useMemo(() => JSON.stringify(categoryProperties?.values || []), [categoryProperties])
 
   useEffect(() => {
     onSubmitChartPart2()

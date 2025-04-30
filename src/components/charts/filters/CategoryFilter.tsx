@@ -47,10 +47,15 @@ const CategoryFilter: React.FC<Props> = ({ properties, onChangeFilters }) => {
         ]
 
         if (name && value && properties?.options?.[index + 1]) {
-          newValues.push({
-            name: properties.options[index + 1].name,
-            value: null
-          })
+          const nextName = properties.options[index + 1].name
+          const existingNameIndex = newValues.findIndex((r) => r.name === nextName)
+
+          if (existingNameIndex === -1) {
+            newValues.push({
+              name: properties.options[index + 1].name,
+              value: null
+            })
+          }
         }
 
         onChangeFilters(newValues)
@@ -209,9 +214,9 @@ const FilterItem: React.FC<{
                   label={`${item.label_name} (${item.min} - ${item.max})`}
                   placeholder={`Masukkan ${item.label_name}`}
                   isRequired={item.required}
-                  minValue={item.min ? parseInt(item.min) : undefined}
-                  maxValue={item.max ? parseInt(item.max) : undefined}
-                  value={currentValue?.value ? parseInt(currentValue.value) : undefined}
+                  // minValue={currentValue?.value && item.min ? parseInt(item.min) : undefined}
+                  // maxValue={currentValue?.value && item.max ? parseInt(item.max) : undefined}
+                  value={currentValue?.value ? parseInt(currentValue.value) : 0}
                   onValueChange={(value) => {
                     const min = item.min ? parseInt(item.min) : undefined
                     const max = item.max ? parseInt(item.max) : undefined
