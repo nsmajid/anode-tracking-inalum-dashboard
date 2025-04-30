@@ -209,12 +209,12 @@ const FilterItem: React.FC<{
                   label={`${item.label_name} (${item.min} - ${item.max})`}
                   placeholder={`Masukkan ${item.label_name}`}
                   isRequired={item.required}
-                  min={item.min ? Number(item.min) : undefined}
-                  max={item.max ? Number(item.max) : undefined}
-                  value={currentValue?.value ? Number(currentValue.value) : undefined}
+                  minValue={item.min ? parseInt(item.min) : undefined}
+                  maxValue={item.max ? parseInt(item.max) : undefined}
+                  value={currentValue?.value ? parseInt(currentValue.value) : undefined}
                   onValueChange={(value) => {
-                    const min = item.min ? Number(item.min) : undefined
-                    const max = item.max ? Number(item.max) : undefined
+                    const min = item.min ? parseInt(item.min) : undefined
+                    const max = item.max ? parseInt(item.max) : undefined
 
                     if (typeof min === 'number' && typeof max === 'number') {
                       if (value < min || value > max) return
