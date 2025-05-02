@@ -20,7 +20,10 @@ const ChartTypeFilter: React.FC<Props> = ({ state, value, onChange }) => {
         placeholder={`Pilih ${state.label_name}`}
         isRequired={state.required}
         selectedKeys={value ? [value] : []}
-        onChange={(e) => onChange(e.target.value as ChartTypeDisplay)}
+        onChange={(e) => {
+          if (!e.target.value) return
+          onChange(e.target.value as ChartTypeDisplay)
+        }}
       >
         {(state.value || []).map((option) => (
           <SelectItem key={option.option_value}>{option.option_name}</SelectItem>
