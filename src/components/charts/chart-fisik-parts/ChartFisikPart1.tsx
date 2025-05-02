@@ -70,20 +70,14 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
             shared: false,
             intersect: true,
             followCursor: true,
-            custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
-              const value = data?.datasets[seriesIndex]
+            custom: ({ dataPointIndex }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
               const is_custom_tooltip = !!data?.custom_hover
               const lists = data?.hover?.[dataPointIndex] ?? []
               const label = data?.labels?.[dataPointIndex]
-              const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
 
               return renderToStaticMarkup(
                 <div className='w-fit rounded-md text-black'>
                   <div className='px-2 py-1 bg-gray-100'>{label}</div>
-                  <div className='px-2 py-1'>
-                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                    {value}
-                  </div>
                   {is_custom_tooltip && (
                     <div className='px-2 py-1'>
                       <ul className='list-disc pl-4'>
