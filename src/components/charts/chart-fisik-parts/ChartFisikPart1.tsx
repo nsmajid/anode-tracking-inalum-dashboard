@@ -3,14 +3,15 @@ import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
 import { Activity, Minus, Plus } from 'react-feather'
 
-import { ChartFisikPart1Data } from '@/types/chart'
+import { ChartFisikPart1Data, ChartTypeDisplay } from '@/types/chart'
 
 type Props = {
   loading: boolean
   data: ChartFisikPart1Data | null
+  chartType: ChartTypeDisplay
 }
 
-const ChartFisikPart1: React.FC<Props> = ({ loading, data }) => {
+const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
   return (
     <div className='w-full relative'>
       {loading && (
@@ -19,7 +20,7 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data }) => {
         </div>
       )}
       <ReactApexChart
-        type='bar'
+        type={chartType}
         series={[
           {
             name: '',
@@ -28,7 +29,7 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data }) => {
         ]}
         options={{
           chart: {
-            type: 'bar',
+            type: chartType,
             height: 350,
             zoom: {
               type: 'x',

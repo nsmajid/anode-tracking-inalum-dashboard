@@ -32,12 +32,15 @@ import {
   CycleFilterStateProperties,
   DateRangeFilterStateProperties,
   LabelViewFilterStateProperties,
-  NumericFilterStateProperties
+  NumericFilterStateProperties,
+  ChartTypeData,
+  ChartTypeDisplay
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
+import ChartTypeFilter from './filters/ChartTypeFilter'
 
 type Props = {
   chart: ChartItem
@@ -50,6 +53,8 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   const [cycleProperties, setCycleProperties] = useState<CycleFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
   const [labelViewsProperties, setLabelViewsProperties] = useState<LabelViewFilterStateProperties | null>(null)
+  const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
+  const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay>(ChartTypeDisplay.BAR)
   // END of PART 1 filters
 
   // PART 2 filters
@@ -148,6 +153,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
             required: boolean
             value: string[]
           }
+          chart_type: ChartTypeData
         }
         2: {
           title: string
@@ -243,6 +249,11 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
         options: numerics.value,
         value: numerics.default || null
       })
+
+      const { chart_type } = data.chart.parts[1]
+
+      setChartTypeProperties(chart_type)
+      setChartTypeValue(chart_type.default || ChartTypeDisplay.BAR)
 
       setTimeout(() => {
         document.getElementById(`submit-part1-${chart.id}`)?.click()
@@ -623,6 +634,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                   <SelectItem key={option}>{option}</SelectItem>
                 ))}
               </Select>
+              <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}</div>
@@ -639,7 +651,7 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
           </form>
         </CardHeader>
         <CardBody className='w-full'>
-          <ChartFisikPart1 data={part1Data} loading={loadingChart} />
+          <ChartFisikPart1 chartType={chartTypeValue} data={part1Data} loading={loadingChart} />
         </CardBody>
       </Card>
       {part1Data && (

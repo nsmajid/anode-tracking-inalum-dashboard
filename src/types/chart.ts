@@ -20,6 +20,22 @@ export type DefaultChartData = {
   'text-filter'?: string
 }
 
+export enum ChartTypeDisplay {
+  LINE = 'line',
+  BAR = 'bar'
+}
+
+export type ChartTypeData = {
+  label_name: string
+  name: string
+  value: Array<{
+    option_value: ChartTypeDisplay
+    option_name: string
+  }>
+  default: ChartTypeDisplay | null
+  required: boolean
+}
+
 export type ChartFisikPart1Data = DefaultChartData & {
   info: {
     min: number

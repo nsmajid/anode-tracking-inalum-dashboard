@@ -23,6 +23,8 @@ import {
   CategoryFilterProperties,
   ChartGradePart1Data,
   ChartGradePart2or3Data,
+  ChartTypeData,
+  ChartTypeDisplay,
   CycleFilterStateProperties,
   DateRangeFilterStateProperties,
   LotFilterStateProperties,
@@ -33,6 +35,7 @@ import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter } from '@/hooks/chart-filter'
 import toast from 'react-hot-toast'
 import CategoryFilter from './filters/CategoryFilter'
+import ChartTypeFilter from './filters/ChartTypeFilter'
 
 type Props = {
   chart: ChartItem
@@ -43,6 +46,8 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
   const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
   const [cycleProperties, setCycleProperties] = useState<CycleFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
+  const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay>(ChartTypeDisplay.LINE)
   // END of PART 1 filters
 
   // PART 2 filters
@@ -124,6 +129,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          chart_type: ChartTypeData
         }
         2: {
           title: string
@@ -209,6 +215,11 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
         options: numerics.value,
         value: numerics.default || null
       })
+
+      const { chart_type } = data.chart.parts[1]
+
+      setChartTypeProperties(chart_type)
+      setChartTypeValue(chart_type.default || ChartTypeDisplay.LINE)
 
       setTimeout(() => {
         document.getElementById(`submit-part1-${chart.id}`)?.click()
@@ -449,7 +460,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
                 </div>
               </div>
             </div>
-            <div className='w-full'>
+            <div className='w-full inline-flex items-center gap-2'>
               <DateRangePicker
                 showMonthAndYearPickers
                 className='max-w-xs'
@@ -507,6 +518,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
                   )
                 }}
               />
+              <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
@@ -523,7 +535,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
           </form>
         </CardHeader>
         <CardBody className='w-full'>
-          <ChartGradePart1 data={part1Data} loading={loadingChart} />
+          <ChartGradePart1 data={part1Data} loading={loadingChart} chartType={chartTypeValue} />
         </CardBody>
       </Card>
       {part1Data && (

@@ -4,13 +4,14 @@ import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
 import { Activity, Minus, Plus } from 'react-feather'
 
-import { ChartGradePart1Data } from '@/types/chart'
+import { ChartGradePart1Data, ChartTypeDisplay } from '@/types/chart'
 import { format } from 'date-fns'
 import { fixIsoDate } from '@/utils/date'
 
 type Props = {
   loading: boolean
   data: ChartGradePart1Data | null
+  chartType: ChartTypeDisplay
 }
 
 const fixedColors = [
@@ -26,7 +27,7 @@ const fixedColors = [
   '#A533FF'
 ]
 
-const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
+const ChartGradePart1: React.FC<Props> = ({ loading, data, chartType }) => {
   return (
     <div className='w-full relative'>
       {loading && (
@@ -35,7 +36,7 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
         </div>
       )}
       <ReactApexChart
-        type='line'
+        type={chartType}
         series={(data?.datasets || []).map((r, i) => ({
           name: r.label,
           data: r.data,
@@ -43,7 +44,7 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data }) => {
         }))}
         options={{
           chart: {
-            type: 'line',
+            type: chartType,
             height: 350,
             stacked: false,
             zoom: {
