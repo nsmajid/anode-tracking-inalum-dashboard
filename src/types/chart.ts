@@ -42,6 +42,8 @@ export type ChartFisikPart1Data = DefaultChartData & {
     max: number
     average: number
   }
+  custom_hover?: boolean
+  hover?: Array<Array<{ label: string; value: number }>>
 }
 export type ChartFisikPart2Data = DefaultChartData
 export type ChartFisikPart3Data = DefaultChartData
