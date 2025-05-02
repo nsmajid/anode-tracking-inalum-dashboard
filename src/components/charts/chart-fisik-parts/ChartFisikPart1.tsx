@@ -40,6 +40,12 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
               autoSelected: 'zoom'
             }
           },
+          markers: {
+            size: 5
+          },
+          stroke: {
+            width: 2
+          },
           xaxis: {
             // type: 'datetime',
             title: {

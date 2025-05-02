@@ -77,6 +77,9 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data, chartType }) => {
           markers: {
             size: 5
           },
+          stroke: {
+            width: 2
+          },
           tooltip: {
             enabled: true,
             shared: false,
