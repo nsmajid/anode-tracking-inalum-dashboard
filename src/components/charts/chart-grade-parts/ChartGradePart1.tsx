@@ -57,7 +57,7 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data, chartType }) => {
             }
           },
           xaxis: {
-            type: 'datetime',
+            // type: 'datetime',
             title: {
               text: data?.['x-label'] || '',
               style: {

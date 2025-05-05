@@ -27,6 +27,7 @@ import {
   ChartTypeDisplay,
   CycleFilterStateProperties,
   DateRangeFilterStateProperties,
+  LabelViewFilterStateProperties,
   LotFilterStateProperties,
   NestedCategoryFilterStateProperties,
   NumericFilterStateProperties
@@ -47,6 +48,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
   const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
   const [cycleProperties, setCycleProperties] = useState<CycleFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [labelViewsProperties, setLabelViewsProperties] = useState<LabelViewFilterStateProperties | null>(null)
   const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
   const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay>(ChartTypeDisplay.LINE)
   // END of PART 1 filters
@@ -133,6 +135,13 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          label_views: {
+            label_name: string
+            name: string
+            default: string | null
+            required: boolean
+            value: string[]
+          }
           chart_type: ChartTypeData
         }
         2: {
@@ -159,7 +168,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
         3: data.chart.parts?.[3]?.title
       })
 
-      const { filters } = data.chart.parts[1]
+      const { filters, label_views } = data.chart.parts[1]
       const { lot, cycle, daterange } = filters.options
 
       setLotProperties({
@@ -191,6 +200,11 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
           label_name: `${daterange.label_name} ${daterange.value.end_daterange.label_name}`,
           value: daterange.value.end_daterange.default || null
         }
+      })
+      setLabelViewsProperties({
+        ...label_views,
+        options: label_views.value,
+        value: label_views.default || null
       })
 
       const { categories } = data.chart.parts[2]
@@ -262,9 +276,10 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
           cycle: cycleProperties,
           date_range: dateRangeProperties,
           nested_category: categoryProperties,
-          numeric: numericProperties
+          numeric: numericProperties,
+          label_view: labelViewsProperties
         }),
-      [lotProperties, cycleProperties, dateRangeProperties, categoryProperties, numericProperties]
+      [lotProperties, cycleProperties, dateRangeProperties, categoryProperties, numericProperties, labelViewsProperties]
     )
   })
 
@@ -308,7 +323,8 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
       ...buildChartFilters({
         lot: lotProperties,
         cycle: cycleProperties,
-        date_range: dateRangeProperties
+        date_range: dateRangeProperties,
+        label_view: labelViewsProperties
       })
     }
 
@@ -322,7 +338,15 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
       onSubmitChartPart2()
       onSubmitChartPart3()
     })
-  }, [getDisplayChart, lotProperties, cycleProperties, dateRangeProperties, onSubmitChartPart2, onSubmitChartPart3])
+  }, [
+    getDisplayChart,
+    lotProperties,
+    cycleProperties,
+    dateRangeProperties,
+    onSubmitChartPart2,
+    onSubmitChartPart3,
+    labelViewsProperties
+  ])
 
   const onChangeCategoryFilters = useCallback((values: Array<{ name: string; value: string | null }>) => {
     setCategoryProperties((current) => (current ? { ...current, values } : current))
@@ -525,6 +549,23 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
                   )
                 }}
               />
+              <Select
+                className='max-w-xs'
+                label={labelViewsProperties?.label_name}
+                placeholder={`Pilih ${labelViewsProperties?.label_name}`}
+                isRequired={labelViewsProperties?.required}
+                isDisabled={loadingChart}
+                selectedKeys={labelViewsProperties?.value ? [labelViewsProperties?.value] : []}
+                onChange={(e) => {
+                  const { value } = e.target
+
+                  setLabelViewsProperties((current) => (current ? { ...current, value } : current))
+                }}
+              >
+                {(labelViewsProperties?.options || []).map((option) => (
+                  <SelectItem key={option}>{option}</SelectItem>
+                ))}
+              </Select>
               <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
