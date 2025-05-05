@@ -32,10 +32,11 @@ import {
   NumericFilterStateProperties
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
-import { useChartFilter } from '@/hooks/chart-filter'
+import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import toast from 'react-hot-toast'
 import CategoryFilter from './filters/CategoryFilter'
 import ChartTypeFilter from './filters/ChartTypeFilter'
+import clsx from 'clsx'
 
 type Props = {
   chart: ChartItem
@@ -73,6 +74,9 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
   const [part3Data, setPart3Data] = useState<ChartGradePart2or3Data | null>(null)
 
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
+  const [chartNamesHiddenFilter, setChartNamesHiddenFilter] = useState<Record<number, string>>({})
+
+  const { showFilter } = useChartFilterVisibility()
 
   const { loading, loadingChart, chartData, getDisplayChart } = useDisplayChart<{
     chart: {
@@ -235,12 +239,15 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
 
         if (part === '1') {
           setPart1Data(chart)
+          setChartNamesHiddenFilter((current) => ({ ...current, 1: chart?.['text-filter'] || '' }))
         }
         if (part === '2') {
           setPart2Data(chart)
+          setChartNamesHiddenFilter((current) => ({ ...current, 2: chart?.['text-filter'] || '' }))
         }
         if (part === '3') {
           setPart3Data(chart)
+          setChartNamesHiddenFilter((current) => ({ ...current, 3: chart?.['text-filter'] || '' }))
         }
       }
     }
@@ -351,7 +358,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
               onSubmitChartPart1()
             }}
           >
-            <div className='w-full space-y-1'>
+            <div className={clsx('w-full space-y-1', !showFilter && 'hidden')}>
               <div className='w-full flex items-center gap-2'>
                 <Select
                   className='w-full max-w-[13rem]'
@@ -460,7 +467,7 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
                 </div>
               </div>
             </div>
-            <div className='w-full inline-flex items-center gap-2'>
+            <div className={clsx('w-full inline-flex items-center gap-2', !showFilter && 'hidden')}> 
               <DateRangePicker
                 showMonthAndYearPickers
                 className='max-w-xs'
@@ -521,13 +528,13 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
               <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
-              <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+              <div className='text-xl font-semibold'>{showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}</div>
               <Button
                 type='submit'
                 id={`submit-part1-${chart.id}`}
                 color='primary'
                 isLoading={loadingChart}
-                className='print:hidden'
+                className={clsx(!showFilter && 'hidden', 'print:hidden')}
               >
                 Tampilkan
               </Button>
@@ -543,8 +550,10 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
           <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
             <CardHeader>
               <div className='w-full space-y-3'>
-                <div className='text-xl font-semibold'>{chartNames?.[2]}</div>
-                <div className='w-full'>
+                <div className='text-xl font-semibold'>
+                  {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
+                </div>
+                <div className={clsx('w-full', !showFilter && 'hidden')}>
                   <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
                 </div>
               </div>
@@ -556,8 +565,10 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
           <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
             <CardHeader>
               <div className='w-full space-y-3'>
-                <div className='text-xl font-semibold'>{chartNames?.[3]}</div>
-                <div className='w-full'>
+                <div className='text-xl font-semibold'>
+                  {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
+                </div>
+                <div className={clsx('w-full', !showFilter && 'hidden')}>
                   <Select
                     className='max-w-xs'
                     label={numericProperties?.label_name}
