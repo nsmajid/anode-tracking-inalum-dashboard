@@ -17,7 +17,6 @@ import { useRouter } from 'next/router'
 
 import { siteConfig } from '@/config/site'
 // import { ThemeSwitch } from '@/components/theme-switch'
-import { Logo } from '@/components/icons'
 import { RoleType, useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL } from '@/config/constants'
 
@@ -55,8 +54,7 @@ export const Navbar = () => {
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
         <NavbarBrand className='gap-3 max-w-fit'>
           <NextLink className='flex justify-start items-center gap-1' href='/'>
-            <Logo />
-            <p className='font-bold text-inherit'>ACME</p>
+            <img alt='logo' draggable='false' src='/assets/images/inalum-logo.png' className='h-8' />
           </NextLink>
         </NavbarBrand>
         <div className='hidden lg:flex gap-4 justify-start ml-2'>
