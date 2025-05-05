@@ -50,7 +50,7 @@ const ChartGradePart2or3: React.FC<Props> = ({ loading, data }) => {
                 fontSize: '18px'
               }
             },
-            categories: data?.labels || []
+            categories: (data?.labels || []).map((r) => r || '')
           },
           yaxis: {
             title: {
