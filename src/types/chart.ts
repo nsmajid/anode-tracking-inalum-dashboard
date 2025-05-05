@@ -45,8 +45,14 @@ export type ChartFisikPart1Data = DefaultChartData & {
   custom_hover?: boolean
   hover?: Array<Array<{ label: string; value: number }>>
 }
-export type ChartFisikPart2Data = DefaultChartData
-export type ChartFisikPart3Data = DefaultChartData
+export type ChartFisikPart2Data = DefaultChartData & {
+  custom_hover?: boolean
+  hover?: Array<Array<{ label: string; value: number }>>
+}
+export type ChartFisikPart3Data = DefaultChartData & {
+  custom_hover?: boolean
+  hover?: Array<Array<{ label: string; value: number }>>
+}
 
 export type ChartGradePart1Data = Omit<DefaultChartData, 'datasets'> & {
   datasets: Array<{

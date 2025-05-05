@@ -3,6 +3,7 @@ import ReactApexChart from 'react-apexcharts'
 import { Spinner } from '@heroui/react'
 
 import { ChartFisikPart3Data } from '@/types/chart'
+import { renderToStaticMarkup } from 'react-dom/server'
 
 type Props = {
   loading: boolean
@@ -45,6 +46,35 @@ const ChartFisikPart3: React.FC<Props> = ({ loading, data }) => {
               style: {
                 fontSize: '18px'
               }
+            }
+          },
+          tooltip: {
+            enabled: true,
+            shared: false,
+            intersect: true,
+            followCursor: true,
+            custom: ({ dataPointIndex }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+              const is_custom_tooltip = !!data?.custom_hover
+              const lists = data?.hover?.[dataPointIndex] ?? []
+              const label = data?.labels?.[dataPointIndex]
+
+              return renderToStaticMarkup(
+                <div className='w-fit rounded-md text-black'>
+                  <div className='px-2 py-1 bg-gray-100'>{label}</div>
+                  {is_custom_tooltip && (
+                    <div className='px-2 py-1'>
+                      <ul className='list-disc pl-4'>
+                        {lists.map((list) => (
+                          <li key={list.label}>
+                            <span className='mr-1 underline'>{list.label}:</span>
+                            <span className='font-bold'>{list.value}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )
             }
           }
         }}
