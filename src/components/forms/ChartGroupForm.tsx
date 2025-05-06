@@ -318,6 +318,12 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
     let apiUrl: string | undefined
     let method: Method | undefined
 
+    if (data.dashboard_has_slider && data.dashboard_slides.some((s) => s.slide_charts.length > 1)) {
+      toast.error('1 slide hanya diperbolehkan memiliki 1 chart')
+
+      return
+    }
+
     if (mode === 'ADD') {
       apiUrl = `/api/dashboard`
       method = 'POST'
@@ -590,18 +596,20 @@ const ChartGroupForm: React.FC<Props> = ({ mode, editUUID }) => {
                                               </div>
                                               <div className='w-full text-lg font-semibold'>Slide ke {i + 1}</div>
                                               <div className='flex items-center gap-2'>
-                                                <Button
-                                                  isIconOnly
-                                                  color='primary'
-                                                  size='sm'
-                                                  variant='flat'
-                                                  startContent={<Plus />}
-                                                  isLoading={loadingRefData}
-                                                  onPress={() => {
-                                                    setCurrentSlideIndex(i)
-                                                    onOpenAddChart()
-                                                  }}
-                                                />
+                                                {slide.slide_charts.length < 1 && (
+                                                  <Button
+                                                    isIconOnly
+                                                    color='primary'
+                                                    size='sm'
+                                                    variant='flat'
+                                                    startContent={<Plus />}
+                                                    isLoading={loadingRefData}
+                                                    onPress={() => {
+                                                      setCurrentSlideIndex(i)
+                                                      onOpenAddChart()
+                                                    }}
+                                                  />
+                                                )}
                                                 <Button
                                                   isIconOnly
                                                   color='danger'
