@@ -13,6 +13,7 @@ import DashboardWithSlider from '@/components/DashboardWithSlider'
 import RenderCharts from '@/components/RenderCharts'
 import { useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL, getAuthHeaders, SESSION_KEY } from '@/config/constants'
+import { useScreenResolution } from '@/hooks/screen-resolution'
 
 export default function ChartPage() {
   const { profileStatus } = useProfile()
@@ -21,6 +22,7 @@ export default function ChartPage() {
   const [loading, setLoading] = useState<boolean>(false)
   const [dashboard, setDashboard] = useState<DashboardSettingItem | null>(null)
   const [charts, setCharts] = useState<ChartItem[]>([])
+  const { setScreenResolution } = useScreenResolution()
 
   useEffect(() => {
     if (chartId) {
@@ -43,6 +45,8 @@ export default function ChartPage() {
               charts: Array<ChartItem>
             }>
           >('/api/dashboard', { params: { id: chartId } })
+
+          setScreenResolution(data?.data?.dashboard?.dashboard_resolution ?? null)
 
           const is_public = !!Number(data.data.dashboard.dashboard_public)
 
@@ -81,6 +85,10 @@ export default function ChartPage() {
           setLoading(false)
         }
       })()
+    }
+
+    return () => {
+      setScreenResolution(null)
     }
   }, [chartId, profileStatus])
 

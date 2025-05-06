@@ -41,12 +41,14 @@ import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 import ChartTypeFilter from './filters/ChartTypeFilter'
+import { useScreenResolution } from '@/hooks/screen-resolution'
 
 type Props = {
   chart: ChartItem
 }
 
 const ChartFisik: React.FC<Props> = ({ chart }) => {
+  const { isTVResolution } = useScreenResolution()
   // PART 1 filters
   const [parametersProperties, setParametersProperties] = useState<ParametersFilterStateProperties | null>(null)
   const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
@@ -422,163 +424,101 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
   return (
     <div className='w-full space-y-6'>
       <h3 className='text-2xl font-semibold text-center'>{chartData?.chart_name}</h3>
-      <Card className='w-full space-y-2 print:shadow-none'>
-        <CardHeader>
-          <form
-            className='w-full space-y-2'
-            onSubmit={(e) => {
-              e.preventDefault()
-              onSubmitChartPart1()
-            }}
-          >
-            <div className={clsx('w-full', !showFilter && 'hidden')}>
-              <Select
-                className='max-w-xs'
-                label={parametersProperties?.label_name}
-                placeholder={`Pilih ${parametersProperties?.label_name}`}
-                isRequired={parametersProperties?.required}
-                isDisabled={loadingChart}
-                selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
-                onChange={(e) => {
-                  const { value } = e.target
-
-                  setParametersProperties((current) => (current ? { ...current, value } : current))
-                }}
-              >
-                {(parametersProperties?.options || []).map((option) => (
-                  <SelectItem key={option}>{option}</SelectItem>
-                ))}
-              </Select>
-            </div>
-            <div className={clsx('w-full space-y-1', !showFilter && 'hidden')}>
-              <div className='w-full flex items-center gap-2'>
+      <div className={clsx('w-full flex gap-6', isTVResolution ? 'flex-row' : 'flex-col')}>
+        <Card className='w-full space-y-2 print:shadow-none'>
+          <CardHeader>
+            <form
+              className='w-full space-y-2'
+              onSubmit={(e) => {
+                e.preventDefault()
+                onSubmitChartPart1()
+              }}
+            >
+              <div className={clsx('w-full', !showFilter && 'hidden')}>
                 <Select
-                  className='w-full max-w-[13rem]'
-                  label={lotProperties?.label_name}
-                  placeholder={`Pilih ${lotProperties?.label_name}`}
-                  isRequired={lotProperties?.required}
-                  isDisabled={loadingChart || !parametersProperties?.value}
-                  selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
-                  endContent={
-                    lotProperties?.value ? (
-                      <X
-                        className='w-4 h-4 cursor-pointer'
-                        onClick={() => {
-                          setLotProperties((current) => (current ? { ...current, value: null } : current))
-                          setCycleProperties((current) =>
-                            current
-                              ? {
-                                  ...current,
-                                  start: { ...current.start, value: null },
-                                  end: { ...current.end, value: null }
-                                }
-                              : current
-                          )
-                        }}
-                      />
-                    ) : undefined
-                  }
+                  className='max-w-xs'
+                  label={parametersProperties?.label_name}
+                  placeholder={`Pilih ${parametersProperties?.label_name}`}
+                  isRequired={parametersProperties?.required}
+                  isDisabled={loadingChart}
+                  selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
                   onChange={(e) => {
                     const { value } = e.target
 
-                    const lotRow = (lotProperties?.options || []).find((option) => option.lot === value)
-
-                    setLotProperties((current) => (current ? { ...current, value } : current))
-                    setCycleProperties((current) =>
-                      current
-                        ? {
-                            ...current,
-                            start: { ...current.start, value: lotRow?.start_cycle || null },
-                            end: { ...current.end, value: lotRow?.end_cycle || null }
-                          }
-                        : current
-                    )
+                    setParametersProperties((current) => (current ? { ...current, value } : current))
                   }}
                 >
-                  {(lotProperties?.options || []).map((option) => (
-                    <SelectItem key={option.lot}>{option.lot}</SelectItem>
+                  {(parametersProperties?.options || []).map((option) => (
+                    <SelectItem key={option}>{option}</SelectItem>
                   ))}
                 </Select>
-                <div className='inline-flex items-center gap-2'>
-                  <NumberInput
-                    className='w-full max-w-[15rem]'
-                    label={`${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`}
-                    isDisabled={loadingChart || !lotProperties?.value}
-                    isRequired={cycleProperties?.start?.required}
-                    minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
-                    maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
-                    value={cycleProperties?.start?.value ? Number(cycleProperties?.start?.value) : 0}
-                    onValueChange={(value) => {
-                      setCycleProperties((current) =>
-                        current
-                          ? {
-                              ...current,
-                              start: {
-                                ...current.start,
-                                value: `${value}`
-                              },
-                              end: {
-                                ...current.end,
-                                value: null
-                              }
-                            }
-                          : current
-                      )
-                    }}
-                  />
-                  <div>-</div>
-                  <NumberInput
-                    className='w-full max-w-[15rem]'
-                    label={`${cycleProperties?.label_name} ${cycleProperties?.end.label_name}`}
-                    isDisabled={loadingChart || !lotProperties?.value || !cycleProperties?.start?.value}
-                    isRequired={cycleProperties?.end?.required}
-                    minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
-                    maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
-                    value={cycleProperties?.end?.value ? Number(cycleProperties?.end?.value) : 0}
-                    validate={(value) => {
-                      if (value < Number(cycleProperties?.start?.value || 0)) {
-                        return `${cycleProperties?.label_name} ${cycleProperties?.end.label_name} must be greater than ${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`
-                      }
-
-                      return true
-                    }}
-                    onValueChange={(value) => {
-                      setCycleProperties((current) =>
-                        current
-                          ? {
-                              ...current,
-                              end: {
-                                ...current.end,
-                                value: `${value}`
-                              }
-                            }
-                          : current
-                      )
-                    }}
-                  />
-                </div>
               </div>
-            </div>
-            <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
-              <DateRangePicker
-                showMonthAndYearPickers
-                className='max-w-xs'
-                label={dateRangeProperties?.label_name}
-                isRequired={dateRangeProperties?.required}
-                isDisabled={loadingChart}
-                selectorButtonPlacement='start'
-                endContent={
-                  dateRangeProperties?.start?.value && dateRangeProperties?.end?.value ? (
-                    <X
-                      className='w-8 h-8 cursor-pointer'
-                      onClick={() => {
-                        setDateRangeProperties((current) =>
+              <div className={clsx('w-full space-y-1', !showFilter && 'hidden')}>
+                <div className='w-full flex items-center gap-2'>
+                  <Select
+                    className='w-full max-w-[13rem]'
+                    label={lotProperties?.label_name}
+                    placeholder={`Pilih ${lotProperties?.label_name}`}
+                    isRequired={lotProperties?.required}
+                    isDisabled={loadingChart || !parametersProperties?.value}
+                    selectedKeys={lotProperties?.value ? [lotProperties?.value] : []}
+                    endContent={
+                      lotProperties?.value ? (
+                        <X
+                          className='w-4 h-4 cursor-pointer'
+                          onClick={() => {
+                            setLotProperties((current) => (current ? { ...current, value: null } : current))
+                            setCycleProperties((current) =>
+                              current
+                                ? {
+                                    ...current,
+                                    start: { ...current.start, value: null },
+                                    end: { ...current.end, value: null }
+                                  }
+                                : current
+                            )
+                          }}
+                        />
+                      ) : undefined
+                    }
+                    onChange={(e) => {
+                      const { value } = e.target
+
+                      const lotRow = (lotProperties?.options || []).find((option) => option.lot === value)
+
+                      setLotProperties((current) => (current ? { ...current, value } : current))
+                      setCycleProperties((current) =>
+                        current
+                          ? {
+                              ...current,
+                              start: { ...current.start, value: lotRow?.start_cycle || null },
+                              end: { ...current.end, value: lotRow?.end_cycle || null }
+                            }
+                          : current
+                      )
+                    }}
+                  >
+                    {(lotProperties?.options || []).map((option) => (
+                      <SelectItem key={option.lot}>{option.lot}</SelectItem>
+                    ))}
+                  </Select>
+                  <div className='inline-flex items-center gap-2'>
+                    <NumberInput
+                      className='w-full max-w-[15rem]'
+                      label={`${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`}
+                      isDisabled={loadingChart || !lotProperties?.value}
+                      isRequired={cycleProperties?.start?.required}
+                      minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
+                      maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
+                      value={cycleProperties?.start?.value ? Number(cycleProperties?.start?.value) : 0}
+                      onValueChange={(value) => {
+                        setCycleProperties((current) =>
                           current
                             ? {
                                 ...current,
                                 start: {
                                   ...current.start,
-                                  value: null
+                                  value: `${value}`
                                 },
                                 end: {
                                   ...current.end,
@@ -589,121 +529,187 @@ const ChartFisik: React.FC<Props> = ({ chart }) => {
                         )
                       }}
                     />
-                  ) : undefined
-                }
-                value={
-                  dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
-                    ? {
-                        start: parseDate(fixIsoDate(dateRangeProperties?.start?.value)),
-                        end: parseDate(fixIsoDate(dateRangeProperties?.end?.value))
-                      }
-                    : null
-                }
-                onChange={(value) => {
-                  setDateRangeProperties((current) =>
-                    current
-                      ? {
-                          ...current,
-                          start: {
-                            ...current.start,
-                            value: value?.start?.toString?.() || null
-                          },
-                          end: {
-                            ...current.end,
-                            value: value?.end?.toString?.() || null
-                          }
+                    <div>-</div>
+                    <NumberInput
+                      className='w-full max-w-[15rem]'
+                      label={`${cycleProperties?.label_name} ${cycleProperties?.end.label_name}`}
+                      isDisabled={loadingChart || !lotProperties?.value || !cycleProperties?.start?.value}
+                      isRequired={cycleProperties?.end?.required}
+                      minValue={rangeSelectedCycle?.start_cycle ? Number(rangeSelectedCycle?.start_cycle) : 0}
+                      maxValue={rangeSelectedCycle?.end_cycle ? Number(rangeSelectedCycle?.end_cycle) : 0}
+                      value={cycleProperties?.end?.value ? Number(cycleProperties?.end?.value) : 0}
+                      validate={(value) => {
+                        if (value < Number(cycleProperties?.start?.value || 0)) {
+                          return `${cycleProperties?.label_name} ${cycleProperties?.end.label_name} must be greater than ${cycleProperties?.label_name} ${cycleProperties?.start.label_name}`
                         }
-                      : current
-                  )
-                }}
-              />
-              <Select
-                className='max-w-xs'
-                label={labelViewsProperties?.label_name}
-                placeholder={`Pilih ${labelViewsProperties?.label_name}`}
-                isRequired={labelViewsProperties?.required}
-                isDisabled={loadingChart}
-                selectedKeys={labelViewsProperties?.value ? [labelViewsProperties?.value] : []}
-                onChange={(e) => {
-                  const { value } = e.target
 
-                  setLabelViewsProperties((current) => (current ? { ...current, value } : current))
-                }}
-              >
-                {(labelViewsProperties?.options || []).map((option) => (
-                  <SelectItem key={option}>{option}</SelectItem>
-                ))}
-              </Select>
-              <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
-            </div>
-            <div className='w-full flex justify-between items-center gap-2'>
-              <div className='text-xl font-semibold'>{showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}</div>
-              <Button
-                type='submit'
-                id={`submit-part1-${chart.id}`}
-                color='primary'
-                isLoading={loadingChart}
-                className={clsx(!showFilter && 'hidden', 'print:hidden')}
-              >
-                Tampilkan
-              </Button>
-            </div>
-          </form>
-        </CardHeader>
-        <CardBody className='w-full'>
-          <ChartFisikPart1 chartType={chartTypeValue} data={part1Data} loading={loadingChart} />
-        </CardBody>
-      </Card>
-      {part1Data && (
-        <div className='w-full grid grid-cols-1 lg:grid-cols-2 print:grid-cols-1 gap-6'>
-          <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
-            <CardHeader>
-              <div className='w-full space-y-3'>
-                <div className='text-xl font-semibold'>
-                  {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
-                </div>
-                <div className={clsx('w-full', !showFilter && 'hidden')}>
-                  <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
+                        return true
+                      }}
+                      onValueChange={(value) => {
+                        setCycleProperties((current) =>
+                          current
+                            ? {
+                                ...current,
+                                end: {
+                                  ...current.end,
+                                  value: `${value}`
+                                }
+                              }
+                            : current
+                        )
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardBody className='w-full'>
-              <ChartFisikPart2 loading={loadingPart2} data={part2Data} />
-            </CardBody>
-          </Card>
-          <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
-            <CardHeader>
-              <div className='w-full space-y-3'>
-                <div className='text-xl font-semibold'>
-                  {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
-                </div>
-                <div className={clsx('w-full', !showFilter && 'hidden')}>
-                  <Select
-                    className='max-w-xs'
-                    label={numericProperties?.label_name}
-                    placeholder={`Pilih ${numericProperties?.label_name}`}
-                    isRequired={numericProperties?.required}
-                    selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
-                    onChange={(e) => {
-                      const { value } = e.target
+              <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
+                <DateRangePicker
+                  showMonthAndYearPickers
+                  className='max-w-xs'
+                  label={dateRangeProperties?.label_name}
+                  isRequired={dateRangeProperties?.required}
+                  isDisabled={loadingChart}
+                  selectorButtonPlacement='start'
+                  endContent={
+                    dateRangeProperties?.start?.value && dateRangeProperties?.end?.value ? (
+                      <X
+                        className='w-8 h-8 cursor-pointer'
+                        onClick={() => {
+                          setDateRangeProperties((current) =>
+                            current
+                              ? {
+                                  ...current,
+                                  start: {
+                                    ...current.start,
+                                    value: null
+                                  },
+                                  end: {
+                                    ...current.end,
+                                    value: null
+                                  }
+                                }
+                              : current
+                          )
+                        }}
+                      />
+                    ) : undefined
+                  }
+                  value={
+                    dateRangeProperties?.start?.value && dateRangeProperties?.end?.value
+                      ? {
+                          start: parseDate(fixIsoDate(dateRangeProperties?.start?.value)),
+                          end: parseDate(fixIsoDate(dateRangeProperties?.end?.value))
+                        }
+                      : null
+                  }
+                  onChange={(value) => {
+                    setDateRangeProperties((current) =>
+                      current
+                        ? {
+                            ...current,
+                            start: {
+                              ...current.start,
+                              value: value?.start?.toString?.() || null
+                            },
+                            end: {
+                              ...current.end,
+                              value: value?.end?.toString?.() || null
+                            }
+                          }
+                        : current
+                    )
+                  }}
+                />
+                <Select
+                  className='max-w-xs'
+                  label={labelViewsProperties?.label_name}
+                  placeholder={`Pilih ${labelViewsProperties?.label_name}`}
+                  isRequired={labelViewsProperties?.required}
+                  isDisabled={loadingChart}
+                  selectedKeys={labelViewsProperties?.value ? [labelViewsProperties?.value] : []}
+                  onChange={(e) => {
+                    const { value } = e.target
 
-                      if (!value) return
-                      setNumericProperties((current) => (current ? { ...current, value } : current))
-                    }}
-                  >
-                    {(numericProperties?.options || []).map((option) => (
-                      <SelectItem key={option}>{option}</SelectItem>
-                    ))}
-                  </Select>
-                </div>
+                    setLabelViewsProperties((current) => (current ? { ...current, value } : current))
+                  }}
+                >
+                  {(labelViewsProperties?.options || []).map((option) => (
+                    <SelectItem key={option}>{option}</SelectItem>
+                  ))}
+                </Select>
+                <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
               </div>
-            </CardHeader>
-            <CardBody className='w-full'>
-              <ChartFisikPart3 loading={loadingPart3} data={part3Data} />
-            </CardBody>
-          </Card>
-        </div>
-      )}
+              <div className='w-full flex justify-between items-center gap-2'>
+                <div className='text-xl font-semibold'>{showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}</div>
+                <Button
+                  type='submit'
+                  id={`submit-part1-${chart.id}`}
+                  color='primary'
+                  isLoading={loadingChart}
+                  className={clsx(!showFilter && 'hidden', 'print:hidden')}
+                >
+                  Tampilkan
+                </Button>
+              </div>
+            </form>
+          </CardHeader>
+          <CardBody className='w-full'>
+            <ChartFisikPart1 chartType={chartTypeValue} data={part1Data} loading={loadingChart} />
+          </CardBody>
+        </Card>
+        {part1Data && (
+          <div
+            className={clsx('grid gap-6', isTVResolution ? 'w-2/5 grid-cols-1' : 'w-full grid-cols-1 lg:grid-cols-2')}
+          >
+            <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
+              <CardHeader>
+                <div className='w-full space-y-3'>
+                  <div className='text-xl font-semibold'>
+                    {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
+                  </div>
+                  <div className={clsx('w-full', !showFilter && 'hidden')}>
+                    <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardBody className='w-full'>
+                <ChartFisikPart2 loading={loadingPart2} data={part2Data} />
+              </CardBody>
+            </Card>
+            <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
+              <CardHeader>
+                <div className='w-full space-y-3'>
+                  <div className='text-xl font-semibold'>
+                    {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
+                  </div>
+                  <div className={clsx('w-full', !showFilter && 'hidden')}>
+                    <Select
+                      className='max-w-xs'
+                      label={numericProperties?.label_name}
+                      placeholder={`Pilih ${numericProperties?.label_name}`}
+                      isRequired={numericProperties?.required}
+                      selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
+                      onChange={(e) => {
+                        const { value } = e.target
+
+                        if (!value) return
+                        setNumericProperties((current) => (current ? { ...current, value } : current))
+                      }}
+                    >
+                      {(numericProperties?.options || []).map((option) => (
+                        <SelectItem key={option}>{option}</SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardBody className='w-full'>
+                <ChartFisikPart3 loading={loadingPart3} data={part3Data} />
+              </CardBody>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
