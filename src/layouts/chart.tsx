@@ -24,7 +24,7 @@ export default function ChartLayout({ children }: { children: React.ReactNode })
     <div className='relative flex flex-col min-h-[100dvh]'>
       <Head />
       <Navbar />
-      <main className={clsx('mx-auto px-6 flex-grow', isTVResolution ? 'max-w-[80vw]' : 'max-w-7xl')}>
+      <main className={clsx('mx-auto px-6 flex-grow', isTVResolution ? 'max-w-[80vw]' : 'container max-w-7xl')}>
         <section className='w-full py-8 md:py-10'>{children}</section>
       </main>
       <Footer />
