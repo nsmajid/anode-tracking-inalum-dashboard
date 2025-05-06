@@ -7,7 +7,7 @@ export const fixIsoDate = (input: string) => {
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
   }
 
-  throw new Error('Invalid date format')
+  return input
 }
 
 export const getMaxDateInMonth = (input: string) => {
