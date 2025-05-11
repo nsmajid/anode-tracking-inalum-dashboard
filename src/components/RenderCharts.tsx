@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import { useAtomValue } from 'jotai'
 import { useReactToPrint } from 'react-to-print'
 import { Button, Spinner, Tooltip } from '@heroui/react'
-import { Printer } from 'react-feather'
+import { Filter, Printer, Save } from 'react-feather'
 
 import { atomDisablePrint } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
@@ -41,21 +41,42 @@ const RenderCharts: React.FC<{
 
   return (
     <>
-      <div className='w-full flex justify-end items-center gap-2'>
+      <div className='w-full flex justify-end items-center gap-3'>
         {profile?.roles?.includes?.(RoleType.ADMINISTRATOR) && (
-          <Button color='primary' isLoading={saving} onPress={() => setTrigger((current) => current + 1)}>
-            Simpan Filter
-          </Button>
+          <Tooltip content='Simpan Filter' placement='bottom-end' color='foreground'>
+            <Button
+              color='primary'
+              variant={saving ? 'solid' : 'light'}
+              isLoading={saving}
+              onPress={() => setTrigger((current) => current + 1)}
+              isIconOnly
+            >
+              <Save />
+            </Button>
+          </Tooltip>
         )}
-        <Button color='primary' onPress={() => setShowFilter((current) => !current)}>
-          {showFilter ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-        </Button>
+        <Tooltip
+          content={showFilter ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+          placement='bottom-end'
+          color='foreground'
+        >
+          <Button
+            color='primary'
+            variant={showFilter ? 'solid' : 'light'}
+            onPress={() => setShowFilter((current) => !current)}
+            isIconOnly
+          >
+            <Filter />
+          </Button>
+        </Tooltip>
         <div className={clsx(isDisablePrint && 'invisible')}>
           {printing ? (
             <Spinner size='sm' className='mx-5' />
           ) : (
             <Tooltip content='Cetak Chart' placement='bottom-end' color='foreground'>
-              <Button variant='light' color='primary' onPress={() => reactToPrintFn()} startContent={<Printer />} />
+              <Button variant='light' color='primary' onPress={() => reactToPrintFn()} isIconOnly>
+                <Printer />
+              </Button>
             </Tooltip>
           )}
         </div>
