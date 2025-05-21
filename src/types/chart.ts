@@ -195,7 +195,7 @@ export type QCParametersFilterStateProperties = {
     option_name: string
     option_value: string
   }>
-  value: string[]
+  value: string
 }
 
 export type KorelasiParametersFilterStateProperties = {

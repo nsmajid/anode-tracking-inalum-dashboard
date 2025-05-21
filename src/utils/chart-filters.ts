@@ -69,7 +69,7 @@ export const buildChartFilters = (properties: BuildChartFiltersProperties) => {
   if (qc_parameters?.value) {
     params = {
       ...params,
-      [qc_parameters.name]: qc_parameters.value.join(',')
+      [qc_parameters.name]: qc_parameters.value
     }
   }
 

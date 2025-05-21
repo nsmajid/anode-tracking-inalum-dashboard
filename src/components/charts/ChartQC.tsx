@@ -87,7 +87,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
         1: {
           title: string
           parameters: {
-            default: string[] | null
+            default: string | null
             label_name: string
             name: string
             required: boolean
@@ -178,7 +178,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
       setParametersProperties({
         ...parameters,
         options: parameters.value,
-        value: parameters?.default || []
+        value: parameters?.default || ''
       })
       setLotProperties({
         ...lot,
@@ -405,22 +405,11 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
                   placeholder={`Pilih ${parametersProperties?.label_name}`}
                   isRequired={parametersProperties?.required}
                   isDisabled={loadingChart}
-                  selectionMode='multiple'
-                  selectedKeys={parametersProperties?.value ?? []}
+                  selectedKeys={parametersProperties?.value ? [parametersProperties?.value] : []}
                   onChange={(e) => {
                     const { value } = e.target
-                    const selectedValues = value.split(',')
-
-                    setParametersProperties((current) => {
-                      if (current) {
-                        return {
-                          ...current,
-                          value: selectedValues
-                        }
-                      }
-
-                      return current
-                    })
+                    if (!value) return
+                    setParametersProperties((current) => (current ? { ...current, value } : current))
                   }}
                 >
                   {(parametersProperties?.options || []).map((option) => (
