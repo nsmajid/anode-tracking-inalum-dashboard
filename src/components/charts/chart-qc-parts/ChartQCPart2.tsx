@@ -4,6 +4,7 @@ import ReactApexChart from 'react-apexcharts'
 
 import { ChartQCPart2Data } from '@/types/chart'
 import { Activity, Minus, Plus } from 'react-feather'
+import { renderToStaticMarkup } from 'react-dom/server'
 
 type Props = {
   loading: boolean
@@ -47,6 +48,41 @@ const ChartQCPart2: React.FC<Props> = ({ loading, data }) => {
                 style: {
                   fontSize: '18px'
                 }
+              }
+            },
+            tooltip: {
+              enabled: true,
+              shared: false,
+              intersect: true,
+              followCursor: true,
+              custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+                const value = data?.datasets[dataPointIndex]
+                const is_custom_tooltip = !!data?.custom_hover
+                const lists = data?.hover?.[dataPointIndex] ?? []
+                const label = data?.labels?.[dataPointIndex]
+                const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
+
+                return renderToStaticMarkup(
+                  <div className='w-fit rounded-md text-black'>
+                    <div className='px-2 py-1 bg-gray-100'>{label}</div>
+                    <div className='px-2 py-1'>
+                      <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
+                      {value}
+                    </div>
+                    {is_custom_tooltip && (
+                      <div className='px-2 py-1'>
+                        <ul className='list-disc pl-4'>
+                          {lists.map((list) => (
+                            <li key={list.label}>
+                              <span className='mr-1 underline'>{list.label}:</span>
+                              <span className='font-bold'>{list.value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )
               }
             }
           }}

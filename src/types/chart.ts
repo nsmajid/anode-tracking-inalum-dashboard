@@ -79,6 +79,8 @@ export type ChartQCPart1Data = Array<
     }
     line_min: number | null
     line_max: number | null
+    custom_hover?: boolean
+    hover?: Array<Array<{ label: string; value: number }>>
   }
 >
 export type ChartQCPart2Data = DefaultChartData & {
@@ -87,6 +89,8 @@ export type ChartQCPart2Data = DefaultChartData & {
     max: number
     average: number
   }
+  custom_hover?: boolean
+  hover?: Array<Array<{ label: string; value: number }>>
 }
 export type ChartQCPart3Data = DefaultChartData & {
   info: {
@@ -94,6 +98,8 @@ export type ChartQCPart3Data = DefaultChartData & {
     max: number
     average: number
   }
+  custom_hover?: boolean
+  hover?: Array<Array<{ label: string; value: number }>>
 }
 
 export type ChartPnPPart1Data = Omit<DefaultChartData, 'datasets'> & {
