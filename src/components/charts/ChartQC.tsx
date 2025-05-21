@@ -7,11 +7,12 @@ import {
   NumberInput,
   Select,
   SelectItem,
-  Skeleton
+  Skeleton,
+  Tooltip
 } from '@heroui/react'
 import { parseDate } from '@internationalized/date'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { X } from 'react-feather'
+import { Filter, X } from 'react-feather'
 
 import ChartQCPart1 from './chart-qc-parts/ChartQCPart1'
 import ChartQCPart2 from './chart-qc-parts/ChartQCPart2'
@@ -82,7 +83,7 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
   const [chartNamesHiddenFilter, setChartNamesHiddenFilter] = useState<Record<number, string>>({})
 
-  const { showFilter } = useChartFilterVisibility()
+  const { showFilter, setShowFilter } = useChartFilterVisibility()
 
   const { loading, loadingChart, chartData, getDisplayChart } = useDisplayChart<{
     chart: {
@@ -593,8 +594,17 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
                 <ChartTypeFilter state={chartTypeProperties} value={chartTypeValue} onChange={setChartTypeValue} />
               </div>
               <div className='w-full flex justify-between items-center gap-2'>
-                <div className='text-xl font-semibold'>
-                  {showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}
+                <div className='inline-flex items-center gap-2'>
+                  <div className='text-xl font-semibold'>
+                    {showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}
+                  </div>
+                  {!showFilter && (
+                    <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                      <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                        <Filter />
+                      </Button>
+                    </Tooltip>
+                  )}
                 </div>
                 <Button
                   type='submit'
@@ -619,8 +629,17 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
             <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
               <CardHeader>
                 <div className='w-full space-y-3'>
-                  <div className='text-xl font-semibold'>
-                    {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
+                  <div className='inline-flex items-center gap-2'>
+                    <div className='text-xl font-semibold'>
+                      {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
+                    </div>
+                    {!showFilter && (
+                      <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                        <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                          <Filter />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </div>
                   <div className={clsx('w-full', !showFilter && 'hidden')}>
                     <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
@@ -634,8 +653,17 @@ const ChartQC: React.FC<Props> = ({ chart }) => {
             <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
               <CardHeader>
                 <div className='w-full space-y-3'>
-                  <div className='text-xl font-semibold'>
-                    {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
+                  <div className='inline-flex items-center gap-2'>
+                    <div className='text-xl font-semibold'>
+                      {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
+                    </div>
+                    {!showFilter && (
+                      <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                        <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                          <Filter />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </div>
                   <div className={clsx('w-full', !showFilter && 'hidden')}>
                     <Select
