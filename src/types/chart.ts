@@ -76,6 +76,8 @@ export type ChartQCPart1Data = Array<
       min: number
       max: number
       average: number
+      in_standart?: number
+      out_standart?: number
     }
     line_min: number | null
     line_max: number | null
