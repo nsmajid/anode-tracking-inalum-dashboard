@@ -46,13 +46,13 @@ const CategoryFilter: React.FC<Props> = ({ properties, onChangeFilters }) => {
           ...(properties?.values || []).slice(index + 1)
         ]
 
-        if (name && value && properties?.options?.[index + 1]) {
-          const nextName = properties.options[index + 1].name
+        if (name && value && newValues?.[index + 1]) {
+          const nextName = newValues[index + 1].name
           const existingNameIndex = newValues.findIndex((r) => r.name === nextName)
 
           if (existingNameIndex === -1) {
             newValues.push({
-              name: properties.options[index + 1].name,
+              name: newValues[index + 1].name,
               value: null
             })
           }
