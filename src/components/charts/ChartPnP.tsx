@@ -1,7 +1,8 @@
-import { Button, Card, CardBody, CardHeader, DateRangePicker, Select, SelectItem, Skeleton } from '@heroui/react'
+import { Button, Card, CardBody, CardHeader, DateRangePicker, Select, SelectItem, Skeleton, Tooltip } from '@heroui/react'
 import { memo, useCallback, useMemo, useState } from 'react'
-import { X } from 'react-feather'
+import { Filter, X } from 'react-feather'
 import { parseDate } from '@internationalized/date'
+import clsx from 'clsx'
 
 import ChartPnPPart1 from './chart-pnp-parts/ChartPnPPart1'
 
@@ -10,7 +11,7 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import { ChartPnPPart1Data, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
-import { useChartFilter } from '@/hooks/chart-filter'
+import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 
 type Props = {
   chart: ChartItem
@@ -18,6 +19,9 @@ type Props = {
 
 const ChartPnP: React.FC<Props> = ({ chart }) => {
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
+  const [chartNamesHiddenFilter, setChartNamesHiddenFilter] = useState<Record<number, string>>({})
+
+  const { showFilter, setShowFilter } = useChartFilterVisibility()
   const [chartResult, setChartResult] = useState<ChartPnPPart1Data | null>(null)
 
   const [selectedPlantType, setSelectedPlantType] = useState<PlantType | null>(null)
@@ -125,6 +129,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
           ).chart
 
           setChartResult(chart)
+          setChartNamesHiddenFilter((current) => ({ ...current, 1: chart?.['text-filter'] || '' }))
         }
       }
     }
@@ -176,7 +181,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
               onSubmitChart()
             }}
           >
-            <div className='w-full flex items-center gap-2'>
+            <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
               <Select
                 className='max-w-[12rem]'
                 label={plantProperties?.label_name}
@@ -216,7 +221,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
                 ))}
               </Select>
             </div>
-            <div className='w-full'>
+            <div className={clsx('w-full', !showFilter && 'hidden')}>
               <DateRangePicker
                 showMonthAndYearPickers
                 className='max-w-xs'
@@ -276,13 +281,24 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
               />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
-              <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+              <div className='inline-flex items-center gap-2'>
+                <div className='text-xl font-semibold'>
+                  {showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}
+                </div>
+                {!showFilter && (
+                  <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                    <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                      <Filter />
+                    </Button>
+                  </Tooltip>
+                )}
+              </div>
               <Button
                 type='submit'
                 id={`submit-part1-${chart.id}`}
                 color='primary'
                 isLoading={loadingChart}
-                className='print:hidden'
+                className={clsx(!showFilter && 'hidden', 'print:hidden')}
               >
                 Tampilkan
               </Button>
