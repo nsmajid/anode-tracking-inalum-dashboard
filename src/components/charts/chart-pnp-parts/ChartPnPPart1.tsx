@@ -83,7 +83,7 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data, chartType }) => {
             custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
               const series = data?.datasets[seriesIndex]
               const value = series?.data[dataPointIndex]
-              const notes = data?.notes?.[dataPointIndex]
+              const notes = series?.notes?.[dataPointIndex]
               const label = series?.label
               const color = (w as unknown as { globals: { colors: string[], labels: number[] } }).globals.colors[seriesIndex]
               const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''

@@ -105,10 +105,10 @@ export type ChartQCPart3Data = DefaultChartData & {
 }
 
 export type ChartPnPPart1Data = Omit<DefaultChartData, 'datasets'> & {
-  notes: (string | null)[]
   datasets: Array<{
     label: string
     data: number[]
+    notes: (string | null)[]
   }>
 }
 
