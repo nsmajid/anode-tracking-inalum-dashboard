@@ -110,6 +110,12 @@ export type ChartPnPPart1Data = Omit<DefaultChartData, 'datasets'> & {
     data: number[]
     notes: (string | null)[]
   }>
+  info: Array<{
+    label: string
+    min: number
+    max: number
+    average: number
+  }>
 }
 
 export type ChartResumePart1Data = Omit<DefaultChartData, 'datasets'> & {

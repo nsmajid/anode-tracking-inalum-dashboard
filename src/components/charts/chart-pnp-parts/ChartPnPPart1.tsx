@@ -1,11 +1,12 @@
 import { memo } from 'react'
 import ReactApexChart from 'react-apexcharts'
-import { Spinner } from '@heroui/react'
+import { Card, CardBody, Spinner } from '@heroui/react'
 
 import { ChartPnPPart1Data, ChartTypeDisplay } from '@/types/chart'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { format } from 'date-fns'
 import { fixIsoDate } from '@/utils/date'
+import { Activity, Minus, Plus } from 'react-feather'
 
 type Props = {
   loading: boolean
@@ -102,6 +103,50 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data, chartType }) => {
           }
         }}
       />
+      {(data?.info || []).length > 0 && (
+        <div className='w-full flex justify-center pb-6'>
+          <div className='w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-4'>
+            {(data?.info || []).map((info, i) => (
+              <Card key={info.label} style={{ backgroundColor: fixedColors?.[i] }}>
+                <CardBody className='space-y-4'>
+                  <div className='w-full flex justify-center gap-2'>
+                    <div className='text-lg font-bold bg-background px-5 py-1 rounded-3xl'>{info.label}</div>
+                  </div>
+                  <div className='w-full grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>
+                    <Card>
+                      <CardBody>
+                        <div className='w-full text-center text-xl font-bold mb-1'>{info.average}</div>
+                        <div className='flex justify-center items-center gap-2'>
+                          <Activity className='w-4 h-4' />
+                          <div className='text-xs font-medium text-center'>Average</div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                    <Card>
+                      <CardBody>
+                        <div className='w-full text-center text-xl font-bold mb-1'>{info.min}</div>
+                        <div className='flex justify-center items-center gap-2'>
+                          <Minus className='w-4 h-4' />
+                          <div className='text-xs font-medium text-center'>Min</div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                    <Card>
+                      <CardBody>
+                        <div className='w-full text-center text-xl font-bold mb-1'>{info.max}</div>
+                        <div className='flex justify-center items-center gap-2'>
+                          <Plus className='w-4 h-4' />
+                          <div className='text-xs font-medium text-center'>Max</div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
