@@ -2,7 +2,7 @@ import { memo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { Spinner } from '@heroui/react'
 
-import { ChartPnPPart1Data } from '@/types/chart'
+import { ChartPnPPart1Data, ChartTypeDisplay } from '@/types/chart'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { format } from 'date-fns'
 import { fixIsoDate } from '@/utils/date'
@@ -10,6 +10,7 @@ import { fixIsoDate } from '@/utils/date'
 type Props = {
   loading: boolean
   data: ChartPnPPart1Data | null
+  chartType: ChartTypeDisplay
 }
 
 const fixedColors = [
@@ -25,7 +26,7 @@ const fixedColors = [
   '#A533FF'
 ]
 
-const ChartPnPPart1: React.FC<Props> = ({ loading, data }) => {
+const ChartPnPPart1: React.FC<Props> = ({ loading, data, chartType }) => {
   return (
     <div className='w-full relative'>
       {loading && (
@@ -34,7 +35,7 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data }) => {
         </div>
       )}
       <ReactApexChart
-        type='line'
+        type={chartType}
         series={(data?.datasets || []).map((r, i) => ({
           name: r.label,
           data: r.data,
@@ -42,7 +43,7 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data }) => {
         }))}
         options={{
           chart: {
-            type: 'line',
+            type: chartType,
             height: 350,
             stacked: false,
             zoom: {

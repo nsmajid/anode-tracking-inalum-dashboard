@@ -9,9 +9,10 @@ import ChartPnPPart1 from './chart-pnp-parts/ChartPnPPart1'
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
-import { ChartPnPPart1Data, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
+import { ChartPnPPart1Data, ChartTypeData, ChartTypeDisplay, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
+import ChartTypeFilter from './filters/ChartTypeFilter'
 
 type Props = {
   chart: ChartItem
@@ -28,6 +29,8 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
   const [selectedSubPlantType, setSelectedSubPlantType] = useState<string[]>([])
   const [plantProperties, setPlantProperties] = useState<PlantFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
+  const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay | null>(ChartTypeDisplay.LINE)
   const subPlantOptions = useMemo(() => {
     return selectedPlantType ? plantProperties?.options?.[selectedPlantType] || [] : []
   }, [plantProperties, selectedPlantType])
@@ -72,6 +75,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          chart_type: ChartTypeData
         }
       }
     }
@@ -114,6 +118,11 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
           value: daterange.value.end_daterange.default || null
         }
       })
+
+      const { chart_type } = data.chart.parts[1]
+
+      setChartTypeProperties(chart_type)
+      setChartTypeValue(chart_type.default || ChartTypeDisplay.LINE)
 
       setTimeout(() => {
         document.getElementById(`submit-part1-${chart.id}`)?.click()
@@ -221,7 +230,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
                 ))}
               </Select>
             </div>
-            <div className={clsx('w-full', !showFilter && 'hidden')}>
+            <div className={clsx('w-full inline-flex items-center gap-2', !showFilter && 'hidden')}>
               <DateRangePicker
                 showMonthAndYearPickers
                 className='max-w-xs'
@@ -279,6 +288,14 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
                   )
                 }}
               />
+              <ChartTypeFilter
+                state={chartTypeProperties}
+                value={chartTypeValue || ChartTypeDisplay.LINE}
+                onChange={(value) => {
+                  setChartTypeValue(null)
+                  setTimeout(() => setChartTypeValue(value))
+                }}
+              />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='inline-flex items-center gap-2'>
@@ -306,7 +323,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
           </form>
         </CardHeader>
         <CardBody className='w-full'>
-          <ChartPnPPart1 loading={loadingChart} data={chartResult} />
+          {chartTypeValue && <ChartPnPPart1 loading={loadingChart} data={chartResult} chartType={chartTypeValue} />}
         </CardBody>
       </Card>
     </div>
