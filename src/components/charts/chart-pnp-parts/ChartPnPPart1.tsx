@@ -56,7 +56,6 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data, chartType }) => {
             }
           },
           xaxis: {
-            type: 'datetime',
             title: {
               text: data?.['x-label'] || '',
               style: {

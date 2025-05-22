@@ -9,7 +9,7 @@ import ChartPnPPart1 from './chart-pnp-parts/ChartPnPPart1'
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
-import { ChartPnPPart1Data, ChartTypeData, ChartTypeDisplay, DateRangeFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
+import { ChartPnPPart1Data, ChartTypeData, ChartTypeDisplay, DateRangeFilterStateProperties, LabelViewFilterStateProperties, PlantFilterStateProperties, PlantType } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import ChartTypeFilter from './filters/ChartTypeFilter'
@@ -29,6 +29,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
   const [selectedSubPlantType, setSelectedSubPlantType] = useState<string[]>([])
   const [plantProperties, setPlantProperties] = useState<PlantFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [labelViewsProperties, setLabelViewsProperties] = useState<LabelViewFilterStateProperties | null>(null)
   const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
   const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay | null>(ChartTypeDisplay.LINE)
   const subPlantOptions = useMemo(() => {
@@ -75,6 +76,13 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          label_views: {
+            label_name: string
+            name: string
+            default: string | null
+            required: boolean
+            value: string[]
+          }
           chart_type: ChartTypeData
         }
       }
@@ -85,7 +93,7 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
         1: data.chart.parts?.[1]?.title
       })
 
-      const { filters } = data.chart.parts[1]
+      const { filters, label_views } = data.chart.parts[1]
       const { daterange, plant } = filters?.options
 
       setPlantProperties({
@@ -117,6 +125,12 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
           label_name: `${daterange.label_name} ${daterange.value.end_daterange.label_name}`,
           value: daterange.value.end_daterange.default || null
         }
+      })
+
+      setLabelViewsProperties({
+        ...label_views,
+        options: label_views.value,
+        value: label_views.default || null
       })
 
       const { chart_type } = data.chart.parts[1]
@@ -151,9 +165,10 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
         buildChartFilters({
           plant: plantProperties,
           selected_sub_plants: selectedSubPlantType,
-          date_range: dateRangeProperties
+          date_range: dateRangeProperties,
+          label_view: labelViewsProperties
         }),
-      [plantProperties, selectedSubPlantType, dateRangeProperties]
+      [plantProperties, selectedSubPlantType, dateRangeProperties, labelViewsProperties]
     )
   })
 
@@ -163,12 +178,13 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
       ...buildChartFilters({
         plant: plantProperties,
         selected_sub_plants: selectedSubPlantType,
-        date_range: dateRangeProperties
+        date_range: dateRangeProperties,
+        label_view: labelViewsProperties
       })
     }
 
     getDisplayChart(params, { isSubmitChart: true, part: params.part as string })
-  }, [getDisplayChart, dateRangeProperties, plantProperties, selectedSubPlantType])
+  }, [getDisplayChart, dateRangeProperties, plantProperties, selectedSubPlantType, labelViewsProperties])
 
   if (loading) {
     return (
@@ -288,6 +304,23 @@ const ChartPnP: React.FC<Props> = ({ chart }) => {
                   )
                 }}
               />
+              <Select
+                className='max-w-xs'
+                label={labelViewsProperties?.label_name}
+                placeholder={`Pilih ${labelViewsProperties?.label_name}`}
+                isRequired={labelViewsProperties?.required}
+                isDisabled={loadingChart}
+                selectedKeys={labelViewsProperties?.value ? [labelViewsProperties?.value] : []}
+                onChange={(e) => {
+                  const { value } = e.target
+
+                  setLabelViewsProperties((current) => (current ? { ...current, value } : current))
+                }}
+              >
+                {(labelViewsProperties?.options || []).map((option) => (
+                  <SelectItem key={option}>{option}</SelectItem>
+                ))}
+              </Select>
               <ChartTypeFilter
                 state={chartTypeProperties}
                 value={chartTypeValue || ChartTypeDisplay.LINE}
