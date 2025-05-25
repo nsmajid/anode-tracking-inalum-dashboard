@@ -7,10 +7,11 @@ import {
   NumberInput,
   Select,
   SelectItem,
-  Skeleton
+  Skeleton,
+  Tooltip
 } from '@heroui/react'
 import { memo, useCallback, useMemo, useState } from 'react'
-import { X } from 'react-feather'
+import { Filter, X } from 'react-feather'
 import { parseDate } from '@internationalized/date'
 
 import ChartKorelasiPart1 from './chart-korelasi-parts/ChartKorelasiPart1'
@@ -28,8 +29,9 @@ import {
   KorelasiParametersMinMaxFilterStateProperties
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
-import { useChartFilter } from '@/hooks/chart-filter'
+import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import ChartTypeFilter from './filters/ChartTypeFilter'
+import clsx from 'clsx'
 
 type Props = {
   chart: ChartItem
@@ -53,6 +55,9 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
 
   const [part1Data, setPart1Data] = useState<ChartKorelasiPart1Data | null>(null)
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
+  const [chartNamesHiddenFilter, setChartNamesHiddenFilter] = useState<Record<number, string>>({})
+
+  const { showFilter, setShowFilter } = useChartFilterVisibility()
 
   const { loading, chartData, loadingChart, getDisplayChart } = useDisplayChart<{
     chart: {
@@ -219,6 +224,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
 
         if (part === '1') {
           setPart1Data(chart)
+          setChartNamesHiddenFilter((current) => ({ ...current, 1: chart?.['text-filter'] || '' }))
         }
       }
     }
@@ -299,7 +305,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
               onSubmitChartPart1()
             }}
           >
-            <div className='w-full flex items-center gap-2'>
+            <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
               <Select
                 className='max-w-xs'
                 label={parameter1Properties?.label_name}
@@ -355,7 +361,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 }}
               />
             </div>
-            <div className='w-full flex items-center gap-2'>
+            <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
               <Select
                 className='max-w-xs'
                 label={parameter2Properties?.label_name}
@@ -411,7 +417,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 }}
               />
             </div>
-            <div className='w-full flex items-center gap-2'>
+            <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
               <DateRangePicker
                 showMonthAndYearPickers
                 className='max-w-xs'
@@ -509,13 +515,24 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
               />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
-              <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+              <div className='inline-flex items-center gap-2'>
+                <div className='text-xl font-semibold'>
+                  {showFilter ? chartNames?.[1] : chartNamesHiddenFilter?.[1]}
+                </div>
+                {!showFilter && (
+                  <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                    <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                      <Filter />
+                    </Button>
+                  </Tooltip>
+                )}
+              </div>
               <Button
                 type='submit'
                 id={`submit-part1-${chart.id}`}
                 color='primary'
                 isLoading={loadingChart}
-                className='print:hidden'
+                className={clsx(!showFilter && 'hidden', 'print:hidden')}
               >
                 Tampilkan
               </Button>
