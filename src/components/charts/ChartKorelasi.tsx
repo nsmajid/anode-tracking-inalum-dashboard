@@ -20,6 +20,8 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate } from '@/utils/date'
 import {
   ChartKorelasiPart1Data,
+  ChartTypeData,
+  ChartTypeDisplay,
   ClassFilterStateProperties,
   DateRangeFilterStateProperties,
   KorelasiParametersFilterStateProperties,
@@ -27,6 +29,7 @@ import {
 } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter } from '@/hooks/chart-filter'
+import ChartTypeFilter from './filters/ChartTypeFilter'
 
 type Props = {
   chart: ChartItem
@@ -45,6 +48,8 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
     useState<KorelasiParametersMinMaxFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
   const [classProperties, setClassProperties] = useState<ClassFilterStateProperties | null>(null)
+  const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
+  const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay | null>(ChartTypeDisplay.LINE)
 
   const [part1Data, setPart1Data] = useState<ChartKorelasiPart1Data | null>(null)
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
@@ -129,6 +134,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          chart_type: ChartTypeData
         }
       }
     }
@@ -193,6 +199,11 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
         ..._class,
         value: _class.default || null
       })
+
+      const { chart_type } = data.chart.parts[1]
+
+      setChartTypeProperties(chart_type)
+      setChartTypeValue(chart_type.default || ChartTypeDisplay.LINE)
 
       setTimeout(() => {
         document.getElementById(`submit-part1-${chart.id}`)?.click()
@@ -488,6 +499,14 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                   setClassProperties((current) => (current ? { ...current, value } : current))
                 }}
               />
+              <ChartTypeFilter
+                state={chartTypeProperties}
+                value={chartTypeValue || ChartTypeDisplay.LINE}
+                onChange={(value) => {
+                  setChartTypeValue(null)
+                  setTimeout(() => setChartTypeValue(value))
+                }}
+              />
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
               <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
@@ -504,7 +523,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
           </form>
         </CardHeader>
         <CardBody className='w-full'>
-          <ChartKorelasiPart1 loading={loadingChart} data={part1Data} />
+          {chartTypeValue && <ChartKorelasiPart1 loading={loadingChart} data={part1Data} chartType={chartTypeValue} />}
         </CardBody>
       </Card>
     </div>

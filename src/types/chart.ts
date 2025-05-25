@@ -22,7 +22,8 @@ export type DefaultChartData = {
 
 export enum ChartTypeDisplay {
   LINE = 'line',
-  BAR = 'bar'
+  BAR = 'bar',
+  SCATTER = 'scatter'
 }
 
 export type ChartTypeData = {

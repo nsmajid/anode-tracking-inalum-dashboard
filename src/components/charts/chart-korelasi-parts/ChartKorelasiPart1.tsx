@@ -3,14 +3,15 @@ import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
 import { Activity, Minus, Plus } from 'react-feather'
 
-import { ChartKorelasiPart1Data } from '@/types/chart'
+import { ChartKorelasiPart1Data, ChartTypeDisplay } from '@/types/chart'
 
 type Props = {
   loading: boolean
   data: ChartKorelasiPart1Data | null
+  chartType: ChartTypeDisplay
 }
 
-const ChartKorelasiPart1: React.FC<Props> = ({ loading, data }) => {
+const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
   return (
     <div className='w-full relative'>
       {loading && (
@@ -20,7 +21,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data }) => {
       )}
       <div className='w-full space-y-4'>
         <ReactApexChart
-          type='line'
+          type={chartType}
           series={[
             {
               name: '',
@@ -29,7 +30,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data }) => {
           ]}
           options={{
             chart: {
-              type: 'line',
+              type: chartType,
               height: 350,
               zoom: {
                 type: 'x',
