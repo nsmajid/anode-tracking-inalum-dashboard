@@ -1,12 +1,12 @@
 import {
+  Autocomplete,
+  AutocompleteItem,
   Button,
   Card,
   CardBody,
   CardHeader,
   DateRangePicker,
   NumberInput,
-  Select,
-  SelectItem,
   Skeleton,
   Tooltip
 } from '@heroui/react'
@@ -306,21 +306,20 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
             }}
           >
             <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
-              <Select
+              <Autocomplete
+                isClearable={false}
                 className='max-w-xs'
                 label={parameter1Properties?.label_name}
                 placeholder={`Pilih ${parameter1Properties?.label_name}`}
                 isRequired={parameter1Properties?.required}
                 isDisabled={loadingChart}
-                selectedKeys={parameter1Properties?.value ? [parameter1Properties?.value] : []}
-                onChange={(e) => {
-                  const { value } = e.target
-
+                selectedKey={parameter1Properties?.value}
+                onSelectionChange={(value) => {
                   setParameter1Properties((current) => {
                     if (current) {
                       return {
                         ...current,
-                        value: value
+                        value: value as string | null
                       }
                     }
 
@@ -329,9 +328,9 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 }}
               >
                 {(parameter1Properties?.options || []).map((option) => (
-                  <SelectItem key={option.option_value}>{option.option_name}</SelectItem>
+                  <AutocompleteItem key={option.option_value}>{option.option_name}</AutocompleteItem>
                 ))}
-              </Select>
+              </Autocomplete>
               <NumberInput
                 className='w-full max-w-[12rem]'
                 label={parameter1MinProperties?.label_name}
@@ -362,21 +361,20 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
               />
             </div>
             <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
-              <Select
+              <Autocomplete
+                isClearable={false}
                 className='max-w-xs'
                 label={parameter2Properties?.label_name}
                 placeholder={`Pilih ${parameter2Properties?.label_name}`}
                 isRequired={parameter2Properties?.required}
                 isDisabled={loadingChart}
-                selectedKeys={parameter2Properties?.value ? [parameter2Properties?.value] : []}
-                onChange={(e) => {
-                  const { value } = e.target
-
-                  setParameter2Properties((current) => {
+                selectedKey={parameter2Properties?.value}
+                onSelectionChange={(value) => {
+                  setParameter1Properties((current) => {
                     if (current) {
                       return {
                         ...current,
-                        value: value
+                        value: value as string | null
                       }
                     }
 
@@ -385,9 +383,9 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 }}
               >
                 {(parameter2Properties?.options || []).map((option) => (
-                  <SelectItem key={option.option_value}>{option.option_name}</SelectItem>
+                  <AutocompleteItem key={option.option_value}>{option.option_name}</AutocompleteItem>
                 ))}
-              </Select>
+              </Autocomplete>
               <NumberInput
                 className='w-full max-w-[12rem]'
                 label={parameter2MinProperties?.label_name}
