@@ -143,6 +143,8 @@ export type ChartKorelasiPart1Data = Omit<DefaultChartData, 'datasets'> & {
     max: number
     average: number
   }
+  custom_hover?: boolean
+  hover?: Array<Array<{ label: string; value: number }>>
 }
 
 export enum CategoryFilterInputType {
