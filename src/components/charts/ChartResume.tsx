@@ -8,9 +8,10 @@ import ChartResumePart1 from './chart-resume-parts/ChartResumePart1'
 import { useDisplayChart } from '@/hooks/display-chart'
 import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate, getMaxDateInMonth } from '@/utils/date'
-import { ChartResumePart1Data, DateRangeFilterStateProperties, LotFilterStateProperties } from '@/types/chart'
+import { ChartResumePart1Data, ChartTypeData, ChartTypeDisplay, DateRangeFilterStateProperties, LotFilterStateProperties } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
 import { useChartFilter } from '@/hooks/chart-filter'
+import ChartTypeFilter from './filters/ChartTypeFilter'
 
 type Props = {
   chart: ChartItem
@@ -19,6 +20,8 @@ type Props = {
 const ChartResume: React.FC<Props> = ({ chart }) => {
   const [lotProperties, setLotProperties] = useState<LotFilterStateProperties | null>(null)
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
+  const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
+  const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay | null>(ChartTypeDisplay.LINE)
 
   const [part1Data, setPart1Data] = useState<ChartResumePart1Data | null>(null)
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
@@ -44,13 +47,13 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
               daterange: {
                 label_name: string
                 value: {
-                  start_monthrange: {
+                  start_daterange: {
                     label_name: string
                     name: string
                     default: string | null
                     required: boolean
                   }
-                  end_monthrange: {
+                  end_daterange: {
                     label_name: string
                     name: string
                     default: string | null
@@ -61,6 +64,7 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
               }
             }
           }
+          chart_type: ChartTypeData
         }
       }
     }
@@ -80,16 +84,21 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
         label_name: daterange.label_name,
         required: daterange.required,
         start: {
-          ...daterange.value.start_monthrange,
-          label_name: `${daterange.label_name} ${daterange.value.start_monthrange.label_name}`,
-          value: daterange.value.start_monthrange.default || null
+          ...daterange.value.start_daterange,
+          label_name: `${daterange.label_name} ${daterange.value.start_daterange.label_name}`,
+          value: daterange.value.start_daterange.default || null
         },
         end: {
-          ...daterange.value.end_monthrange,
-          label_name: `${daterange.label_name} ${daterange.value.end_monthrange.label_name}`,
-          value: daterange.value.end_monthrange.default || null
+          ...daterange.value.end_daterange,
+          label_name: `${daterange.label_name} ${daterange.value.end_daterange.label_name}`,
+          value: daterange.value.end_daterange.default || null
         }
       })
+
+      const { chart_type } = data.chart.parts[1]
+
+      setChartTypeProperties(chart_type)
+      setChartTypeValue(chart_type.default || ChartTypeDisplay.LINE)
 
       setTimeout(() => {
         document.getElementById(`submit-part1-${chart.id}`)?.click()
@@ -241,6 +250,14 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
                           }
                         : current
                     )
+                  }}
+                />
+                <ChartTypeFilter
+                  state={chartTypeProperties}
+                  value={chartTypeValue || ChartTypeDisplay.LINE}
+                  onChange={(value) => {
+                    setChartTypeValue(null)
+                    setTimeout(() => setChartTypeValue(value))
                   }}
                 />
               </div>
