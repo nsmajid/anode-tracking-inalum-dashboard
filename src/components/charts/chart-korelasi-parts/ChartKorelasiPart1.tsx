@@ -48,7 +48,8 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                   reset: false,
                   pan: false,
                   zoom: false
-                }
+                },
+                offsetY: -10
               }
             },
             markers: {
