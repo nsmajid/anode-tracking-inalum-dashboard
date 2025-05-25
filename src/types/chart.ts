@@ -119,21 +119,24 @@ export type ChartPnPPart1Data = Omit<DefaultChartData, 'datasets'> & {
   }>
 }
 
-export type ChartResumePart1Data = Omit<DefaultChartData, 'datasets'> & {
-  notes: (string | null)[]
-  datasets: Array<{
-    label: string
-    data: number[]
-    custom_hover: boolean
-    hover?: Array<Array<{ jenis_anoda: string; berat: number; jumlah: number }>>
-  }>
-  info: Array<{
-    label: string
-    min: number
-    max: number
-    average: number
-  }>
-}
+export type ChartResumePart1Data = Record<
+  string,
+  Omit<DefaultChartData, 'datasets'> & {
+    notes: (string | null)[]
+    datasets: Array<{
+      label: string
+      data: number[]
+      custom_hover: boolean
+      hover?: Array<Array<{ jenis_anoda: string; berat: number; jumlah: number }>>
+    }>
+    info: Array<{
+      label: string
+      min: number
+      max: number
+      average: number
+    }>
+  }
+>
 
 export type ChartKorelasiPart1Data = Omit<DefaultChartData, 'datasets'> & {
   annotation: string | null

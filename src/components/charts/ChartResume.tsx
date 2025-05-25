@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, DateRangePicker, Select, SelectItem, Skeleton } from '@heroui/react'
+import { Button, Card, CardBody, CardHeader, DateRangePicker, Select, SelectItem, Skeleton, Tooltip } from '@heroui/react'
 import { memo, useCallback, useMemo, useState } from 'react'
-import { X } from 'react-feather'
+import { Filter, X } from 'react-feather'
 import { parseDate } from '@internationalized/date'
 
 import ChartResumePart1 from './chart-resume-parts/ChartResumePart1'
@@ -10,8 +10,9 @@ import { ChartItem } from '@/types/dashboard-settings'
 import { fixIsoDate, getMaxDateInMonth } from '@/utils/date'
 import { ChartResumePart1Data, ChartTypeData, ChartTypeDisplay, DateRangeFilterStateProperties, LotFilterStateProperties } from '@/types/chart'
 import { buildChartFilters } from '@/utils/chart-filters'
-import { useChartFilter } from '@/hooks/chart-filter'
+import { useChartFilter, useChartFilterVisibility } from '@/hooks/chart-filter'
 import ChartTypeFilter from './filters/ChartTypeFilter'
+import clsx from 'clsx'
 
 type Props = {
   chart: ChartItem
@@ -22,6 +23,8 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
   const [dateRangeProperties, setDateRangeProperties] = useState<DateRangeFilterStateProperties | null>(null)
   const [chartTypeProperties, setChartTypeProperties] = useState<ChartTypeData | null>(null)
   const [chartTypeValue, setChartTypeValue] = useState<ChartTypeDisplay | null>(ChartTypeDisplay.LINE)
+
+  const { showFilter, setShowFilter } = useChartFilterVisibility()
 
   const [part1Data, setPart1Data] = useState<ChartResumePart1Data | null>(null)
   const [chartNames, setChartNames] = useState<Record<number, string>>({})
@@ -164,7 +167,7 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
             }}
           >
             <div className='w-full space-y-1'>
-              <div className='w-full flex items-center gap-2'>
+              <div className={clsx('w-full flex items-center gap-2', !showFilter && 'hidden')}>
                 <Select
                   className='w-full max-w-[13rem]'
                   label={lotProperties?.label_name}
@@ -263,13 +266,22 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
               </div>
             </div>
             <div className='w-full flex justify-between items-center gap-2'>
-              <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+              <div className='inline-flex items-center gap-2'>
+                <div className='text-xl font-semibold'>{chartNames?.[1]}</div>
+                {!showFilter && (
+                  <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                    <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                      <Filter />
+                    </Button>
+                  </Tooltip>
+                )}
+              </div>
               <Button
                 type='submit'
                 id={`submit-part1-${chart.id}`}
                 color='primary'
                 isLoading={loadingChart}
-                className='print:hidden'
+                className={clsx('print:hidden', !showFilter && 'hidden')}
               >
                 Tampilkan
               </Button>
@@ -277,7 +289,7 @@ const ChartResume: React.FC<Props> = ({ chart }) => {
           </form>
         </CardHeader>
         <CardBody className='w-full'>
-          <ChartResumePart1 loading={loadingChart} data={part1Data} />
+          {chartTypeValue && <ChartResumePart1 loading={loadingChart} data={part1Data} chartType={chartTypeValue} />}
         </CardBody>
       </Card>
     </div>
