@@ -39,7 +39,16 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                 autoScaleYaxis: true
               },
               toolbar: {
-                autoSelected: 'zoom'
+                show: true,
+                autoSelected: 'zoom',
+                tools: {
+                  download: true,
+                  zoomin: false,
+                  zoomout: false,
+                  reset: false,
+                  pan: false,
+                  zoom: false
+                }
               }
             },
             markers: {
