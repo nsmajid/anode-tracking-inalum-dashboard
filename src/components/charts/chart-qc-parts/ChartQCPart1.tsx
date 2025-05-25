@@ -69,7 +69,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                 },
                 annotations: {
                   yaxis: [
-                    ...(typeof chart?.line_min === 'number'
+                    ...(chart?.line_min
                       ? [
                           {
                             y: chart?.line_min || 0,
@@ -85,7 +85,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                           }
                         ]
                       : []),
-                    ...(typeof chart?.line_max === 'number'
+                    ...(chart?.line_max
                       ? [
                           {
                             y: chart?.line_max || 0,
