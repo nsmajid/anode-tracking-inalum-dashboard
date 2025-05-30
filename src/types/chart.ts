@@ -96,6 +96,8 @@ export type ChartQCPart1Data = Array<
     }
     line_min: number | null
     line_max: number | null
+    vertical_line_min: number | null
+    vertical_line_max: number | null
     custom_hover?: boolean
     hover?: Array<Array<{ label: string; value: number }>>
   }

@@ -142,6 +142,40 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                             }
                           ]
                         : [])
+                    ],
+                    xaxis: [
+                      ...(chart?.vertical_line_min
+                        ? [
+                            {
+                              x: parseFloat(`${chart?.vertical_line_min || 0}`),
+                              borderColor: '#FF4560',
+                              label: {
+                                borderColor: '#FF4560',
+                                style: {
+                                  color: '#fff',
+                                  background: '#FF4560'
+                                },
+                                text: `Min: ${chart?.vertical_line_min}`
+                              }
+                            }
+                          ]
+                        : []),
+                      ...(chart?.vertical_line_max
+                        ? [
+                            {
+                              x: parseFloat(`${chart?.vertical_line_max || 0}`),
+                              borderColor: '#28a745',
+                              label: {
+                                borderColor: '#28a745',
+                                style: {
+                                  color: '#fff',
+                                  background: '#28a745'
+                                },
+                                text: `Max: ${chart?.vertical_line_max}`
+                              }
+                            }
+                          ]
+                        : [])
                     ]
                   },
                   tooltip: {
