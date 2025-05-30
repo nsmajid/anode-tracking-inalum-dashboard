@@ -20,7 +20,7 @@ import { siteConfig } from '@/config/site'
 import { RoleType, useProfile } from '@/hooks/profile'
 import { BACKOFFICE_URL } from '@/config/constants'
 
-export const Navbar = () => {
+export const Navbar = ({ gray }: { gray?: boolean }) => {
   const router = useRouter()
   const { profile } = useProfile()
 
@@ -50,7 +50,7 @@ export const Navbar = () => {
   }, [router.pathname, profile])
 
   return (
-    <HeroUINavbar maxWidth='xl' position='sticky'>
+    <HeroUINavbar maxWidth='xl' position='sticky' className={clsx(gray && 'bg-gray-200')}>
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
         <NavbarBrand className='gap-3 max-w-fit'>
           <NextLink className='flex justify-start items-center gap-1' href='/'>

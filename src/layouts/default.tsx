@@ -47,9 +47,9 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <div className='relative flex flex-col min-h-[100dvh]'>
+    <div className='relative flex flex-col min-h-[100dvh] bg-gray-200'>
       <Head />
-      <Navbar />
+      <Navbar gray />
       <main className='container mx-auto max-w-7xl px-6 flex-grow pt-16'>
         {router.pathname.startsWith('/settings') && !profile?.roles.includes(RoleType.ADMINISTRATOR) ? (
           <div className='w-full flex min-h-[60dvh]'>
