@@ -18,12 +18,25 @@ export type DefaultChartData = {
   labels: string[]
   datasets: number[]
   'text-filter'?: string
-}
+} & ChartTrendLine
 
 export enum ChartTypeDisplay {
   LINE = 'line',
   BAR = 'bar',
   SCATTER = 'scatter'
+}
+
+export enum ChartTrendLineDirection {
+  UP = 'naik',
+  DOWN = 'turun',
+  FLAT = 'datar'
+}
+
+export type ChartTrendLine = {
+  trendline?: {
+    trendline: number[]
+    direction: ChartTrendLineDirection
+  }
 }
 
 export type ChartTypeData = {
@@ -124,12 +137,14 @@ export type ChartResumePart1Data = Record<
   string,
   Omit<DefaultChartData, 'datasets'> & {
     notes: (string | null)[]
-    datasets: Array<{
-      label: string
-      data: number[]
-      custom_hover: boolean
-      hover?: Array<Array<{ jenis_anoda: string; berat: number; jumlah: number }>>
-    }>
+    datasets: Array<
+      {
+        label: string
+        data: number[]
+        custom_hover: boolean
+        hover?: Array<Array<{ jenis_anoda: string; berat: number; jumlah: number }>>
+      } & ChartTrendLine
+    >
     info: Array<{
       label: string
       min: number

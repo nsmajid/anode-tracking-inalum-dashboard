@@ -2,9 +2,10 @@ import { memo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
 import { Activity, Minus, Plus } from 'react-feather'
+import { renderToStaticMarkup } from 'react-dom/server'
 
 import { ChartFisikPart1Data, ChartTypeDisplay } from '@/types/chart'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { ChartTrendLineDirectionColor, ChartTrendLineDirectionIcon } from '@/constants/chart'
 
 type Props = {
   loading: boolean
@@ -13,6 +14,8 @@ type Props = {
 }
 
 const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
+  const trendline = data?.trendline?.trendline || []
+
   return (
     <div className='w-full relative'>
       {loading && (
@@ -21,16 +24,22 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
         </div>
       )}
       <ReactApexChart
-        type={chartType}
+        type='line'
         series={[
           {
             name: '',
+            type: chartType,
             data: data?.datasets || []
+          },
+          {
+            name: '',
+            type: 'line',
+            data: trendline
           }
         ]}
         options={{
           chart: {
-            type: chartType,
+            type: 'line',
             height: 350,
             zoom: {
               type: 'x',
@@ -41,11 +50,18 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
               autoSelected: 'zoom'
             }
           },
+          legend: {
+            show: false
+          },
           markers: {
-            size: 5
+            size: [5, 0]
           },
           stroke: {
-            width: 2
+            width: [2, 2]
+          },
+          dataLabels: {
+            enabled: false
+            // enabledOnSeries: [0]
           },
           xaxis: {
             // type: 'datetime',
@@ -70,7 +86,8 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
             shared: false,
             intersect: true,
             followCursor: true,
-            custom: ({ dataPointIndex }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+            custom: ({ seriesIndex, dataPointIndex }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+              if (seriesIndex > 0) return renderToStaticMarkup(<div />)
               const is_custom_tooltip = !!data?.custom_hover
               const lists = data?.hover?.[dataPointIndex] ?? []
               const label = data?.labels?.[dataPointIndex]
@@ -93,7 +110,35 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                 </div>
               )
             }
-          }
+          },
+          ...(data?.trendline && trendline.length > 0
+            ? {
+                annotations: {
+                  yaxis: [
+                    {
+                      y: trendline[trendline.length - 1],
+                      borderWidth: 0,
+                      label: {
+                        text: ChartTrendLineDirectionIcon?.[data.trendline.direction],
+                        borderWidth: 0,
+                        style: {
+                          color: ChartTrendLineDirectionColor?.[data?.trendline?.direction],
+                          fontSize: '30px',
+                          background: 'transparent',
+                          padding: {
+                            bottom: 0,
+                            top: 0,
+                            left: 0,
+                            right: 0
+                          }
+                        },
+                        offsetY: 32
+                      }
+                    }
+                  ]
+                }
+              }
+            : {})
         }}
       />
       {data?.info && (

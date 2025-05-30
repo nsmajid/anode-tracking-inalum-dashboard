@@ -2,9 +2,10 @@ import { memo } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
+import { Activity, Minus, Plus } from 'react-feather'
 
 import { ChartResumePart1Data, ChartTypeDisplay } from '@/types/chart'
-import { Activity, Minus, Plus } from 'react-feather'
+import { ChartTrendLineDirectionColor, ChartTrendLineDirectionIcon } from '@/constants/chart'
 
 type Props = {
   loading: boolean
@@ -38,10 +39,20 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
           return (
             <div className='w-full border-2 p-2 rounded-lg' key={key}>
               <ReactApexChart
-                type={chartType}
-                series={(data?.datasets || []).map((r, i) => ({
-                  name: r.label,
-                  data: r.data,
+                type='bar'
+                series={[
+                  ...(data?.datasets || []).map((r) => ({
+                    name: r.label,
+                    data: r.data,
+                    type: chartType
+                  })),
+                  ...(data?.datasets || []).map((r) => ({
+                    name: `Trendline ${r.label}`,
+                    data: r.trendline?.trendline ?? [],
+                    type: 'line'
+                  }))
+                ].map((r, i) => ({
+                  ...r,
                   color: fixedColors?.[i]
                 }))}
                 options={{
@@ -49,7 +60,7 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                     text: data?.['text-filter'] ?? ''
                   },
                   chart: {
-                    type: chartType,
+                    type: 'bar',
                     height: 350,
                     toolbar: {
                       tools: {
@@ -80,14 +91,30 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                     }
                   },
                   markers: {
-                    size: 5
+                    size: [...(data?.datasets || []).map(() => 5), ...(data?.datasets || []).map(() => 0)]
+                  },
+                  stroke: {
+                    width: [...(data?.datasets || []).map(() => 2), ...(data?.datasets || []).map(() => 2)]
+                  },
+                  dataLabels: {
+                    enabled: true,
+                    enabledOnSeries: chartType === ChartTypeDisplay.LINE ? [] : (data?.datasets || []).map((r, i) => i)
                   },
                   tooltip: {
                     enabled: true,
                     shared: false,
                     intersect: true,
                     followCursor: true,
-                    custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+                    custom: ({
+                      seriesIndex,
+                      dataPointIndex,
+                      w
+                    }: {
+                      seriesIndex: number
+                      dataPointIndex: number
+                      w: unknown
+                    }) => {
+                      if (seriesIndex > (data?.datasets?.length ?? 0) - 1) return renderToStaticMarkup(<div />)
                       const series = data?.datasets[seriesIndex]
                       const value = series?.data[dataPointIndex]
                       const is_custom_tooltip = !!series?.custom_hover
@@ -100,7 +127,10 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                         <div className='w-fit rounded-md text-black'>
                           <div className='px-2 py-1 bg-gray-100'>{yLabel}</div>
                           <div className='px-2 py-1'>
-                            <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
+                            <span
+                              className='apexcharts-tooltip-marker rounded-full'
+                              style={{ backgroundColor: color }}
+                            />
                             {label}: {value}
                           </div>
                           {is_custom_tooltip && (
@@ -143,6 +173,38 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                         </div>
                       )
                     }
+                  },
+                  annotations: {
+                    yaxis: (data?.datasets || []).reduce((arr, r) => {
+                      const trendline = r?.trendline?.trendline || []
+
+                      if (trendline.length > 0 && r.trendline) {
+                        arr.push({
+                          y: trendline[trendline.length - 1],
+                          borderWidth: 0,
+                          label: {
+                            text: ChartTrendLineDirectionIcon?.[r?.trendline?.direction],
+                            borderWidth: 0,
+                            textAnchor: 'start',
+                            style: {
+                              color: ChartTrendLineDirectionColor?.[r?.trendline?.direction],
+                              fontSize: '30px',
+                              background: 'transparent',
+                              padding: {
+                                bottom: 0,
+                                top: 0,
+                                left: 0,
+                                right: 0
+                              }
+                            },
+                            offsetX: -140,
+                            offsetY: 32
+                          }
+                        })
+                      }
+
+                      return arr
+                    }, [] as YAxisAnnotations[])
                   }
                 }}
               />

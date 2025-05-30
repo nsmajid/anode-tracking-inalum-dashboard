@@ -5,6 +5,7 @@ import { Activity, GitCommit, Minus, Plus } from 'react-feather'
 
 import { ChartKorelasiPart1Data, ChartTypeDisplay } from '@/types/chart'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { ChartTrendLineDirectionColor, ChartTrendLineDirectionIcon } from '@/constants/chart'
 
 type Props = {
   loading: boolean
@@ -13,6 +14,8 @@ type Props = {
 }
 
 const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
+  const trendline = data?.trendline?.trendline || []
+
   return (
     <div className='w-full relative'>
       {loading && (
@@ -22,16 +25,22 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
       )}
       <div className='w-full space-y-4'>
         <ReactApexChart
-          type={chartType}
+          type='line'
           series={[
             {
               name: '',
+              type: chartType,
               data: data?.datasets || []
+            },
+            {
+              name: '',
+              type: 'line',
+              data: trendline
             }
           ]}
           options={{
             chart: {
-              type: chartType,
+              type: 'line',
               height: 350,
               zoom: {
                 type: 'x',
@@ -52,11 +61,14 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                 offsetY: -10
               }
             },
+            legend: {
+              show: false
+            },
             markers: {
-              size: 6
+              size: [6, 0]
             },
             stroke: {
-              width: 2
+              width: [2, 2]
             },
             xaxis: {
               title: {
@@ -94,6 +106,30 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                         }
                       }
                     ]
+                  : []),
+                ...(data?.trendline && trendline.length > 0
+                  ? [
+                      {
+                        y: trendline[trendline.length - 1],
+                        borderWidth: 0,
+                        label: {
+                          text: ChartTrendLineDirectionIcon?.[data?.trendline?.direction],
+                          borderWidth: 0,
+                          style: {
+                            color: ChartTrendLineDirectionColor?.[data?.trendline?.direction],
+                            fontSize: '30px',
+                            background: 'transparent',
+                            padding: {
+                              bottom: 0,
+                              top: 0,
+                              left: 0,
+                              right: 0
+                            }
+                          },
+                          offsetY: 32
+                        }
+                      }
+                    ]
                   : [])
               ]
             },
@@ -102,7 +138,16 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
               shared: false,
               intersect: true,
               followCursor: true,
-              custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+              custom: ({
+                seriesIndex,
+                dataPointIndex,
+                w
+              }: {
+                seriesIndex: number
+                dataPointIndex: number
+                w: unknown
+              }) => {
+                if (seriesIndex > 0) return renderToStaticMarkup(<div />)
                 const value = data?.datasets[dataPointIndex]
                 const is_custom_tooltip = !!data?.custom_hover
                 const lists = data?.hover?.[dataPointIndex] ?? []
