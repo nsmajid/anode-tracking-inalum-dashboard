@@ -79,6 +79,7 @@ export type ChartQCPart1Data = Array<
       average: number
       in_standart?: number
       out_standart?: number
+      std_dev?: number
     }
     line_min: number | null
     line_max: number | null
@@ -145,6 +146,7 @@ export type ChartKorelasiPart1Data = Omit<DefaultChartData, 'datasets'> & {
     min: number | null
     max: number
     average: number
+    std_dev?: number
   }
   custom_hover?: boolean
   hover?: Array<Array<{ label: string; value: number }>>

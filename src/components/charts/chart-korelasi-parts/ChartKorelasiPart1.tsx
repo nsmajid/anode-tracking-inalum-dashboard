@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
-import { Activity, Minus, Plus } from 'react-feather'
+import { Activity, GitCommit, Minus, Plus } from 'react-feather'
 
 import { ChartKorelasiPart1Data, ChartTypeDisplay } from '@/types/chart'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -164,6 +164,17 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                   </div>
                 </CardBody>
               </Card>
+              {'std_dev' in data.info && (
+                <Card>
+                  <CardBody>
+                    <div className='w-full text-center text-xl font-bold mb-1'>{data.info.std_dev}</div>
+                    <div className='flex justify-center items-center gap-2'>
+                      <GitCommit size={12} />
+                      <div className='text-xs font-medium text-center'>Std Dev</div>
+                    </div>
+                  </CardBody>
+                </Card>
+              )}
             </div>
           </div>
         )}

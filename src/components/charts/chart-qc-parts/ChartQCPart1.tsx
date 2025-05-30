@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { Card, CardBody, Spinner } from '@heroui/react'
-import { Activity, AlertTriangle, CheckCircle, Minus, Plus } from 'react-feather'
+import { Activity, AlertTriangle, CheckCircle, GitCommit, Minus, Plus } from 'react-feather'
 
 import { ChartQCPart1Data, ChartTypeDisplay } from '@/types/chart'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -188,6 +188,17 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                         <div className='flex justify-center items-center gap-2'>
                           <AlertTriangle size={12} />
                           <div className='text-xs font-medium text-center'>Out Standard</div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  )}
+                  {'std_dev' in chart.info && (
+                    <Card>
+                      <CardBody>
+                        <div className='w-full text-center text-xl font-bold mb-1'>{chart.info.std_dev}</div>
+                        <div className='flex justify-center items-center gap-2'>
+                          <GitCommit size={12} />
+                          <div className='text-xs font-medium text-center'>Std Dev</div>
                         </div>
                       </CardBody>
                     </Card>
