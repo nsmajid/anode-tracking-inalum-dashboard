@@ -61,7 +61,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   useEffect(() => {
-    fetchProfile()
+    setTimeout(fetchProfile, 500)
   }, [])
 
   return (

@@ -18,6 +18,14 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   const { loading, profileStatus, profile } = useProfile()
 
   useEffect(() => {
+    const ids = router.query.ids
+
+    if (ids) {
+      router.replace(`/auth?${new URLSearchParams(router.query as Record<string, string>).toString()}`)
+    }
+  }, [router.query, router])
+
+  useEffect(() => {
     if (!loading && restrictedRoutes.some((v) => router.pathname.startsWith(v))) {
       (async () => {
         const headers = await getAuthHeaders()
