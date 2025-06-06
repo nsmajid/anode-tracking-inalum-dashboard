@@ -486,7 +486,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                     const diffInMs: number = endDate.getTime() - startDate.getTime()
                     const diffInDays: number = diffInMs / (1000 * 60 * 60 * 24)
 
-                    if (diffInDays <= dateRangeProperties.range_max) return true
+                    if (diffInDays < dateRangeProperties.range_max) return true
 
                     return `Maximum day range is ${dateRangeProperties.range_max} days`
                   }
