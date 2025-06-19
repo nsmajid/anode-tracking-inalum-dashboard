@@ -23,124 +23,127 @@ const ChartFisikPart1: React.FC<Props> = ({ loading, data, chartType }) => {
           <Spinner size='lg' />
         </div>
       )}
-      <ReactApexChart
-        type='line'
-        series={[
-          {
-            name: '',
-            type: chartType,
-            data: data?.datasets || []
-          },
-          {
-            name: '',
-            type: 'line',
-            data: trendline
-          }
-        ]}
-        options={{
-          chart: {
-            type: 'line',
-            height: 350,
-            zoom: {
-              type: 'x',
-              enabled: true,
-              autoScaleYaxis: true
+      <div className='w-full space-y-4 h-[calc(100dvh-300px)]'>
+        <ReactApexChart
+          type='line'
+          series={[
+            {
+              name: '',
+              type: chartType,
+              data: data?.datasets || []
             },
-            toolbar: {
-              autoSelected: 'zoom'
+            {
+              name: '',
+              type: 'line',
+              data: trendline
             }
-          },
-          legend: {
-            show: false
-          },
-          markers: {
-            size: [5, 0]
-          },
-          stroke: {
-            width: [2, 2]
-          },
-          dataLabels: {
-            enabled: false
-            // enabledOnSeries: [0]
-          },
-          xaxis: {
-            // type: 'datetime',
-            title: {
-              text: data?.['x-label'] || '',
-              style: {
-                fontSize: '18px'
+          ]}
+          options={{
+            chart: {
+              type: 'line',
+              height: 350,
+              zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
+              },
+              toolbar: {
+                autoSelected: 'zoom'
               }
             },
-            categories: data?.labels || []
-          },
-          yaxis: {
-            title: {
-              text: data?.['y-label'] || '',
-              style: {
-                fontSize: '18px'
-              }
-            }
-          },
-          tooltip: {
-            enabled: true,
-            shared: false,
-            intersect: true,
-            followCursor: true,
-            custom: ({ seriesIndex, dataPointIndex }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
-              if (seriesIndex > 0) return renderToStaticMarkup(<div />)
-              const is_custom_tooltip = !!data?.custom_hover
-              const lists = data?.hover?.[dataPointIndex] ?? []
-              const label = data?.labels?.[dataPointIndex]
-
-              return renderToStaticMarkup(
-                <div className='w-fit rounded-md text-black'>
-                  <div className='px-2 py-1 bg-gray-100'>{label}</div>
-                  {is_custom_tooltip && (
-                    <div className='px-2 py-1'>
-                      <ul className='list-disc pl-4'>
-                        {lists.map((list) => (
-                          <li key={list.label}>
-                            <span className='mr-1 underline'>{list.label}:</span>
-                            <span className='font-bold'>{list.value}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )
-            }
-          },
-          ...(data?.trendline && trendline.length > 0
-            ? {
-                annotations: {
-                  yaxis: [
-                    {
-                      y: trendline[trendline.length - 1],
-                      borderWidth: 0,
-                      label: {
-                        text: ChartTrendLineDirectionIcon?.[data.trendline.direction],
-                        borderWidth: 0,
-                        style: {
-                          color: ChartTrendLineDirectionColor?.[data?.trendline?.direction],
-                          fontSize: '30px',
-                          background: 'transparent',
-                          padding: {
-                            bottom: 0,
-                            top: 0,
-                            left: 0,
-                            right: 0
-                          }
-                        },
-                        offsetY: 32
-                      }
-                    }
-                  ]
+            legend: {
+              show: false
+            },
+            markers: {
+              size: [5, 0]
+            },
+            stroke: {
+              width: [2, 2]
+            },
+            dataLabels: {
+              enabled: false
+              // enabledOnSeries: [0]
+            },
+            xaxis: {
+              // type: 'datetime',
+              title: {
+                text: data?.['x-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
+              },
+              categories: data?.labels || []
+            },
+            yaxis: {
+              title: {
+                text: data?.['y-label'] || '',
+                style: {
+                  fontSize: '18px'
                 }
               }
-            : {})
-        }}
-      />
+            },
+            tooltip: {
+              enabled: true,
+              shared: false,
+              intersect: true,
+              followCursor: true,
+              custom: ({ seriesIndex, dataPointIndex }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+                if (seriesIndex > 0) return renderToStaticMarkup(<div />)
+                const is_custom_tooltip = !!data?.custom_hover
+                const lists = data?.hover?.[dataPointIndex] ?? []
+                const label = data?.labels?.[dataPointIndex]
+
+                return renderToStaticMarkup(
+                  <div className='w-fit rounded-md text-black'>
+                    <div className='px-2 py-1 bg-gray-100'>{label}</div>
+                    {is_custom_tooltip && (
+                      <div className='px-2 py-1'>
+                        <ul className='list-disc pl-4'>
+                          {lists.map((list) => (
+                            <li key={list.label}>
+                              <span className='mr-1 underline'>{list.label}:</span>
+                              <span className='font-bold'>{list.value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+            },
+            ...(data?.trendline && trendline.length > 0
+              ? {
+                  annotations: {
+                    yaxis: [
+                      {
+                        y: trendline[trendline.length - 1],
+                        borderWidth: 0,
+                        label: {
+                          text: ChartTrendLineDirectionIcon?.[data.trendline.direction],
+                          borderWidth: 0,
+                          style: {
+                            color: ChartTrendLineDirectionColor?.[data?.trendline?.direction],
+                            fontSize: '30px',
+                            background: 'transparent',
+                            padding: {
+                              bottom: 0,
+                              top: 0,
+                              left: 0,
+                              right: 0
+                            }
+                          },
+                          offsetY: 32
+                        }
+                      }
+                    ]
+                  }
+                }
+              : {})
+          }}
+          height='100%'
+        />
+      </div>
       {data?.info && (
         <div className='w-full flex justify-center pb-6'>
           <div className='w-full max-w-2xl grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>

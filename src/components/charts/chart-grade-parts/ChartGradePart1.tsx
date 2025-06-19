@@ -35,90 +35,93 @@ const ChartGradePart1: React.FC<Props> = ({ loading, data, chartType }) => {
           <Spinner size='lg' />
         </div>
       )}
-      <ReactApexChart
-        type={chartType}
-        series={(data?.datasets || []).map((r, i) => ({
-          name: r.label,
-          data: r.data,
-          color: fixedColors?.[i]
-        }))}
-        options={{
-          chart: {
-            type: chartType,
-            height: 350,
-            stacked: false,
-            zoom: {
-              type: 'x',
+      <div className='w-full space-y-4 h-[calc(100dvh-300px)]'>
+        <ReactApexChart
+          type={chartType}
+          series={(data?.datasets || []).map((r, i) => ({
+            name: r.label,
+            data: r.data,
+            color: fixedColors?.[i]
+          }))}
+          options={{
+            chart: {
+              type: chartType,
+              height: 350,
+              stacked: false,
+              zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
+              },
+              toolbar: {
+                autoSelected: 'zoom'
+              }
+            },
+            xaxis: {
+              // type: 'datetime',
+              title: {
+                text: data?.['x-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
+              },
+              categories: data?.labels || []
+            },
+            yaxis: {
+              title: {
+                text: data?.['y-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
+              }
+            },
+            markers: {
+              size: 5
+            },
+            stroke: {
+              width: 2
+            },
+            tooltip: {
               enabled: true,
-              autoScaleYaxis: true
-            },
-            toolbar: {
-              autoSelected: 'zoom'
-            }
-          },
-          xaxis: {
-            // type: 'datetime',
-            title: {
-              text: data?.['x-label'] || '',
-              style: {
-                fontSize: '18px'
-              }
-            },
-            categories: data?.labels || []
-          },
-          yaxis: {
-            title: {
-              text: data?.['y-label'] || '',
-              style: {
-                fontSize: '18px'
-              }
-            }
-          },
-          markers: {
-            size: 5
-          },
-          stroke: {
-            width: 2
-          },
-          tooltip: {
-            enabled: true,
-            shared: false,
-            intersect: true,
-            followCursor: true,
-            custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
-              const series = data?.datasets[seriesIndex]
-              const value = series?.data[dataPointIndex]
-              const is_custom_tooltip = !!series?.custom_hover
-              const lists = series?.hover?.[dataPointIndex] ?? []
-              const label = series?.label
-              const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
-              const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''
+              shared: false,
+              intersect: true,
+              followCursor: true,
+              custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+                const series = data?.datasets[seriesIndex]
+                const value = series?.data[dataPointIndex]
+                const is_custom_tooltip = !!series?.custom_hover
+                const lists = series?.hover?.[dataPointIndex] ?? []
+                const label = series?.label
+                const color = (w as unknown as { globals: { colors: string[] } }).globals.colors[seriesIndex]
+                const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''
 
-              return renderToStaticMarkup(
-                <div className='w-fit rounded-md text-black'>
-                  <div className='px-2 py-1 bg-gray-100'>{format(new Date(parsedLabel), 'dd MMM yyyy')}</div>
-                  <div className='px-2 py-1'>
-                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                    {label}: {value}
-                  </div>
-                  {is_custom_tooltip && (
+                return renderToStaticMarkup(
+                  <div className='w-fit rounded-md text-black'>
+                    <div className='px-2 py-1 bg-gray-100'>{format(new Date(parsedLabel), 'dd MMM yyyy')}</div>
                     <div className='px-2 py-1'>
-                      <ul className='list-disc pl-4'>
-                        {lists.map((list) => (
-                          <li key={list.label}>
-                            <span className='mr-1 underline'>{list.label}:</span>
-                            <span className='font-bold'>{list.value}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
+                      {label}: {value}
                     </div>
-                  )}
-                </div>
-              )
+                    {is_custom_tooltip && (
+                      <div className='px-2 py-1'>
+                        <ul className='list-disc pl-4'>
+                          {lists.map((list) => (
+                            <li key={list.label}>
+                              <span className='mr-1 underline'>{list.label}:</span>
+                              <span className='font-bold'>{list.value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )
+              }
             }
-          }
-        }}
-      />
+          }}
+          height='100%'
+        />
+      </div>
       {(data?.info || []).length > 0 && (
         <div className='w-full flex justify-center pb-6'>
           <div className='w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-4'>

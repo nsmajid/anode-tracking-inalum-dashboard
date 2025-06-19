@@ -23,7 +23,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
           <Spinner size='lg' />
         </div>
       )}
-      <div className='w-full space-y-4'>
+      <div className='w-full space-y-4 h-[calc(100dvh-300px)]'>
         <ReactApexChart
           type='line'
           series={[
@@ -178,6 +178,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
               }
             }
           }}
+          height='100%'
         />
         {data?.info && (
           <div className='w-full flex justify-center pb-6'>

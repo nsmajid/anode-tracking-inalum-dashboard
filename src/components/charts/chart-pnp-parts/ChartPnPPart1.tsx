@@ -35,74 +35,77 @@ const ChartPnPPart1: React.FC<Props> = ({ loading, data, chartType }) => {
           <Spinner size='lg' />
         </div>
       )}
-      <ReactApexChart
-        type={chartType}
-        series={(data?.datasets || []).map((r, i) => ({
-          name: r.label,
-          data: r.data,
-          color: fixedColors?.[i]
-        }))}
-        options={{
-          chart: {
-            type: chartType,
-            height: 350,
-            stacked: false,
-            zoom: {
-              type: 'x',
+      <div className='h-[calc(100dvh-275px)]'>
+        <ReactApexChart
+          type={chartType}
+          series={(data?.datasets || []).map((r, i) => ({
+            name: r.label,
+            data: r.data,
+            color: fixedColors?.[i]
+          }))}
+          options={{
+            chart: {
+              type: chartType,
+              height: 350,
+              stacked: false,
+              zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
+              },
+              toolbar: {
+                autoSelected: 'zoom'
+              }
+            },
+            xaxis: {
+              title: {
+                text: data?.['x-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
+              },
+              categories: data?.labels || []
+            },
+            yaxis: {
+              title: {
+                text: data?.['y-label'] || '',
+                style: {
+                  fontSize: '18px'
+                }
+              }
+            },
+            markers: {
+              size: 5
+            },
+            tooltip: {
               enabled: true,
-              autoScaleYaxis: true
-            },
-            toolbar: {
-              autoSelected: 'zoom'
-            }
-          },
-          xaxis: {
-            title: {
-              text: data?.['x-label'] || '',
-              style: {
-                fontSize: '18px'
-              }
-            },
-            categories: data?.labels || []
-          },
-          yaxis: {
-            title: {
-              text: data?.['y-label'] || '',
-              style: {
-                fontSize: '18px'
-              }
-            }
-          },
-          markers: {
-            size: 5
-          },
-          tooltip: {
-            enabled: true,
-            shared: false,
-            intersect: true,
-            followCursor: true,
-            custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
-              const series = data?.datasets[seriesIndex]
-              const value = series?.data[dataPointIndex]
-              const notes = series?.notes?.[dataPointIndex]
-              const label = series?.label
-              const color = (w as unknown as { globals: { colors: string[], labels: number[] } }).globals.colors[seriesIndex]
-              const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''
+              shared: false,
+              intersect: true,
+              followCursor: true,
+              custom: ({ seriesIndex, dataPointIndex, w }: { seriesIndex: number; dataPointIndex: number; w: unknown }) => {
+                const series = data?.datasets[seriesIndex]
+                const value = series?.data[dataPointIndex]
+                const notes = series?.notes?.[dataPointIndex]
+                const label = series?.label
+                const color = (w as unknown as { globals: { colors: string[], labels: number[] } }).globals.colors[seriesIndex]
+                const parsedLabel = data?.labels?.[dataPointIndex] ? fixIsoDate(data?.labels?.[dataPointIndex]) : ''
 
-              return renderToStaticMarkup(
-                <div className='w-fit rounded-md text-black'>
-                  <div className='px-2 py-1 bg-gray-100'>{format(new Date(parsedLabel), 'dd MMM yyyy')}</div>
-                  <div className='px-2 py-1'>
-                    <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
-                    {label}: {value}
+                return renderToStaticMarkup(
+                  <div className='w-fit rounded-md text-black'>
+                    <div className='px-2 py-1 bg-gray-100'>{format(new Date(parsedLabel), 'dd MMM yyyy')}</div>
+                    <div className='px-2 py-1'>
+                      <span className='apexcharts-tooltip-marker rounded-full' style={{ backgroundColor: color }} />
+                      {label}: {value}
+                    </div>
+                    {notes && <div className='px-2 py-1'>{notes}</div>}
                   </div>
-                  {notes && <div className='px-2 py-1'>{notes}</div>}
-                </div>
-              )
+                )
+              }
             }
-          }
-        }}
-      />
+          }}
+          height='100%'
+        />
+      </div>
       {(data?.info || []).length > 0 && (
         <div className='w-full flex justify-center pb-6'>
           <div className='w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-4'>
