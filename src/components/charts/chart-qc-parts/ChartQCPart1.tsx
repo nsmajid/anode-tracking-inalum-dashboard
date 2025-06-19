@@ -75,7 +75,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                         fontSize: '18px'
                       }
                     },
-                    categories: chart?.labels || []
+                    categories: (chart?.labels || []).map((label) => parseInt(`${label}`))
                   },
                   yaxis: {
                     title: {
@@ -148,7 +148,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                       ...(chart?.vertical_line_min
                         ? [
                             {
-                              x: parseFloat(`${chart?.vertical_line_min || 0}`),
+                              x: parseInt(`${chart?.vertical_line_min || 0}`),
                               borderColor: '#FF4560',
                               label: {
                                 borderColor: '#FF4560',
@@ -164,7 +164,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                       ...(chart?.vertical_line_max
                         ? [
                             {
-                              x: parseFloat(`${chart?.vertical_line_max || 0}`),
+                              x: parseInt(`${chart?.vertical_line_max || 0}`),
                               borderColor: '#28a745',
                               label: {
                                 borderColor: '#28a745',
