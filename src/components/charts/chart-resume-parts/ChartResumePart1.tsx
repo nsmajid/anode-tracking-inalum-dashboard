@@ -225,9 +225,13 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
               />
               {(data?.info || []).length > 0 && (
                 <div className='w-full flex justify-center pb-6'>
-                  <div className='w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-4'>
+                  <div className='w-full max-w-4xl flex flex-wrap justify-center gap-4'>
                     {(data?.info || []).map((info, i) => (
-                      <Card key={info.label} style={{ backgroundColor: fixedColors?.[i] }}>
+                      <Card
+                        key={info.label}
+                        style={{ backgroundColor: fixedColors?.[i] }}
+                        className='w-full lg:w-[47.5%] print:w-[47.5%]'
+                      >
                         <CardBody className='space-y-4'>
                           <div className='w-full flex justify-center gap-2'>
                             <div className='text-base font-bold bg-background px-5 py-1 rounded-3xl'>{info.label}</div>
@@ -235,7 +239,7 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                           <div className='w-full grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-4'>
                             <Card>
                               <CardBody className='p-2'>
-                                <div className='w-full text-center text-base font-bold mb-0.5'>{info.average}</div>
+                                <div className='w-full text-center text-sm font-bold mb-0.5'>{info.average}</div>
                                 <div className='flex justify-center items-center gap-1'>
                                   <div>
                                     <Activity className='w-3 h-3' />
@@ -246,7 +250,7 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                             </Card>
                             <Card>
                               <CardBody className='p-2'>
-                                <div className='w-full text-center text-base font-bold mb-0.5'>{info.min}</div>
+                                <div className='w-full text-center text-sm font-bold mb-0.5'>{info.min}</div>
                                 <div className='flex justify-center items-center gap-1'>
                                   <div>
                                     <Minus className='w-3 h-3' />
@@ -257,7 +261,7 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                             </Card>
                             <Card>
                               <CardBody className='p-2'>
-                                <div className='w-full text-center text-base font-bold mb-0.5'>{info.max}</div>
+                                <div className='w-full text-center text-sm font-bold mb-0.5'>{info.max}</div>
                                 <div className='flex justify-center items-center gap-1'>
                                   <div>
                                     <Plus className='w-3 h-3' />
