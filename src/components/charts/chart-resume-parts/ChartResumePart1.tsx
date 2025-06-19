@@ -26,6 +26,19 @@ const fixedColors = [
   '#A533FF'
 ]
 
+const fixedColorsSemiTransparent = [
+  '#4285F441', // Google Blue
+  '#F4B40066', // Google Yellow
+  '#0F9D587F', // Google Green
+  '#DB443766', // Google Red
+  '#FF573366',
+  '#33FF577F',
+  '#3357FF66',
+  '#FF33A566',
+  '#33FFA566',
+  '#A533FF66'
+]
+
 const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }) => {
   return (
     <div className='w-full relative'>
@@ -49,11 +62,13 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                   ...(data?.datasets || []).map((r) => ({
                     name: `Trendline ${r.label}`,
                     data: r.trendline?.trendline ?? [],
-                    type: 'line'
+                    type: 'line',
+                    is_semi_transparent: true
                   }))
-                ].map((r, i) => ({
+                  // @ts-ignore
+                ].map(({ is_semi_transparent, ...r }, i) => ({
                   ...r,
-                  color: fixedColors?.[i]
+                  color: is_semi_transparent ? fixedColorsSemiTransparent?.[i] : fixedColors?.[i]
                 }))}
                 options={{
                   title: {

@@ -38,7 +38,8 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                   {
                     name: '',
                     type: 'line',
-                    data: trendline
+                    data: trendline,
+                    color: '#33FF577F'
                   }
                 ]}
                 options={{
