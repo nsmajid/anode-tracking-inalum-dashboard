@@ -370,7 +370,7 @@ const ChartKorelasi: React.FC<Props> = ({ chart }) => {
                 isDisabled={loadingChart}
                 selectedKey={parameter2Properties?.value}
                 onSelectionChange={(value) => {
-                  setParameter1Properties((current) => {
+                  setParameter2Properties((current) => {
                     if (current) {
                       return {
                         ...current,
