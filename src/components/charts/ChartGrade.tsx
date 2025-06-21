@@ -40,6 +40,7 @@ import CategoryFilter from './filters/CategoryFilter'
 import ChartTypeFilter from './filters/ChartTypeFilter'
 import clsx from 'clsx'
 import { useScreenResolution } from '@/hooks/screen-resolution'
+import ReadingGuidance from '../ReadingGuidance'
 
 type Props = {
   chart: ChartItem
@@ -607,22 +608,25 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
           >
             <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
               <CardHeader>
-                <div className='w-full space-y-3'>
-                  <div className='inline-flex items-center gap-2'>
-                    <div className='text-xl font-semibold'>
-                      {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
+                <div className='w-full flex justify-between gap-3'>
+                  <div className='w-full space-y-3'>
+                    <div className='inline-flex items-center gap-2'>
+                      <div className='text-xl font-semibold'>
+                        {showFilter ? chartNames?.[2] : chartNamesHiddenFilter?.[2]}
+                      </div>
+                      {!showFilter && (
+                        <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                          <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                            <Filter />
+                          </Button>
+                        </Tooltip>
+                      )}
                     </div>
-                    {!showFilter && (
-                      <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
-                        <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
-                          <Filter />
-                        </Button>
-                      </Tooltip>
-                    )}
+                    <div className={clsx('w-full', !showFilter && 'hidden')}>
+                      <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
+                    </div>
                   </div>
-                  <div className={clsx('w-full', !showFilter && 'hidden')}>
-                    <CategoryFilter properties={categoryProperties} onChangeFilters={onChangeCategoryFilters} />
-                  </div>
+                  <ReadingGuidance content={part2Data?.reading_guidance} />
                 </div>
               </CardHeader>
               <CardBody className='w-full'>
@@ -631,38 +635,41 @@ const ChartGrade: React.FC<Props> = ({ chart }) => {
             </Card>
             <Card className='w-full space-y-2 print:shadow-none break-inside-avoid-page'>
               <CardHeader>
-                <div className='w-full space-y-3'>
-                  <div className='inline-flex items-center gap-2'>
-                    <div className='text-xl font-semibold'>
-                      {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
+                <div className='w-full flex justify-between gap-3'>
+                  <div className='w-full space-y-3'>
+                    <div className='inline-flex items-center gap-2'>
+                      <div className='text-xl font-semibold'>
+                        {showFilter ? chartNames?.[3] : chartNamesHiddenFilter?.[3]}
+                      </div>
+                      {!showFilter && (
+                        <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
+                          <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
+                            <Filter />
+                          </Button>
+                        </Tooltip>
+                      )}
                     </div>
-                    {!showFilter && (
-                      <Tooltip content='Tampilkan Filter' placement='bottom-end' color='foreground'>
-                        <Button color='primary' variant='light' onPress={() => setShowFilter(true)} isIconOnly>
-                          <Filter />
-                        </Button>
-                      </Tooltip>
-                    )}
-                  </div>
-                  <div className={clsx('w-full', !showFilter && 'hidden')}>
-                    <Select
-                      className='max-w-xs'
-                      label={numericProperties?.label_name}
-                      placeholder={`Pilih ${numericProperties?.label_name}`}
-                      isRequired={numericProperties?.required}
-                      selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
-                      onChange={(e) => {
-                        const { value } = e.target
+                    <div className={clsx('w-full', !showFilter && 'hidden')}>
+                      <Select
+                        className='max-w-xs'
+                        label={numericProperties?.label_name}
+                        placeholder={`Pilih ${numericProperties?.label_name}`}
+                        isRequired={numericProperties?.required}
+                        selectedKeys={numericProperties?.value ? [numericProperties?.value] : []}
+                        onChange={(e) => {
+                          const { value } = e.target
 
-                        if (!value) return
-                        setNumericProperties((current) => (current ? { ...current, value } : current))
-                      }}
-                    >
-                      {(numericProperties?.options || []).map((option) => (
-                        <SelectItem key={option}>{option}</SelectItem>
-                      ))}
-                    </Select>
+                          if (!value) return
+                          setNumericProperties((current) => (current ? { ...current, value } : current))
+                        }}
+                      >
+                        {(numericProperties?.options || []).map((option) => (
+                          <SelectItem key={option}>{option}</SelectItem>
+                        ))}
+                      </Select>
+                    </div>
                   </div>
+                  <ReadingGuidance content={part3Data?.reading_guidance} />
                 </div>
               </CardHeader>
               <CardBody className='w-full'>

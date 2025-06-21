@@ -18,6 +18,7 @@ export type DefaultChartData = {
   labels: string[]
   datasets: number[]
   'text-filter'?: string
+  reading_guidance?: string
 } & ChartTrendLine
 
 export enum ChartTypeDisplay {
