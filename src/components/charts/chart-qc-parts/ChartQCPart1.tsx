@@ -70,13 +70,26 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                     // enabledOnSeries: [0]
                   },
                   xaxis: {
+                    type: i > 0 ? 'numeric' : undefined,
                     title: {
                       text: chart?.['x-label'] || '',
                       style: {
                         fontSize: '18px'
                       }
                     },
-                    categories: (chart?.labels || []).map((label) => parseInt(`${label}`))
+                    categories: (chart?.labels || []).map((label) => (i === 0 ? label : parseInt(`${label}`))),
+                    labels: {
+                      formatter:
+                        i > 0
+                          ? function (value) {
+                              if (typeof value === 'number' && value % 1 !== 0) {
+                                return parseFloat(`${value}`).toFixed(2)
+                              }
+
+                              return value
+                            }
+                          : undefined
+                    }
                   },
                   yaxis: {
                     title: {
@@ -149,7 +162,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                       ...(chart?.vertical_line_min
                         ? [
                             {
-                              x: parseInt(`${chart?.vertical_line_min || 0}`),
+                              x: parseFloat(`${chart?.vertical_line_min || 0}`),
                               borderColor: '#FF4560',
                               label: {
                                 borderColor: '#FF4560',
@@ -165,7 +178,7 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                       ...(chart?.vertical_line_max
                         ? [
                             {
-                              x: parseInt(`${chart?.vertical_line_max || 0}`),
+                              x: parseFloat(`${chart?.vertical_line_max || 0}`),
                               borderColor: '#28a745',
                               label: {
                                 borderColor: '#28a745',
