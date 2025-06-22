@@ -83,11 +83,7 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
               categories: data?.labels || [],
               labels: {
                 formatter: function (value) {
-                  if (typeof value === 'number' && value % 1 !== 0) {
-                    return parseFloat(`${value}`).toFixed(2)
-                  }
-
-                  return value
+                  return Number(`${value}`).toFixed(2)
                 }
               }
             },

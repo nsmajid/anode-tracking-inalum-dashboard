@@ -77,16 +77,14 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                         fontSize: '18px'
                       }
                     },
-                    categories: (chart?.labels || []).map((label) => (i === 0 ? label : parseInt(`${label}`))),
+                    categories: (chart?.labels || []).map((label) => (i === 0 ? label : Number(`${label}`))),
                     labels: {
+                      showDuplicates: true,
+                      hideOverlappingLabels: false,
                       formatter:
                         i > 0
                           ? function (value) {
-                              if (typeof value === 'number' && value % 1 !== 0) {
-                                return parseFloat(`${value}`).toFixed(2)
-                              }
-
-                              return value
+                              return Number(`${value}`).toFixed(2)
                             }
                           : undefined
                     }
