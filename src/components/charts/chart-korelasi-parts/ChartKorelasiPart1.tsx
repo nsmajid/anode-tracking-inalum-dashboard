@@ -73,13 +73,23 @@ const ChartKorelasiPart1: React.FC<Props> = ({ loading, data, chartType }) => {
               dashArray: [0, 5]
             },
             xaxis: {
+              type: 'numeric',
               title: {
                 text: data?.['x-label'] || '',
                 style: {
                   fontSize: '18px'
                 }
               },
-              categories: data?.labels || []
+              categories: data?.labels || [],
+              labels: {
+                formatter: function (value) {
+                  if (typeof value === 'number' && value % 1 !== 0) {
+                    return parseFloat(`${value}`).toFixed(2)
+                  }
+
+                  return value
+                }
+              }
             },
             yaxis: {
               title: {
