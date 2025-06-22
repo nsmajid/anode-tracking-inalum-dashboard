@@ -62,7 +62,8 @@ const ChartQCPart1: React.FC<Props> = ({ loading, data, chartType }) => {
                     size: [6, 0]
                   },
                   stroke: {
-                    width: [2, 2]
+                    width: [2, 2],
+                    dashArray: [0, 5]
                   },
                   dataLabels: {
                     enabled: false

@@ -109,7 +109,8 @@ const ChartResumePart1: React.FC<Props> = ({ loading, data: records, chartType }
                     size: [...(data?.datasets || []).map(() => 5), ...(data?.datasets || []).map(() => 0)]
                   },
                   stroke: {
-                    width: [...(data?.datasets || []).map(() => 2), ...(data?.datasets || []).map(() => 2)]
+                    width: [...(data?.datasets || []).map(() => 2), ...(data?.datasets || []).map(() => 2)],
+                    dashArray: [...(data?.datasets || []).map(() => 0), ...(data?.datasets || []).map(() => 5)]
                   },
                   dataLabels: {
                     enabled: true,
